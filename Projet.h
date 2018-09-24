@@ -1,0 +1,1 @@
+int collision(SDL_Rect A, SDL_Rect B);
