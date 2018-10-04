@@ -28,13 +28,11 @@ void HandleEvent(SDL_Event event,
 		    
                 case SDLK_LEFT:
                     *currDirection = DIR_LEFT;
-                    *animFlip = 1 - *animFlip;
                     *gauche = 1;
                     break;
 		    
                 case SDLK_RIGHT:
                     *currDirection = DIR_RIGHT;
-                    *animFlip = 1 - *animFlip;
                     *droite = 1;
                     break;
 		
@@ -57,6 +55,9 @@ void HandleEvent(SDL_Event event,
 		    *droite = 0;
 		    break;
 		    
+		case SDLK_SPACE:
+		    *space = 0;
+		    break;
 		default :
 		    break;
 	    }
@@ -118,15 +119,15 @@ int main(int argc, char* argv[])
   SDL_FreeSurface(temp);
     
   /*Timer*/
-  temp   = SDL_LoadBMP("bubex_black.bmp");
+  temp   = SDL_LoadBMP("franklin.bmp");
   temps = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
   SDL_Rect tempsImage;
-  tempsImage.x = 0;
-  tempsImage.w = 54;
-  tempsImage.h = 54;
-  tempsPosition.w = 54;
-  tempsPosition.h = 54;
+  tempsImage.y = 102;
+  tempsImage.w = 15;
+  tempsImage.h = 19;
+  tempsPosition.w = 15;
+  tempsPosition.h = 19;
   tempsPosition.x = 5;
   tempsPosition.y = 5;
   SDL_SetColorKey(temps, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
@@ -264,13 +265,12 @@ int main(int argc, char* argv[])
 	  spritePosition.y = plateformePos[i].y - BLOC_SIZE;
 	}
       }
-      
-      
 
       /*Saut*/
       hperso = spritePosition.y;
       int col_haut = 0;
       
+      /*Si le personnage est en train de sauter*/
       if (saut == SAUT) {
 	for (int i = 0; i < NB_PLATEFORME; i++){
 	  if (collision(spritePosition, plateformePos[i])==4){
@@ -278,29 +278,32 @@ int main(int argc, char* argv[])
 	  }
 	}
 	if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != 0) && !col_haut){
-	    
 	  spritePosition.y -= 1;
 	}
 	else { saut = PASSAUT; }
       }
       
+      /*Si le personnage n'est pas au sol et qu'il ne saute pas*/
       if (spritePosition.y != SOL) {
 	if (saut == PASSAUT) {
 	  spritePosition.y += 1;
 	}
       }
       
+      /*Si il y a une collision en haut*/
       for (int i = 0; i <NB_PLATEFORME; i++){
 	if (collision(spritePosition,plateformePos[i]) == 3) {
 	  spritePosition.y -= 1;
 	  finsaut = 1;
 	}
       }
+      
+      /*Si le personnage est au sol*/
       if (spritePosition.y == SOL) {
 	finsaut = 1;      
       }
       
-	      /* draw the background */
+      /* draw the background */
       for (int x = 0; x < SCREEN_WIDTH; x++) {
 	for (int y = 0; y < SCREEN_HEIGHT; y++) {
 	  SDL_Rect position;
@@ -312,28 +315,36 @@ int main(int argc, char* argv[])
       
       
       /*draw the timer*/
-      tempsImage.y = 51 * (heures/10);
+      tempsImage.x = 32 * (heures/10);
       tempsPosition.x = 0;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
-      tempsImage.y = 51 * (heures%10);
-      tempsPosition.x += 54;
+      tempsImage.x = 32 * (heures%10);
+      tempsPosition.x += 30;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
-      tempsImage.y = 51 * (minutes/10);
-      tempsPosition.x += 54;
+      tempsImage.x = 320;
+      tempsPosition.x += 30;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
-      tempsImage.y = 51 * (minutes%10);
-      tempsPosition.x += 54;
+      tempsImage.x = 32 * (minutes/10);
+      tempsPosition.x += 30;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
-      tempsImage.y = 51 * (secondes/10);
-      tempsPosition.x += 54;
+      tempsImage.x = 32 * (minutes%10);
+      tempsPosition.x += 30;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
-      tempsImage.y = 51 * (secondes%10);
-      tempsPosition.x += 54;
+      tempsImage.x = 320;
+      tempsPosition.x += 30;
+      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      
+      tempsImage.x = 32 * (secondes/10);
+      tempsPosition.x += 30;
+      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      
+      tempsImage.x = 32 * (secondes%10);
+      tempsPosition.x += 30;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
 
 
