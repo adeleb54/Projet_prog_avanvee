@@ -97,8 +97,8 @@ int main(int argc, char* argv[])
   spriteImage.h = SPRITE_SIZE;
   spritePosition.w = SPRITE_WIDTH;
   spritePosition.h = SPRITE_HEIGHT;
-  spritePosition.x = 20;
-  spritePosition.y = 440;
+  spritePosition.x = 150;
+  spritePosition.y = 400;
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
@@ -151,15 +151,14 @@ int main(int argc, char* argv[])
       saut = PASSAUT;
       return 3;
     }
-    if(A.y - A.h < B.y - 20 && A.y > B.y - 30 && A.x > B.x && A.x < B.x + B.w){
-      printf("haut \n");
-      return 4;
+    if(A.x <= B.x + B.w && A.x > B.x + 20 && A.y >= B.y - B.h + 1){
+      return 2;
     }
-    if(A.x + A.w >= B.x && A.x + 20< B.x){
+    if(A.x + A.w > B.x && A.x + 20 < B.x && A.y >= B.y - B.h + 1){
       return 1;
     }
-    if(A.x <= B.x + B.w && A.x -20 > B.x){
-      return 2;
+    if(A.y - A.h < B.y + 5  && A.y > B.y){
+      return 4;
     }
     return 0;
   }
@@ -176,7 +175,7 @@ int main(int argc, char* argv[])
 		  &animationFlip, &spritePosition, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche);
     }
     
-    
+    printf("sprite y = %u\n", spritePosition.y); 
    /*handle the movement of the sprite*/
    if (droite == 1){
      spritePosition.x += SPRITE_STEP;
@@ -212,9 +211,11 @@ int main(int argc, char* argv[])
    
     for (int i = 0; i <NB_PLATEFORME; i++){
       if (collision(spritePosition,plateformePos[i])==1){
-	spritePosition.x = plateformePos[i].x - SPRITE_WIDTH;
+	printf("col droite\n");
+	spritePosition.x = plateformePos[i].x - SPRITE_WIDTH - 6;
       }
       if (collision(spritePosition,plateformePos[i])==2){
+	printf("col gauche\n");
 	spritePosition.x = plateformePos[i].x + BLOC_SIZE;
 	  }
       if (collision(spritePosition,plateformePos[i])==3){
