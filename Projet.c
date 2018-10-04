@@ -175,7 +175,6 @@ int main(int argc, char* argv[])
 		  &animationFlip, &spritePosition, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche);
     }
     
-    printf("sprite y = %u\n", spritePosition.y); 
    /*handle the movement of the sprite*/
    if (droite == 1){
      spritePosition.x += SPRITE_STEP;
