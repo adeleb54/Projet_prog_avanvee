@@ -6,7 +6,8 @@
 #define SCREEN_HEIGHT 480
 
 /* Size of the grass texture picture */
-#define GRASS_SIZE    32
+#define SKY_WIDTH    500
+#define SKY_HEIGHT   190
 
 /* Size of one image: */
 #define SPRITE_SIZE 	32

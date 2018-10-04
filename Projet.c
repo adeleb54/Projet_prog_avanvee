@@ -1,7 +1,8 @@
 #include "Projet.h"
 
 void HandleEvent(SDL_Event event,
-        int *quit, int *currDirection, int *animFlip, SDL_Rect *position, int *saut, int *debutsaut, int *hperso, int *finsaut, int *droite, int *gauche )
+        int *quit, int *currDirection, int *animFlip, SDL_Rect *position, int *saut, int *debutsaut, 
+	int *hperso, int *finsaut, int *droite, int *gauche, int *space )
 {
     switch (event.type) {
         /* close button clicked */
@@ -37,6 +38,10 @@ void HandleEvent(SDL_Event event,
                     *droite = 1;
                     break;
 		
+		case SDLK_SPACE:
+		    *space = 1;
+		break;
+		
                 default:
                     break;
 	    }
@@ -61,11 +66,12 @@ void HandleEvent(SDL_Event event,
 
 int main(int argc, char* argv[])
 {
-  SDL_Surface *screen, *temp, *sprite, *grass, *plateforme[NB_PLATEFORME];
+  SDL_Surface *screen, *temp, *sprite, *sky, *temps, *plateforme[NB_PLATEFORME];
   int colorkey;
   int currentDirection = DIR_RIGHT;
   int animationFlip = 0;
   SDL_Rect spritePosition;
+  SDL_Rect tempsPosition;
   int gameover = 0;
   int hperso = spritePosition.y;
   int debutsaut;
@@ -74,6 +80,10 @@ int main(int argc, char* argv[])
   int droite = 0;
   int gauche = 0;
   int delai = 0;
+  int timer = 0;
+  int pause = 1;
+  int space = 0;
+  int changspace = 1;
   
   
   
@@ -102,12 +112,25 @@ int main(int argc, char* argv[])
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
-  /*Grass */
-  temp  = SDL_LoadBMP("grass.bmp");
-  grass = SDL_DisplayFormat(temp);
+  /*Sky*/
+  temp  = SDL_LoadBMP("ciel.bmp");
+  sky = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
     
-  /*Bloc*/
+  /*Timer*/
+  temp   = SDL_LoadBMP("bubex_black.bmp");
+  temps = SDL_DisplayFormat(temp);
+  SDL_FreeSurface(temp);
+  SDL_Rect tempsImage;
+  tempsImage.x = 0;
+  tempsImage.w = 54;
+  tempsImage.h = 54;
+  tempsPosition.w = 54;
+  tempsPosition.h = 54;
+  tempsPosition.x = 5;
+  tempsPosition.y = 5;
+  SDL_SetColorKey(temps, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  
   
   /*Initialisation du tableau plat_array qui enregistre la présence des plateformes affichées*/
   int plat_array[NB_PLATEFORME];
@@ -172,121 +195,170 @@ int main(int argc, char* argv[])
     //printf ("y= %u\n",spritePosition.y)
     if (SDL_PollEvent(&event)) {
       HandleEvent(event, &gameover, &currentDirection,
-		  &animationFlip, &spritePosition, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche);
+		  &animationFlip, &spritePosition, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space);
     }
     
-   /*handle the movement of the sprite*/
-   if (droite == 1){
-     spritePosition.x += SPRITE_STEP;
-     currentDirection = DIR_RIGHT;
-     if (finsaut != 0) {
-       delai = delai + 1;       
-    }
-    if (delai == 15) {   
-      animationFlip = 1 - animationFlip;
-      delai = 0;      
-    }	     
-  }
-  if (gauche == 1) {
-    spritePosition.x -= SPRITE_STEP;
-    currentDirection = DIR_LEFT;
-    if (finsaut != 0) {
-      delai = delai + 1;      
-    }	
-    if (delai == 15) {
-      animationFlip = 1 - animationFlip;
-      delai = 0;     
-    }    
-  }
     
-    if (spritePosition.x <= 0)
-      spritePosition.x = 0;
-    if (spritePosition.x >= SCREEN_WIDTH - SPRITE_WIDTH) 
-      spritePosition.x = SCREEN_WIDTH - SPRITE_WIDTH;
-    if (spritePosition.y <= 0)
-      spritePosition.y = 0;
-    if (spritePosition.y >= SCREEN_HEIGHT - SPRITE_HEIGHT) 
-      spritePosition.y = SCREEN_HEIGHT - SPRITE_HEIGHT;
-   
-    for (int i = 0; i <NB_PLATEFORME; i++){
-      if (collision(spritePosition,plateformePos[i])==1){
-	printf("col droite\n");
-	spritePosition.x = plateformePos[i].x - SPRITE_WIDTH - 6;
+    if (space == 0) {
+      changspace = 1;
+    }
+    
+    if (changspace == 1 && space == 1) {
+      changspace = 0;
+      pause = 1 - pause;
+    }
+    
+    
+    if (pause == 1) {
+    
+      timer += 1;
+      
+      int secondes = timer/200;
+      int heures = secondes/3600;
+      secondes = secondes - 3600*heures;
+      int minutes = secondes / 60;
+      secondes = secondes - 60*minutes;
+
+
+    /*handle the movement of the sprite*/
+    if (droite == 1){
+      spritePosition.x += SPRITE_STEP;
+      currentDirection = DIR_RIGHT;
+      if (finsaut != 0) {
+	delai = delai + 1;       
       }
-      if (collision(spritePosition,plateformePos[i])==2){
-	printf("col gauche\n");
-	spritePosition.x = plateformePos[i].x + BLOC_SIZE;
-	  }
-      if (collision(spritePosition,plateformePos[i])==3){
-	spritePosition.y = plateformePos[i].y - BLOC_SIZE;
-      }
+      if (delai == 15) {   
+	animationFlip = 1 - animationFlip;
+	delai = 0;      
+      }	     
     }
-    
-    
-    /* draw the background */
-    for (int x = 0; x < SCREEN_WIDTH / GRASS_SIZE; x++) {
-      for (int y = 0; y < SCREEN_HEIGHT / GRASS_SIZE; y++) {
-	SDL_Rect position;
-	position.x = x * GRASS_SIZE;
-	    position.y = y * GRASS_SIZE;
-	    SDL_BlitSurface(grass, NULL, screen, &position);
-      }
+    if (gauche == 1) {
+      spritePosition.x -= SPRITE_STEP;
+      currentDirection = DIR_LEFT;
+      if (finsaut != 0) {
+	delai = delai + 1;      
+      }	
+      if (delai == 15) {
+	animationFlip = 1 - animationFlip;
+	delai = 0;     
+      }    
     }
+      
+      if (spritePosition.x <= 0)
+	spritePosition.x = 0;
+      if (spritePosition.x >= SCREEN_WIDTH - SPRITE_WIDTH) 
+	spritePosition.x = SCREEN_WIDTH - SPRITE_WIDTH;
+      if (spritePosition.y <= 0)
+	spritePosition.y = 0;
+      if (spritePosition.y >= SCREEN_HEIGHT - SPRITE_HEIGHT) 
+	spritePosition.y = SCREEN_HEIGHT - SPRITE_HEIGHT;
     
-    /*Saut*/
-    hperso = spritePosition.y;
-    int col_haut = 0;
-    
-    if (saut == SAUT) {
-      for (int i = 0; i < NB_PLATEFORME; i++){
-	if (collision(spritePosition, plateformePos[i])==4){
-	  col_haut = 1;
+      for (int i = 0; i <NB_PLATEFORME; i++){
+	if (collision(spritePosition,plateformePos[i])==1){
+	  spritePosition.x = plateformePos[i].x - SPRITE_WIDTH - 6;
+	}
+	if (collision(spritePosition,plateformePos[i])==2){
+	  spritePosition.x = plateformePos[i].x + BLOC_SIZE;
+	    }
+	if (collision(spritePosition,plateformePos[i])==3){
+	  spritePosition.y = plateformePos[i].y - BLOC_SIZE;
 	}
       }
-      if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != 0) && !col_haut){
+      
+      
+
+      /*Saut*/
+      hperso = spritePosition.y;
+      int col_haut = 0;
+      
+      if (saut == SAUT) {
+	for (int i = 0; i < NB_PLATEFORME; i++){
+	  if (collision(spritePosition, plateformePos[i])==4){
+	    col_haut = 1;
+	  }
+	}
+	if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != 0) && !col_haut){
+	    
+	  spritePosition.y -= 1;
+	}
+	else { saut = PASSAUT; }
+      }
+      
+      if (spritePosition.y != SOL) {
+	if (saut == PASSAUT) {
+	  spritePosition.y += 1;
+	}
+      }
+      
+      for (int i = 0; i <NB_PLATEFORME; i++){
+	if (collision(spritePosition,plateformePos[i]) == 3) {
+	  spritePosition.y -= 1;
+	  finsaut = 1;
+	}
+      }
+      if (spritePosition.y == SOL) {
+	finsaut = 1;      
+      }
+      
+	      /* draw the background */
+      for (int x = 0; x < SCREEN_WIDTH; x++) {
+	for (int y = 0; y < SCREEN_HEIGHT; y++) {
+	  SDL_Rect position;
+	  position.x = x * SKY_WIDTH;
+	      position.y = y * SKY_HEIGHT;
+	      SDL_BlitSurface(sky, NULL, screen, &position);
+	}
+      }
+      
+      
+      /*draw the timer*/
+      tempsImage.y = 51 * (heures/10);
+      tempsPosition.x = 0;
+      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      
+      tempsImage.y = 51 * (heures%10);
+      tempsPosition.x += 54;
+      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      
+      tempsImage.y = 51 * (minutes/10);
+      tempsPosition.x += 54;
+      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      
+      tempsImage.y = 51 * (minutes%10);
+      tempsPosition.x += 54;
+      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      
+      tempsImage.y = 51 * (secondes/10);
+      tempsPosition.x += 54;
+      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      
+      tempsImage.y = 51 * (secondes%10);
+      tempsPosition.x += 54;
+      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+
+
+      /* choose image according to direction and animation flip: */
+      spriteImage.x = SPRITE_SIZE*(2*currentDirection + animationFlip);
 	  
-	spritePosition.y -= 1;
-      }
-      else { saut = PASSAUT; }
-    }
-    
-    if (spritePosition.y != SOL) {
-      if (saut == PASSAUT) {
-	spritePosition.y += 1;
-      }
-    }
-    
-    for (int i = 0; i <NB_PLATEFORME; i++){
-      if (collision(spritePosition,plateformePos[i]) == 3) {
-	spritePosition.y -= 1;
-	finsaut = 1;
+      SDL_BlitSurface(sprite, &spriteImage, screen, &spritePosition);
+	  
+
+      
+	  
+      SDL_Delay(4);
+	  
+      for (int i=0; i < NB_PLATEFORME; i++){ 
+	if (plat_array[i] == 1){
+	  SDL_BlitSurface(plateforme[i],NULL, screen, &plateformePos[i]);
+	}
       }
     }
-    if (spritePosition.y == SOL) {
-      finsaut = 1;      
-    }
-    
-    /* choose image according to direction and animation flip: */
-    spriteImage.x = SPRITE_SIZE*(2*currentDirection + animationFlip);
-	
-    SDL_BlitSurface(sprite, &spriteImage, screen, &spritePosition);
-        
-    
-        
-    SDL_Delay(5);
-	
-    for (int i=0; i < NB_PLATEFORME; i++){ 
-      if (plat_array[i] == 1){
-	SDL_BlitSurface(plateforme[i],NULL, screen, &plateformePos[i]);
-      }
-    }
-    
     /* update the screen */
     SDL_UpdateRect(screen, 0, 0, 0, 0);
   }  
   /* clean up */
   SDL_FreeSurface(sprite);
-  SDL_FreeSurface(grass);
+  SDL_FreeSurface(sky);
   SDL_Quit();
     
   return 0;
