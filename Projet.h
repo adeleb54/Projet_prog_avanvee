@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 /* Size of the window */
-#define SCREEN_WIDTH  640
+#define SCREEN_WIDTH  624
 #define SCREEN_HEIGHT 480
 
 /* Size of the grass texture picture */
@@ -26,7 +26,7 @@
 #define SOL 448
 
 #define NB_SOL 2
-#define NB_PLATEFORME 15
+#define NB_PLATEFORME 192
 
 /* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     1

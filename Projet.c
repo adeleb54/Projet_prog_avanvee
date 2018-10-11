@@ -27,12 +27,10 @@ void HandleEvent(SDL_Event event,
 		    break;
 		    
                 case SDLK_LEFT:
-                    *currDirection = DIR_LEFT;
                     *gauche = 1;
                     break;
 		    
                 case SDLK_RIGHT:
-                    *currDirection = DIR_RIGHT;
                     *droite = 1;
                     break;
 		
@@ -57,17 +55,21 @@ void HandleEvent(SDL_Event event,
 		    
 		case SDLK_SPACE:
 		    *space = 0;
-		    break;
+		    
 		default :
 		    break;
 	    }
 	    break;
+	
+	case SDL_MOUSEMOTION :
+	//Menu start
+	break;
     }
 }
 
 int main(int argc, char* argv[])
 {
-  SDL_Surface *screen, *temp, *sprite, *sky, *temps, *plateforme[NB_PLATEFORME];
+  SDL_Surface *screen, *temp, *sprite, *sky, *temps, *spritePause, *plateforme[NB_PLATEFORME];
   int colorkey;
   int currentDirection = DIR_RIGHT;
   int animationFlip = 0;
@@ -109,7 +111,7 @@ int main(int argc, char* argv[])
   spritePosition.w = SPRITE_WIDTH;
   spritePosition.h = SPRITE_HEIGHT;
   spritePosition.x = 150;
-  spritePosition.y = 400;
+  spritePosition.y = SOL;
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
@@ -132,6 +134,15 @@ int main(int argc, char* argv[])
   tempsPosition.y = 5;
   SDL_SetColorKey(temps, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
+  /*Pause*/
+  temp  = SDL_LoadBMP("Pause.bmp");
+  spritePause = SDL_DisplayFormat(temp);
+  SDL_Rect pausePosition;
+  pausePosition.x = 289;
+  pausePosition.y = 235;
+  SDL_FreeSurface(temp);
+  SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  
   
   /*Initialisation du tableau plat_array qui enregistre la présence des plateformes affichées*/
   int plat_array[NB_PLATEFORME];
@@ -143,11 +154,45 @@ int main(int argc, char* argv[])
   for (int i=0; i<NB_PLATEFORME; i++){
     temp = SDL_LoadBMP("bloc.bmp"); 
     plateforme[i] = SDL_DisplayFormat(temp);
-    SDL_FreeSurface(temp); 
+    SDL_FreeSurface(temp);
   }
   
 
   SDL_Rect plateformePos [NB_PLATEFORME];
+  
+  void afficher_bloc(const char* nomFichier){
+    FILE* pFile;
+    int c, i = 0;
+    int posX = 0, posY = 0;
+    pFile = fopen(nomFichier, "r");
+    if (pFile==NULL)  perror ("Error opening file"); 
+    else {
+      c = fgetc(pFile);
+      while(c != EOF){
+	switch (c){
+	  case 48 :
+	    plat_array[i] = 0;
+	    i ++;
+	    break;
+	  case 49 :
+	    plat_array[i] = 1;
+	    plateformePos[i].x = posX;
+	    plateformePos[i].y = posY;
+	    i ++;
+	    break;
+	  default:
+	    break;
+	}
+	posX += 39;
+	if (posX > SCREEN_WIDTH){
+	  posX = 0;
+	  posY += 40;
+	}
+	c = fgetc(pFile);
+      }
+      fclose(pFile);
+    } 
+  }
   
   void plateforme_test (){
     plateformePos[0].x = 100;
@@ -187,13 +232,14 @@ int main(int argc, char* argv[])
     return 0;
   }
   
+        
+  afficher_bloc("test.txt");
   
-  plateforme_test ();
+
   while (!gameover)
   {
     SDL_Event event;
 	
-    //printf ("y= %u\n",spritePosition.y)
     if (SDL_PollEvent(&event)) {
       HandleEvent(event, &gameover, &currentDirection,
 		  &animationFlip, &spritePosition, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space);
@@ -209,8 +255,10 @@ int main(int argc, char* argv[])
       pause = 1 - pause;
     }
     
-    
-    if (pause == 1) {
+    if (pause == 0) {
+      SDL_BlitSurface(spritePause, NULL, screen, &pausePosition);
+    }
+    else {
     
       timer += 1;
       
@@ -222,28 +270,28 @@ int main(int argc, char* argv[])
 
 
     /*handle the movement of the sprite*/
-    if (droite == 1){
-      spritePosition.x += SPRITE_STEP;
-      currentDirection = DIR_RIGHT;
-      if (finsaut != 0) {
-	delai = delai + 1;       
+      if (droite == 1){
+	spritePosition.x += SPRITE_STEP;
+	currentDirection = DIR_RIGHT;
+	if (finsaut != 0) {
+	  delai = delai + 1;
+	}
+	if (delai == 15) {
+	  animationFlip = 1 - animationFlip;
+	  delai = 0;
+	}
       }
-      if (delai == 15) {   
-	animationFlip = 1 - animationFlip;
-	delai = 0;      
-      }	     
-    }
-    if (gauche == 1) {
-      spritePosition.x -= SPRITE_STEP;
-      currentDirection = DIR_LEFT;
-      if (finsaut != 0) {
-	delai = delai + 1;      
-      }	
-      if (delai == 15) {
-	animationFlip = 1 - animationFlip;
-	delai = 0;     
-      }    
-    }
+      if (gauche == 1) {
+	spritePosition.x -= SPRITE_STEP;
+	currentDirection = DIR_LEFT;
+	if (finsaut != 0) {
+	  delai = delai + 1;
+	}
+	if (delai == 15) {
+	  animationFlip = 1 - animationFlip;
+	  delai = 0;
+	}
+      }
       
       if (spritePosition.x <= 0)
 	spritePosition.x = 0;
@@ -255,22 +303,25 @@ int main(int argc, char* argv[])
 	spritePosition.y = SCREEN_HEIGHT - SPRITE_HEIGHT;
     
       for (int i = 0; i <NB_PLATEFORME; i++){
-	if (collision(spritePosition,plateformePos[i])==1){
-	  spritePosition.x = plateformePos[i].x - SPRITE_WIDTH - 6;
-	}
-	if (collision(spritePosition,plateformePos[i])==2){
-	  spritePosition.x = plateformePos[i].x + BLOC_SIZE;
-	    }
-	if (collision(spritePosition,plateformePos[i])==3){
-	  spritePosition.y = plateformePos[i].y - BLOC_SIZE;
+	if (plat_array[i] == 1) {
+	  if (collision(spritePosition,plateformePos[i])==1){
+	    spritePosition.x = plateformePos[i].x - SPRITE_WIDTH - 6;
+	  }
+	  if (collision(spritePosition,plateformePos[i])==2){
+	    spritePosition.x = plateformePos[i].x + BLOC_SIZE;
+	      }
+	  if (collision(spritePosition,plateformePos[i])==3){
+	    spritePosition.y = plateformePos[i].y - BLOC_SIZE;
+	  }
 	}
       }
+      
+      
 
       /*Saut*/
       hperso = spritePosition.y;
       int col_haut = 0;
       
-      /*Si le personnage est en train de sauter*/
       if (saut == SAUT) {
 	for (int i = 0; i < NB_PLATEFORME; i++){
 	  if (collision(spritePosition, plateformePos[i])==4){
@@ -278,32 +329,29 @@ int main(int argc, char* argv[])
 	  }
 	}
 	if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != 0) && !col_haut){
+	    
 	  spritePosition.y -= 1;
 	}
 	else { saut = PASSAUT; }
       }
       
-      /*Si le personnage n'est pas au sol et qu'il ne saute pas*/
       if (spritePosition.y != SOL) {
 	if (saut == PASSAUT) {
 	  spritePosition.y += 1;
 	}
       }
       
-      /*Si il y a une collision en haut*/
       for (int i = 0; i <NB_PLATEFORME; i++){
 	if (collision(spritePosition,plateformePos[i]) == 3) {
 	  spritePosition.y -= 1;
 	  finsaut = 1;
 	}
       }
-      
-      /*Si le personnage est au sol*/
       if (spritePosition.y == SOL) {
 	finsaut = 1;      
       }
       
-      /* draw the background */
+	      /* draw the background */
       for (int x = 0; x < SCREEN_WIDTH; x++) {
 	for (int y = 0; y < SCREEN_HEIGHT; y++) {
 	  SDL_Rect position;
@@ -316,11 +364,11 @@ int main(int argc, char* argv[])
       
       /*draw the timer*/
       tempsImage.x = 32 * (heures/10);
-      tempsPosition.x = 0;
+      tempsPosition.x = 10;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 32 * (heures%10);
-      tempsPosition.x += 30;
+      tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 320;
@@ -328,11 +376,11 @@ int main(int argc, char* argv[])
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 32 * (minutes/10);
-      tempsPosition.x += 30;
+      tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 32 * (minutes%10);
-      tempsPosition.x += 30;
+      tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 320;
@@ -340,29 +388,27 @@ int main(int argc, char* argv[])
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 32 * (secondes/10);
-      tempsPosition.x += 30;
+      tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 32 * (secondes%10);
-      tempsPosition.x += 30;
+      tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
-
-
-      /* choose image according to direction and animation flip: */
-      spriteImage.x = SPRITE_SIZE*(2*currentDirection + animationFlip);
-	  
-      SDL_BlitSurface(sprite, &spriteImage, screen, &spritePosition);
-	  
-
-      
-	  
-      SDL_Delay(4);
 	  
       for (int i=0; i < NB_PLATEFORME; i++){ 
 	if (plat_array[i] == 1){
 	  SDL_BlitSurface(plateforme[i],NULL, screen, &plateformePos[i]);
 	}
       }
+      
+       /* choose image according to direction and animation flip: */
+      spriteImage.x = SPRITE_SIZE*(2*currentDirection + animationFlip);
+	  
+      SDL_BlitSurface(sprite, &spriteImage, screen, &spritePosition);
+      
+      
+      
+      SDL_Delay(4);
     }
     /* update the screen */
     SDL_UpdateRect(screen, 0, 0, 0, 0);
