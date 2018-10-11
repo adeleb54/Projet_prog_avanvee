@@ -168,21 +168,23 @@ int main(int argc, char* argv[])
 	switch (c){
 	  case 48 :
 	    plat_array[i] = 0;
+	    i ++;
 	    break;
 	  case 49 :
 	    plat_array[i] = 1;
 	    plateformePos[i].x = posX;
 	    plateformePos[i].y = posY;
+	    i ++;
+	    break;
+	  default:
 	    break;
 	}
-// 	printf("%u \n", plat_array[i]);
 	posX += 39;
 	if (posX > SCREEN_WIDTH){
 	  posX = 0;
 	  posY += 40;
 	}
 	c = fgetc(pFile);
-	i ++;
       }
       fclose(pFile);
     } 
@@ -392,7 +394,6 @@ int main(int argc, char* argv[])
       for (int i=0; i < NB_PLATEFORME; i++){ 
 	if (plat_array[i] == 1){
 	  SDL_BlitSurface(plateforme[i],NULL, screen, &plateformePos[i]);
-	  printf("x = %u, y = %u \n", plateformePos[i].x, plateformePos[i].y);
 	}
       }
       
