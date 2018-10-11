@@ -156,6 +156,38 @@ int main(int argc, char* argv[])
 
   SDL_Rect plateformePos [NB_PLATEFORME];
   
+  void afficher_bloc(const char* nomFichier){
+    FILE* pFile;
+    int c, i = 0;
+    int posX = 0, posY = 0;
+    pFile = fopen(nomFichier, "r");
+    if (pFile==NULL)  perror ("Error opening file"); 
+    else {
+      c = fgetc(pFile);
+      while(c != EOF){
+	switch (c){
+	  case 48 :
+	    plat_array[i] = 0;
+	    break;
+	  case 49 :
+	    plat_array[i] = 1;
+	    plateformePos[i].x = posX;
+	    plateformePos[i].y = posY;
+	    break;
+	}
+// 	printf("%u \n", plat_array[i]);
+	posX += 39;
+	if (posX > SCREEN_WIDTH){
+	  posX = 0;
+	  posY += 40;
+	}
+	c = fgetc(pFile);
+	i ++;
+      }
+      fclose(pFile);
+    } 
+  }
+  
   void plateforme_test (){
     plateformePos[0].x = 100;
     plateformePos[0].y = 440;
@@ -194,13 +226,14 @@ int main(int argc, char* argv[])
     return 0;
   }
   
+        
+  afficher_bloc("test.txt");
   
-  plateforme_test ();
+
   while (!gameover)
   {
     SDL_Event event;
 	
-    //printf ("y= %u\n",spritePosition.y)
     if (SDL_PollEvent(&event)) {
       HandleEvent(event, &gameover, &currentDirection,
 		  &animationFlip, &spritePosition, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space);
@@ -264,14 +297,16 @@ int main(int argc, char* argv[])
 	spritePosition.y = SCREEN_HEIGHT - SPRITE_HEIGHT;
     
       for (int i = 0; i <NB_PLATEFORME; i++){
-	if (collision(spritePosition,plateformePos[i])==1){
-	  spritePosition.x = plateformePos[i].x - SPRITE_WIDTH - 6;
-	}
-	if (collision(spritePosition,plateformePos[i])==2){
-	  spritePosition.x = plateformePos[i].x + BLOC_SIZE;
-	    }
-	if (collision(spritePosition,plateformePos[i])==3){
-	  spritePosition.y = plateformePos[i].y - BLOC_SIZE;
+	if (plat_array[i] == 1) {
+	  if (collision(spritePosition,plateformePos[i])==1){
+	    spritePosition.x = plateformePos[i].x - SPRITE_WIDTH - 6;
+	  }
+	  if (collision(spritePosition,plateformePos[i])==2){
+	    spritePosition.x = plateformePos[i].x + BLOC_SIZE;
+	      }
+	  if (collision(spritePosition,plateformePos[i])==3){
+	    spritePosition.y = plateformePos[i].y - BLOC_SIZE;
+	  }
 	}
       }
       
@@ -353,23 +388,22 @@ int main(int argc, char* argv[])
       tempsImage.x = 32 * (secondes%10);
       tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
-
-
-      /* choose image according to direction and animation flip: */
-      spriteImage.x = SPRITE_SIZE*(2*currentDirection + animationFlip);
-	  
-      SDL_BlitSurface(sprite, &spriteImage, screen, &spritePosition);
-	  
-
-      
-	  
-      SDL_Delay(4);
 	  
       for (int i=0; i < NB_PLATEFORME; i++){ 
 	if (plat_array[i] == 1){
 	  SDL_BlitSurface(plateforme[i],NULL, screen, &plateformePos[i]);
+	  printf("x = %u, y = %u \n", plateformePos[i].x, plateformePos[i].y);
 	}
       }
+      
+       /* choose image according to direction and animation flip: */
+      spriteImage.x = SPRITE_SIZE*(2*currentDirection + animationFlip);
+	  
+      SDL_BlitSurface(sprite, &spriteImage, screen, &spritePosition);
+      
+      
+      
+      SDL_Delay(4);
     }
     /* update the screen */
     SDL_UpdateRect(screen, 0, 0, 0, 0);
