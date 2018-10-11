@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
   spritePosition.w = SPRITE_WIDTH;
   spritePosition.h = SPRITE_HEIGHT;
   spritePosition.x = 150;
-  spritePosition.y = 400;
+  spritePosition.y = SOL;
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
   temp  = SDL_LoadBMP("Pause.bmp");
   spritePause = SDL_DisplayFormat(temp);
   SDL_Rect pausePosition;
-  pausePosition.x = 289;
+  pausePosition.x = 281;
   pausePosition.y = 235;
   SDL_FreeSurface(temp);
   SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
