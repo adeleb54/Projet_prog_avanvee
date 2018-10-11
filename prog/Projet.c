@@ -65,7 +65,7 @@ void HandleEvent(SDL_Event event,
 
 int main(int argc, char* argv[])
 {
-  SDL_Surface *screen, *temp, *sprite, *sky, *temps, *plateforme[NB_PLATEFORME];
+  SDL_Surface *screen, *temp, *sprite, *sky, *temps, *spritePause, *plateforme[NB_PLATEFORME];
   int colorkey;
   int currentDirection = DIR_RIGHT;
   int animationFlip = 0;
@@ -130,6 +130,15 @@ int main(int argc, char* argv[])
   tempsPosition.y = 5;
   SDL_SetColorKey(temps, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
+  /*Pause*/
+  temp  = SDL_LoadBMP("Pause.bmp");
+  spritePause = SDL_DisplayFormat(temp);
+  SDL_Rect pausePosition;
+  pausePosition.x = 289;
+  pausePosition.y = 235;
+  SDL_FreeSurface(temp);
+  SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  
   
   /*Initialisation du tableau plat_array qui enregistre la présence des plateformes affichées*/
   int plat_array[NB_PLATEFORME];
@@ -141,7 +150,7 @@ int main(int argc, char* argv[])
   for (int i=0; i<NB_PLATEFORME; i++){
     temp = SDL_LoadBMP("bloc.bmp"); 
     plateforme[i] = SDL_DisplayFormat(temp);
-    SDL_FreeSurface(temp); 
+    SDL_FreeSurface(temp);
   }
   
 
@@ -207,8 +216,10 @@ int main(int argc, char* argv[])
       pause = 1 - pause;
     }
     
-    
-    if (pause == 1) {
+    if (pause == 0) {
+      SDL_BlitSurface(spritePause, NULL, screen, &pausePosition);
+    }
+    else {
     
       timer += 1;
       
@@ -312,11 +323,11 @@ int main(int argc, char* argv[])
       
       /*draw the timer*/
       tempsImage.x = 32 * (heures/10);
-      tempsPosition.x = 0;
+      tempsPosition.x = 10;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 32 * (heures%10);
-      tempsPosition.x += 30;
+      tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 320;
@@ -324,11 +335,11 @@ int main(int argc, char* argv[])
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 32 * (minutes/10);
-      tempsPosition.x += 30;
+      tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 32 * (minutes%10);
-      tempsPosition.x += 30;
+      tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 320;
@@ -336,11 +347,11 @@ int main(int argc, char* argv[])
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 32 * (secondes/10);
-      tempsPosition.x += 30;
+      tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
       
       tempsImage.x = 32 * (secondes%10);
-      tempsPosition.x += 30;
+      tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
 
 
