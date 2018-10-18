@@ -65,13 +65,14 @@ void HandleEvent(SDL_Event event,
 
 int main(int argc, char* argv[])
 {
-  SDL_Surface *screen, *temp, *sprite, *sky, *temps, *spritePause, *plateforme[NB_PLATEFORME];
+  SDL_Surface *screen, *temp, *sprite, *sky, *temps, *spritePause, *plateforme[NB_PLATEFORME], *coeur;
   int colorkey;
   int currentDirection = DIR_RIGHT;
   int animationFlip = 0;
   SDL_Rect spritePosition;
   SDL_Rect tempsPosition;
   SDL_Rect pausePosition;
+  SDL_Rect coeurPosition;
   int gameover = 0;
   int hperso = spritePosition.y;
   int debutsaut;
@@ -111,6 +112,15 @@ int main(int argc, char* argv[])
   spritePosition.y = SOL;
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  
+  /*Coeur*/
+  temp   = SDL_LoadBMP("coeur.bmp");
+  coeur = SDL_DisplayFormat(temp);
+  SDL_FreeSurface(temp);
+  coeurPosition.x = 900;
+  coeurPosition.y = 0;
+  colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
+  SDL_SetColorKey(coeur, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
   /*Sky*/
   temp  = SDL_LoadBMP("ciel.bmp");
@@ -222,19 +232,27 @@ int main(int argc, char* argv[])
     if(A.x >= B.x + B.w || A.x + A.w <= B.x || A.y >= B.y + B.h || A.y + A.h <= B.y){
       return 0;
     }
-    if(A.y > B.y - B.h && A.y < B.y - 30){
+    //collision avec le bas du sprite
+    if(A.y + A.h > B.y && A.y + A.h < B.y + 5){
       saut = PASSAUT;
       return 3;
     }
-    if(A.x <= B.x + B.w && A.x > B.x + 20 && A.y >= B.y - B.h + 1){
-      return 2;
-    }
-    if(A.x + A.w > B.x && A.x + 20 < B.x && A.y >= B.y - B.h + 1){
-      return 1;
-    }
-    if(A.y - A.h < B.y + 5  && A.y > B.y){
+    
+    //collision avec le haut du sprite
+    if(A.y < B.y + B.h  && A.y + 5 > B.y + B.h){
       return 4;
     }
+    
+    //collision avec la gauche du sprite
+    if(A.x <= B.x + B.w && A.x > B.x && A.y + A.h >= B.y && A.y <= B.y + B.h){
+      return 2;
+    }
+    
+    //collision avec la droite du sprite
+    if(A.x + A.w > B.x && A.x < B.x && A.y + A.h >= B.y && A.y <= B.y + B.h){
+      return 1;
+    }
+    
     return 0;
   }
   
@@ -364,6 +382,7 @@ int main(int argc, char* argv[])
 	      /* draw the background */
 
 	      SDL_BlitSurface(sky, NULL, screen, NULL);
+	      SDL_BlitSurface(coeur, NULL, screen, &coeurPosition);
       
       
       /*draw the timer*/
