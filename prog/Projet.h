@@ -5,14 +5,8 @@
 #define SCREEN_WIDTH  1020
 #define SCREEN_HEIGHT 646
 
-/* Size of the grass texture picture */
-#define SKY_WIDTH    500
-#define SKY_HEIGHT   190
-
 /* Size of one image: */
 #define SPRITE_SIZE 	32
-#define SPRITE_HEIGHT   30
-#define SPRITE_WIDTH	25
 #define BLOC_SIZE       34
 
 /* Order of the different directions in the picture: */
@@ -26,7 +20,7 @@
 #define SOL 615
 
 #define NB_SOL 2
-#define NB_PLATEFORME 570
+#define NB_PLATEFORME 540
 
 /* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     1

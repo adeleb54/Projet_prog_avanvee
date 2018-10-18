@@ -105,8 +105,8 @@ int main(int argc, char* argv[])
   spriteImage.y = 0;
   spriteImage.w = SPRITE_SIZE;
   spriteImage.h = SPRITE_SIZE;
-  spritePosition.w = SPRITE_WIDTH;
-  spritePosition.h = SPRITE_HEIGHT;
+  spritePosition.w = SPRITE_SIZE;
+  spritePosition.h = SPRITE_SIZE;
   spritePosition.x = 150;
   spritePosition.y = SOL;
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
@@ -134,8 +134,8 @@ int main(int argc, char* argv[])
   /*Pause*/
   temp  = SDL_LoadBMP("Pause.bmp");
   spritePause = SDL_DisplayFormat(temp);
-  pausePosition.x = 281;
-  pausePosition.y = 235;
+  pausePosition.x = (SCREEN_WIDTH - 72)/2;
+  pausePosition.y = (SCREEN_HEIGHT - 20)/2;
   SDL_FreeSurface(temp);
   SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
@@ -152,6 +152,7 @@ int main(int argc, char* argv[])
     temp = SDL_LoadBMP("bloc.bmp"); 
     plateforme[i] = SDL_DisplayFormat(temp);
     SDL_FreeSurface(temp);
+    SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   }
   SDL_Rect blocImage;
   blocImage.y = 0;
@@ -163,7 +164,7 @@ int main(int argc, char* argv[])
   void afficher_bloc(const char* nomFichier){
     FILE* pFile;
     int c, i = 0;
-    int posX = 0, posY = 0;
+    int posX = 0, posY = BLOC_SIZE;
     pFile = fopen(nomFichier, "r");
     if (pFile==NULL)  perror ("Error opening file"); 
     else {
@@ -189,10 +190,10 @@ int main(int argc, char* argv[])
 	  default:
 	    break;
 	}
-	posX += 34;
+	posX += BLOC_SIZE;
 	if (posX > SCREEN_WIDTH){
 	  posX = 0;
-	  posY += 34;
+	  posY += BLOC_SIZE;
 	}
 	c = fgetc(pFile);
       }
@@ -239,7 +240,7 @@ int main(int argc, char* argv[])
   }
   
         
-  afficher_bloc("test.txt");
+  afficher_bloc("niveau.txt");
   
 
   while (!gameover)
@@ -301,17 +302,15 @@ int main(int argc, char* argv[])
       
       if (spritePosition.x <= 0)
 	spritePosition.x = 0;
-      if (spritePosition.x >= SCREEN_WIDTH - SPRITE_WIDTH) 
-	spritePosition.x = SCREEN_WIDTH - SPRITE_WIDTH;
-      if (spritePosition.y <= 0)
-	spritePosition.y = 0;
-      if (spritePosition.y >= SCREEN_HEIGHT - SPRITE_HEIGHT) 
-	spritePosition.y = SCREEN_HEIGHT - SPRITE_HEIGHT;
+      if (spritePosition.x >= SCREEN_WIDTH - SPRITE_SIZE) 
+	spritePosition.x = SCREEN_WIDTH - SPRITE_SIZE;
+      if (spritePosition.y >= SCREEN_HEIGHT - SPRITE_SIZE) 
+	spritePosition.y = SCREEN_HEIGHT - SPRITE_SIZE;
     
       for (int i = 0; i <NB_PLATEFORME; i++){
 	if (plat_array[i] != 0) {
 	  if (collision(spritePosition,plateformePos[i])==1){
-	    spritePosition.x = plateformePos[i].x - SPRITE_WIDTH - 6;
+	    spritePosition.x = plateformePos[i].x - SPRITE_SIZE;
 	  }
 	  if (collision(spritePosition,plateformePos[i])==2){
 	    spritePosition.x = plateformePos[i].x + BLOC_SIZE;
@@ -330,11 +329,13 @@ int main(int argc, char* argv[])
       
       if (saut == SAUT) {
 	for (int i = 0; i < NB_PLATEFORME; i++){
-	  if (collision(spritePosition, plateformePos[i])==4){
-	    col_haut = 1;
+	  if (plat_array[i] != 0) {
+	    if (collision(spritePosition, plateformePos[i])==4){
+	      col_haut = 1;
+	    }
 	  }
 	}
-	if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != 0) && !col_haut){
+	if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != 34) && !col_haut){
 	    
 	  spritePosition.y -= 1;
 	}
@@ -348,24 +349,19 @@ int main(int argc, char* argv[])
       }
       
       for (int i = 0; i <NB_PLATEFORME; i++){
-	if (collision(spritePosition,plateformePos[i]) == 3) {
-	  spritePosition.y -= 1;
-	  finsaut = 1;
-	}
+	if (plat_array[i] != 0) {
+	  if (collision(spritePosition,plateformePos[i]) == 3) {
+	    spritePosition.y -= 1;
+	    finsaut = 1;
+	  }
+	} 
       }
       if (spritePosition.y == SOL) {
 	finsaut = 1;      
       }
       
 	      /* draw the background */
-      for (int x = 0; x < SCREEN_WIDTH; x++) {
-	for (int y = 0; y < SCREEN_HEIGHT; y++) {
-	  SDL_Rect position;
-	  position.x = x * SKY_WIDTH;
-	      position.y = y * SKY_HEIGHT;
-	      SDL_BlitSurface(sky, NULL, screen, &position);
-	}
-      }
+      SDL_BlitSurface(sky, NULL, screen, NULL);
       
       
       /*draw the timer*/
@@ -415,7 +411,7 @@ int main(int argc, char* argv[])
       
       
       
-//       SDL_Delay(4);
+       SDL_Delay(4);
     }
     /* update the screen */
     SDL_UpdateRect(screen, 0, 0, 0, 0);
