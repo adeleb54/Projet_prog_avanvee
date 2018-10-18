@@ -1,5 +1,6 @@
 #include <SDL.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /* Size of the window */
 #define SCREEN_WIDTH  1020

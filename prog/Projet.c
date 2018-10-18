@@ -139,7 +139,6 @@ int main(int argc, char* argv[])
   SDL_FreeSurface(temp);
   SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
-  
   /*Initialisation du tableau plat_array qui enregistre la présence des plateformes affichées*/
   int plat_array[NB_PLATEFORME];
   for(int i=0; i < NB_PLATEFORME; i++){
@@ -152,7 +151,6 @@ int main(int argc, char* argv[])
     temp = SDL_LoadBMP("bloc.bmp"); 
     plateforme[i] = SDL_DisplayFormat(temp);
     SDL_FreeSurface(temp);
-    SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   }
   SDL_Rect blocImage;
   blocImage.y = 0;
@@ -330,9 +328,9 @@ int main(int argc, char* argv[])
       if (saut == SAUT) {
 	for (int i = 0; i < NB_PLATEFORME; i++){
 	  if (plat_array[i] != 0) {
-	    if (collision(spritePosition, plateformePos[i])==4){
-	      col_haut = 1;
-	    }
+	  if (collision(spritePosition, plateformePos[i])==4){
+	    col_haut = 1;
+	  }
 	  }
 	}
 	if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != 34) && !col_haut){
@@ -360,7 +358,7 @@ int main(int argc, char* argv[])
 	finsaut = 1;      
       }
       
-	      /* draw the background */
+      /* draw the background */
       SDL_BlitSurface(sky, NULL, screen, NULL);
       
       
