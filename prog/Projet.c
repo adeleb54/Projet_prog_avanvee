@@ -71,6 +71,7 @@ int main(int argc, char* argv[])
   int animationFlip = 0;
   SDL_Rect spritePosition;
   SDL_Rect tempsPosition;
+  SDL_Rect pausePosition;
   int gameover = 0;
   int hperso = spritePosition.y;
   int debutsaut;
@@ -133,7 +134,6 @@ int main(int argc, char* argv[])
   /*Pause*/
   temp  = SDL_LoadBMP("Pause.bmp");
   spritePause = SDL_DisplayFormat(temp);
-  SDL_Rect pausePosition;
   pausePosition.x = 281;
   pausePosition.y = 235;
   SDL_FreeSurface(temp);
@@ -147,12 +147,16 @@ int main(int argc, char* argv[])
   }
   
   /*Initialisation de plateforme[] qui contient les images des blocs*/
+  
   for (int i=0; i<NB_PLATEFORME; i++){
     temp = SDL_LoadBMP("bloc.bmp"); 
     plateforme[i] = SDL_DisplayFormat(temp);
     SDL_FreeSurface(temp);
   }
-  
+  SDL_Rect blocImage;
+  blocImage.y = 0;
+  blocImage.w = BLOC_SIZE;
+  blocImage.h = BLOC_SIZE;
 
   SDL_Rect plateformePos [NB_PLATEFORME];
   
@@ -176,13 +180,19 @@ int main(int argc, char* argv[])
 	    plateformePos[i].y = posY;
 	    i ++;
 	    break;
+	  case 50 :
+	    plat_array[i] = 2;
+	    plateformePos[i].x = posX;
+	    plateformePos[i].y = posY;
+	    i ++;
+	    break;
 	  default:
 	    break;
 	}
-	posX += 39;
+	posX += 34;
 	if (posX > SCREEN_WIDTH){
 	  posX = 0;
-	  posY += 40;
+	  posY += 34;
 	}
 	c = fgetc(pFile);
       }
@@ -299,7 +309,7 @@ int main(int argc, char* argv[])
 	spritePosition.y = SCREEN_HEIGHT - SPRITE_HEIGHT;
     
       for (int i = 0; i <NB_PLATEFORME; i++){
-	if (plat_array[i] == 1) {
+	if (plat_array[i] != 0) {
 	  if (collision(spritePosition,plateformePos[i])==1){
 	    spritePosition.x = plateformePos[i].x - SPRITE_WIDTH - 6;
 	  }
@@ -392,8 +402,9 @@ int main(int argc, char* argv[])
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
 	  
       for (int i=0; i < NB_PLATEFORME; i++){ 
-	if (plat_array[i] == 1){
-	  SDL_BlitSurface(plateforme[i],NULL, screen, &plateformePos[i]);
+	if (plat_array[i] != 0){
+	  blocImage.x = (plat_array[i] - 1)*34;
+	  SDL_BlitSurface(plateforme[i],&blocImage, screen, &plateformePos[i]);
 	}
       }
       
@@ -404,7 +415,7 @@ int main(int argc, char* argv[])
       
       
       
-      SDL_Delay(4);
+//       SDL_Delay(4);
     }
     /* update the screen */
     SDL_UpdateRect(screen, 0, 0, 0, 0);
