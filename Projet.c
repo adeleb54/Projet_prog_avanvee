@@ -60,10 +60,6 @@ void HandleEvent(SDL_Event event,
 		    break;
 	    }
 	    break;
-	
-	case SDL_MOUSEMOTION :
-	//Menu start
-	break;
     }
 }
 
@@ -75,6 +71,7 @@ int main(int argc, char* argv[])
   int animationFlip = 0;
   SDL_Rect spritePosition;
   SDL_Rect tempsPosition;
+  SDL_Rect pausePosition;
   int gameover = 0;
   int hperso = spritePosition.y;
   int debutsaut;
@@ -108,8 +105,8 @@ int main(int argc, char* argv[])
   spriteImage.y = 0;
   spriteImage.w = SPRITE_SIZE;
   spriteImage.h = SPRITE_SIZE;
-  spritePosition.w = SPRITE_WIDTH;
-  spritePosition.h = SPRITE_HEIGHT;
+  spritePosition.w = SPRITE_SIZE;
+  spritePosition.h = SPRITE_SIZE;
   spritePosition.x = 150;
   spritePosition.y = SOL;
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
@@ -137,8 +134,7 @@ int main(int argc, char* argv[])
   /*Pause*/
   temp  = SDL_LoadBMP("Pause.bmp");
   spritePause = SDL_DisplayFormat(temp);
-  SDL_Rect pausePosition;
-  pausePosition.x = 289;
+  pausePosition.x = 281;
   pausePosition.y = 235;
   SDL_FreeSurface(temp);
   SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
@@ -151,19 +147,23 @@ int main(int argc, char* argv[])
   }
   
   /*Initialisation de plateforme[] qui contient les images des blocs*/
+  
   for (int i=0; i<NB_PLATEFORME; i++){
     temp = SDL_LoadBMP("bloc.bmp"); 
     plateforme[i] = SDL_DisplayFormat(temp);
     SDL_FreeSurface(temp);
   }
-  
+  SDL_Rect blocImage;
+  blocImage.y = 0;
+  blocImage.w = BLOC_SIZE;
+  blocImage.h = BLOC_SIZE;
 
   SDL_Rect plateformePos [NB_PLATEFORME];
   
   void afficher_bloc(const char* nomFichier){
     FILE* pFile;
     int c, i = 0;
-    int posX = 0, posY = 0;
+    int posX = 0, posY = BLOC_SIZE;
     pFile = fopen(nomFichier, "r");
     if (pFile==NULL)  perror ("Error opening file"); 
     else {
@@ -180,13 +180,19 @@ int main(int argc, char* argv[])
 	    plateformePos[i].y = posY;
 	    i ++;
 	    break;
+	  case 50 :
+	    plat_array[i] = 2;
+	    plateformePos[i].x = posX;
+	    plateformePos[i].y = posY;
+	    i ++;
+	    break;
 	  default:
 	    break;
 	}
-	posX += 39;
+	posX += BLOC_SIZE;
 	if (posX > SCREEN_WIDTH){
 	  posX = 0;
-	  posY += 40;
+	  posY += BLOC_SIZE;
 	}
 	c = fgetc(pFile);
       }
@@ -295,17 +301,15 @@ int main(int argc, char* argv[])
       
       if (spritePosition.x <= 0)
 	spritePosition.x = 0;
-      if (spritePosition.x >= SCREEN_WIDTH - SPRITE_WIDTH) 
-	spritePosition.x = SCREEN_WIDTH - SPRITE_WIDTH;
-      if (spritePosition.y <= 0)
-	spritePosition.y = 0;
-      if (spritePosition.y >= SCREEN_HEIGHT - SPRITE_HEIGHT) 
-	spritePosition.y = SCREEN_HEIGHT - SPRITE_HEIGHT;
+      if (spritePosition.x >= SCREEN_WIDTH - SPRITE_SIZE) 
+	spritePosition.x = SCREEN_WIDTH - SPRITE_SIZE;
+      if (spritePosition.y >= SCREEN_HEIGHT - SPRITE_SIZE) 
+	spritePosition.y = SCREEN_HEIGHT - SPRITE_SIZE;
     
       for (int i = 0; i <NB_PLATEFORME; i++){
-	if (plat_array[i] == 1) {
+	if (plat_array[i] != 0) {
 	  if (collision(spritePosition,plateformePos[i])==1){
-	    spritePosition.x = plateformePos[i].x - SPRITE_WIDTH - 6;
+	    spritePosition.x = plateformePos[i].x - SPRITE_SIZE ;
 	  }
 	  if (collision(spritePosition,plateformePos[i])==2){
 	    spritePosition.x = plateformePos[i].x + BLOC_SIZE;
@@ -324,14 +328,18 @@ int main(int argc, char* argv[])
       
       if (saut == SAUT) {
 	for (int i = 0; i < NB_PLATEFORME; i++){
-	  if (collision(spritePosition, plateformePos[i])==4){
-	    col_haut = 1;
+	  if (plat_array[i] != 0){
+	    if (collision(spritePosition, plateformePos[i])==4){
+	      col_haut = 1;
+	    }
 	  }
 	}
-	if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != 0) && !col_haut){
+	if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != 34) && !col_haut){
 	    
 	  spritePosition.y -= 1;
 	}
+	
+	
 	else { saut = PASSAUT; }
       }
       
@@ -342,9 +350,11 @@ int main(int argc, char* argv[])
       }
       
       for (int i = 0; i <NB_PLATEFORME; i++){
-	if (collision(spritePosition,plateformePos[i]) == 3) {
-	  spritePosition.y -= 1;
-	  finsaut = 1;
+	if (plat_array[i] != 0){
+	  if (collision(spritePosition,plateformePos[i]) == 3) {
+	      spritePosition.y -= 1;
+	      finsaut = 1;
+	    }
 	}
       }
       if (spritePosition.y == SOL) {
@@ -352,14 +362,8 @@ int main(int argc, char* argv[])
       }
       
 	      /* draw the background */
-      for (int x = 0; x < SCREEN_WIDTH; x++) {
-	for (int y = 0; y < SCREEN_HEIGHT; y++) {
-	  SDL_Rect position;
-	  position.x = x * SKY_WIDTH;
-	      position.y = y * SKY_HEIGHT;
-	      SDL_BlitSurface(sky, NULL, screen, &position);
-	}
-      }
+
+	      SDL_BlitSurface(sky, NULL, screen, NULL);
       
       
       /*draw the timer*/
@@ -396,8 +400,9 @@ int main(int argc, char* argv[])
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
 	  
       for (int i=0; i < NB_PLATEFORME; i++){ 
-	if (plat_array[i] == 1){
-	  SDL_BlitSurface(plateforme[i],NULL, screen, &plateformePos[i]);
+	if (plat_array[i] != 0){
+	  blocImage.x = (plat_array[i] - 1)*34;
+	  SDL_BlitSurface(plateforme[i],&blocImage, screen, &plateformePos[i]);
 	}
       }
       
@@ -408,7 +413,7 @@ int main(int argc, char* argv[])
       
       
       
-      SDL_Delay(4);
+       SDL_Delay(4);
     }
     /* update the screen */
     SDL_UpdateRect(screen, 0, 0, 0, 0);
