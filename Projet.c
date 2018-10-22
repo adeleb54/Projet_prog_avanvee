@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
   temp   = SDL_LoadBMP("coeur.bmp");
   coeur = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
-  coeurPosition.x = 900;
+  coeurPosition.x = SCREEN_WIDTH - 80;
   coeurPosition.y = 0;
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   SDL_SetColorKey(coeur, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
   SDL_FreeSurface(temp);
   SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
-  
+  /*Bloc*/
   /*Initialisation du tableau plat_array qui enregistre la présence des plateformes affichées*/
   int plat_array[NB_PLATEFORME];
   for(int i=0; i < NB_PLATEFORME; i++){
@@ -161,6 +161,7 @@ int main(int argc, char* argv[])
   for (int i=0; i<NB_PLATEFORME; i++){
     temp = SDL_LoadBMP("bloc.bmp"); 
     plateforme[i] = SDL_DisplayFormat(temp);
+    SDL_SetColorKey(plateforme[i], SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
     SDL_FreeSurface(temp);
   }
   SDL_Rect blocImage;
@@ -352,7 +353,7 @@ int main(int argc, char* argv[])
 	    }
 	  }
 	}
-	if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != 34) && !col_haut){
+	if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != BLOC_SIZE) && !col_haut){
 	    
 	  spritePosition.y -= 1;
 	}
@@ -418,6 +419,7 @@ int main(int argc, char* argv[])
       tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
 	  
+      /*Affichage des bloc*/
       for (int i=0; i < NB_PLATEFORME; i++){ 
 	if (plat_array[i] != 0){
 	  blocImage.x = (plat_array[i] - 1)*34;
