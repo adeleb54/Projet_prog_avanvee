@@ -65,7 +65,8 @@ void HandleEvent(SDL_Event event,
 
 int main(int argc, char* argv[])
 {
-  SDL_Surface *screen, *temp, *sprite, *sky, *temps, *spritePause, *plateforme[NB_PLATEFORME], *coeur;
+  SDL_Surface *screen, *temp, *sprite, *sky, *temps, *spritePause, 
+	      *plateforme[NB_PLATEFORME], *coeur, *x, *number;
   int colorkey;
   int currentDirection = DIR_RIGHT;
   int animationFlip = 0;
@@ -73,6 +74,8 @@ int main(int argc, char* argv[])
   SDL_Rect tempsPosition;
   SDL_Rect pausePosition;
   SDL_Rect coeurPosition;
+  SDL_Rect xPosition;
+  SDL_Rect numberPosition;
   int gameover = 0;
   int hperso = spritePosition.y;
   int debutsaut;
@@ -85,6 +88,7 @@ int main(int argc, char* argv[])
   int pause = 1;
   int space = 0;
   int changspace = 1;
+  int vie = 5;
   
   
   
@@ -117,10 +121,33 @@ int main(int argc, char* argv[])
   temp   = SDL_LoadBMP("coeur.bmp");
   coeur = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
-  coeurPosition.x = SCREEN_WIDTH - 80;
-  coeurPosition.y = 0;
+  coeurPosition.x = SCREEN_WIDTH - 95;
+  coeurPosition.y = 5;
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
-  SDL_SetColorKey(coeur, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  SDL_SetColorKey(coeur, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);  
+  
+  /*Croix*/
+  temp   = SDL_LoadBMP("X.bmp");
+  x = SDL_DisplayFormat(temp);
+  SDL_FreeSurface(temp);
+  xPosition.x = SCREEN_WIDTH - 75;
+  xPosition.y = 0;
+  colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
+  SDL_SetColorKey(x, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);  
+  
+  
+  /*Vie*/
+  temp   = SDL_LoadBMP("franklin.bmp");
+  number = SDL_DisplayFormat(temp);
+  SDL_FreeSurface(temp);
+  SDL_Rect numberImage;
+  numberImage.y = 102;
+  numberImage.w = NB_WIDTH;
+  numberImage.h = NB_HEIGHT;
+  numberPosition.x = SCREEN_WIDTH - 50;
+  numberPosition.y = 5;
+  colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
+  SDL_SetColorKey(number, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
   /*Sky*/
   temp  = SDL_LoadBMP("ciel.bmp");
@@ -133,10 +160,10 @@ int main(int argc, char* argv[])
   SDL_FreeSurface(temp);
   SDL_Rect tempsImage;
   tempsImage.y = 102;
-  tempsImage.w = 15;
-  tempsImage.h = 19;
-  tempsPosition.w = 15;
-  tempsPosition.h = 19;
+  tempsImage.w = NB_WIDTH;
+  tempsImage.h = NB_HEIGHT;
+  tempsPosition.w = NB_WIDTH;
+  tempsPosition.h = NB_HEIGHT;
   tempsPosition.x = 5;
   tempsPosition.y = 5;
   SDL_SetColorKey(temps, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
@@ -210,25 +237,7 @@ int main(int argc, char* argv[])
       fclose(pFile);
     } 
   }
-  
-  void plateforme_test (){
-    plateformePos[0].x = 100;
-    plateformePos[0].y = 440;
-    plat_array[0] = 1;  
-    plateformePos[1].x = 100;
-    plateformePos[1].y = 360;
-    plat_array[1] = 1;  
-  }
  
-  void plateforme_test2 (){
-    plateformePos[0].x = 500;
-    plateformePos[0].y = 440;
-    plat_array[0] = 1;  
-    plateformePos[1].x = 500;
-    plateformePos[1].y = 350;
-    plat_array[1] = 1;  
-  }
-  
   int collision(SDL_Rect A, SDL_Rect B){
     if(A.x >= B.x + B.w || A.x + A.w <= B.x || A.y >= B.y + B.h || A.y + A.h <= B.y){
       return 0;
@@ -270,7 +279,7 @@ int main(int argc, char* argv[])
 		  &animationFlip, &spritePosition, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space);
     }
     
-    
+    /*Handle pause*/
     if (space == 0) {
       changspace = 1;
     }
@@ -285,6 +294,7 @@ int main(int argc, char* argv[])
     }
     else {
     
+      /*Handle timer*/
       timer += 1;
       
       int secondes = timer/200;
@@ -318,6 +328,7 @@ int main(int argc, char* argv[])
 	}
       }
       
+      /*Collisions*/
       if (spritePosition.x <= 0)
 	spritePosition.x = 0;
       if (spritePosition.x >= SCREEN_WIDTH - SPRITE_SIZE) 
@@ -351,6 +362,9 @@ int main(int argc, char* argv[])
 	    if (collision(spritePosition, plateformePos[i])==4){
 	      col_haut = 1;
 	    }
+	    if (debutsaut - SPRITE_SIZE == plateformePos[i].y){
+	      
+	    }
 	  }
 	}
 	if ((spritePosition.y >= debutsaut - HSAUT) && (spritePosition.y != BLOC_SIZE) && !col_haut){
@@ -380,13 +394,21 @@ int main(int argc, char* argv[])
 	finsaut = 1;      
       }
       
+		    /******Affichage*******/
+		    
+		    
 	      /* draw the background */
 
-	      SDL_BlitSurface(sky, NULL, screen, NULL);
-	      SDL_BlitSurface(coeur, NULL, screen, &coeurPosition);
+      SDL_BlitSurface(sky, NULL, screen, NULL);
+      
+	    /*Dans bandeau noir*/
+      SDL_BlitSurface(coeur, NULL, screen, &coeurPosition);
+      SDL_BlitSurface(x, NULL, screen, &xPosition);      
+      numberImage.x = vie * 32; 
+      SDL_BlitSurface(number, &numberImage, screen, &numberPosition);
       
       
-      /*draw the timer*/
+	    /*draw the timer*/
       tempsImage.x = 32 * (heures/10);
       tempsPosition.x = 10;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
@@ -419,7 +441,7 @@ int main(int argc, char* argv[])
       tempsPosition.x += 20;
       SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
 	  
-      /*Affichage des bloc*/
+	    /*draw blocs*/
       for (int i=0; i < NB_PLATEFORME; i++){ 
 	if (plat_array[i] != 0){
 	  blocImage.x = (plat_array[i] - 1)*34;
@@ -428,8 +450,7 @@ int main(int argc, char* argv[])
       }
       
        /* choose image according to direction and animation flip: */
-      spriteImage.x = SPRITE_SIZE*(2*currentDirection + animationFlip);
-	  
+      spriteImage.x = SPRITE_SIZE*(2*currentDirection + animationFlip);	  
       SDL_BlitSurface(sprite, &spriteImage, screen, &spritePosition);
       
       
@@ -440,6 +461,13 @@ int main(int argc, char* argv[])
     SDL_UpdateRect(screen, 0, 0, 0, 0);
   }  
   /* clean up */
+  for (int i = 0; i < NB_PLATEFORME; i++){
+    SDL_FreeSurface(plateforme[i]);
+  }
+  SDL_FreeSurface(coeur);
+  SDL_FreeSurface(x);
+  SDL_FreeSurface(number);
+  SDL_FreeSurface(temps);
   SDL_FreeSurface(sprite);
   SDL_FreeSurface(sky);
   SDL_Quit();

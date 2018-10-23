@@ -1,4 +1,4 @@
-SRC=Projet.c Projet.h
+SRC=Projet.c Projet.h 
 BIN=projet
 
 $(BIN): $(SRC)
@@ -6,5 +6,4 @@ $(BIN): $(SRC)
 
 clean:
 	rm -f $(BIN)
-
 

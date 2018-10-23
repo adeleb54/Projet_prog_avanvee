@@ -13,6 +13,8 @@
 /* Size of one image: */
 #define SPRITE_SIZE 	32
 #define BLOC_SIZE       31
+#define NB_WIDTH 	15
+#define NB_HEIGHT 	19
 
 /* Order of the different directions in the picture: */
 #define DIR_RIGHT       1
@@ -32,4 +34,4 @@
 
 int collision(SDL_Rect A, SDL_Rect B);
 
-void plateforme_test();
+void afficher_bloc();
