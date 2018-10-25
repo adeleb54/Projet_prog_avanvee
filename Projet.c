@@ -1,81 +1,17 @@
-#include "Projet.h"
-
-void HandleEvent(SDL_Event event,
-        int *quit, int *currDirection, int *animFlip, SDL_Rect *position, int *saut, int *debutsaut, 
-	int *hperso, int *finsaut, int *droite, int *gauche, int *space )
-{
-    switch (event.type) {
-        /* close button clicked */
-        case SDL_QUIT:
-            *quit = 1;
-            break;
-
-        /* handle the keyboard */
-        case SDL_KEYDOWN:
-            switch (event.key.keysym.sym) {
-                case SDLK_ESCAPE:
-                case SDLK_q:
-                    *quit = 1;
-                    break;
-		    
-		case SDLK_UP:
-		    if (*finsaut != 0) {
-		      *finsaut = 0;
-		      *saut = SAUT;
-		      *debutsaut = *hperso;
-		    }
-		    break;
-		    
-                case SDLK_LEFT:
-                    *gauche = 1;
-                    break;
-		    
-                case SDLK_RIGHT:
-                    *droite = 1;
-                    break;
-		
-		case SDLK_SPACE:
-		    *space = 1;
-		break;
-		
-                default:
-                    break;
-	    }
-	    break;
-	    
-	case SDL_KEYUP:
-	    switch (event.key.keysym.sym) {
-		case SDLK_LEFT:
-		    *gauche = 0;
-		    break;
-		    
-		case SDLK_RIGHT:
-		    *droite = 0;
-		    break;
-		    
-		case SDLK_SPACE:
-		    *space = 0;
-		    
-		default :
-		    break;
-	    }
-	    break;
-    }
-}
+#include "fonction.h"
 
 int main(int argc, char* argv[])
 {
-  SDL_Surface *screen, *temp, *sprite, *sky, *temps, *spritePause, 
-	      *plateforme[NB_PLATEFORME], *coeur, *x, *number;
+  SDL_Surface *screen, *temp, *sprite, *sky, *font, *spritePause, 
+	      //*perso
+	      *plateforme[NB_PLATEFORME];
   int colorkey;
   int currentDirection = DIR_RIGHT;
   int animationFlip = 0;
   SDL_Rect spritePosition;
-  SDL_Rect tempsPosition;
+  //SDL_Rect persoPosition;
   SDL_Rect pausePosition;
-  SDL_Rect coeurPosition;
-  SDL_Rect xPosition;
-  SDL_Rect numberPosition;
+  SDL_Rect fontPosition;
   int gameover = 0;
   int hperso = spritePosition.y;
   int debutsaut;
@@ -85,7 +21,7 @@ int main(int argc, char* argv[])
   int gauche = 0;
   int delai = 0;
   int timer = 0;
-  int pause = 1;
+  int pauseV = 1;
   int space = 0;
   int changspace = 1;
   int vie = 5;
@@ -102,7 +38,7 @@ int main(int argc, char* argv[])
   SDL_EnableKeyRepeat(10, 10);
 
   
-  /*Sprite*/
+  /*Sprites*/
   temp   = SDL_LoadBMP("sprite.bmp");
   sprite = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
@@ -117,57 +53,33 @@ int main(int argc, char* argv[])
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
-  /*Coeur*/
-  temp   = SDL_LoadBMP("coeur.bmp");
-  coeur = SDL_DisplayFormat(temp);
+  /*temp   = SDL_LoadBMP("persos.bmp");
+  perso = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
-  coeurPosition.x = SCREEN_WIDTH - 95;
-  coeurPosition.y = 5;
-  colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
-  SDL_SetColorKey(coeur, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);  
+  SDL_Rect persoImage;
+  persoImage.w = SPRITE_SIZE;
+  persoImage.h = SPRITE_SIZE;
+  persoPosition.w = SPRITE_SIZE;
+  persoPosition.h = SPRITE_SIZE;
+  persoPosition.x = 150;
+  persoPosition.y = SOL;
+  SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);*/
   
-  /*Croix*/
-  temp   = SDL_LoadBMP("X.bmp");
-  x = SDL_DisplayFormat(temp);
-  SDL_FreeSurface(temp);
-  xPosition.x = SCREEN_WIDTH - 75;
-  xPosition.y = 0;
-  colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
-  SDL_SetColorKey(x, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);  
-  
-  
-  /*Vie*/
+  /*Font*/
   temp   = SDL_LoadBMP("franklin.bmp");
-  number = SDL_DisplayFormat(temp);
+  font = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
-  SDL_Rect numberImage;
-  numberImage.y = 102;
-  numberImage.w = NB_WIDTH;
-  numberImage.h = NB_HEIGHT;
-  numberPosition.x = SCREEN_WIDTH - 50;
-  numberPosition.y = 5;
-  colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
-  SDL_SetColorKey(number, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  SDL_Rect fontImage;
+  fontImage.w = FONT_SIZE;
+  fontImage.h = FONT_SIZE; 
+  fontPosition.y = 0;
+  SDL_SetColorKey(font, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);  
   
   /*Sky*/
   temp  = SDL_LoadBMP("ciel.bmp");
   sky = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
-    
-  /*Timer*/
-  temp   = SDL_LoadBMP("franklin.bmp");
-  temps = SDL_DisplayFormat(temp);
-  SDL_FreeSurface(temp);
-  SDL_Rect tempsImage;
-  tempsImage.y = 102;
-  tempsImage.w = NB_WIDTH;
-  tempsImage.h = NB_HEIGHT;
-  tempsPosition.w = NB_WIDTH;
-  tempsPosition.h = NB_HEIGHT;
-  tempsPosition.x = 5;
-  tempsPosition.y = 5;
-  SDL_SetColorKey(temps, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
-  
+      
   /*Pause*/
   temp  = SDL_LoadBMP("Pause.bmp");
   spritePause = SDL_DisplayFormat(temp);
@@ -198,76 +110,7 @@ int main(int argc, char* argv[])
 
   SDL_Rect plateformePos [NB_PLATEFORME];
   
-  void afficher_bloc(const char* nomFichier){
-    FILE* pFile;
-    int c, i = 0;
-    int posX = 0, posY = BLOC_SIZE;
-    pFile = fopen(nomFichier, "r");
-    if (pFile==NULL)  perror ("Error opening file"); 
-    else {
-      c = fgetc(pFile);
-      while(c != EOF){
-	switch (c){
-	  case 48 :
-	    plat_array[i] = 0;
-	    i ++;
-	    break;
-	  case 49 :
-	    plat_array[i] = 1;
-	    plateformePos[i].x = posX;
-	    plateformePos[i].y = posY;
-	    i ++;
-	    break;
-	  case 50 :
-	    plat_array[i] = 2;
-	    plateformePos[i].x = posX;
-	    plateformePos[i].y = posY;
-	    i ++;
-	    break;
-	  default:
-	    break;
-	}
-	posX += BLOC_SIZE;
-	if (posX > SCREEN_WIDTH){
-	  posX = 0;
-	  posY += BLOC_SIZE;
-	}
-	c = fgetc(pFile);
-      }
-      fclose(pFile);
-    } 
-  }
- 
-  int collision(SDL_Rect A, SDL_Rect B){
-    if(A.x >= B.x + B.w || A.x + A.w <= B.x || A.y >= B.y + B.h || A.y + A.h <= B.y){
-      return 0;
-    }
-    //collision avec le bas du sprite
-    if(A.y + A.h > B.y && A.y + A.h < B.y + 5){
-      saut = PASSAUT;
-      return 3;
-    }
-    
-    //collision avec le haut du sprite
-    if(A.y < B.y + B.h  && A.y + 5 > B.y + B.h){
-      return 4;
-    }
-    
-    //collision avec la gauche du sprite
-    if(A.x <= B.x + B.w && A.x > B.x && A.y + A.h >= B.y && A.y <= B.y + B.h){
-      return 2;
-    }
-    
-    //collision avec la droite du sprite
-    if(A.x + A.w > B.x && A.x < B.x && A.y + A.h >= B.y && A.y <= B.y + B.h){
-      return 1;
-    }
-    
-    return 0;
-  }
-  
-        
-  afficher_bloc("test.txt");
+  afficher_bloc("test.txt", plat_array, plateformePos);
   
 
   while (!gameover)
@@ -276,23 +119,10 @@ int main(int argc, char* argv[])
 	
     if (SDL_PollEvent(&event)) {
       HandleEvent(event, &gameover, &currentDirection,
-		  &animationFlip, &spritePosition, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space);
+		  &animationFlip, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space);
     }
-    
-    /*Handle pause*/
-    if (space == 0) {
-      changspace = 1;
-    }
-    
-    if (changspace == 1 && space == 1) {
-      changspace = 0;
-      pause = 1 - pause;
-    }
-    
-    if (pause == 0) {
-      SDL_BlitSurface(spritePause, NULL, screen, &pausePosition);
-    }
-    else {
+
+    if (pause (&space, &changspace, &pauseV, pausePosition, spritePause, screen) == 1){
     
       /*Handle timer*/
       timer += 1;
@@ -304,29 +134,8 @@ int main(int argc, char* argv[])
       secondes = secondes - 60*minutes;
 
 
-    /*handle the movement of the sprite*/
-      if (droite == 1){
-	spritePosition.x += SPRITE_STEP;
-	currentDirection = DIR_RIGHT;
-	if (finsaut != 0) {
-	  delai = delai + 1;
-	}
-	if (delai == 15) {
-	  animationFlip = 1 - animationFlip;
-	  delai = 0;
-	}
-      }
-      if (gauche == 1) {
-	spritePosition.x -= SPRITE_STEP;
-	currentDirection = DIR_LEFT;
-	if (finsaut != 0) {
-	  delai = delai + 1;
-	}
-	if (delai == 15) {
-	  animationFlip = 1 - animationFlip;
-	  delai = 0;
-	}
-      }
+      /*handle the movement of the sprite*/
+      move (&droite, &gauche, &spritePosition, &currentDirection, &finsaut, &delai, &animationFlip);
       
       /*Collisions*/
       if (spritePosition.x <= 0)
@@ -338,13 +147,13 @@ int main(int argc, char* argv[])
     
       for (int i = 0; i <NB_PLATEFORME; i++){
 	if (plat_array[i] != 0) {
-	  if (collision(spritePosition,plateformePos[i])==1){
+	  if (collision(spritePosition,plateformePos[i], &saut)==1){
 	    spritePosition.x = plateformePos[i].x - SPRITE_SIZE ;
 	  }
-	  if (collision(spritePosition,plateformePos[i])==2){
+	  if (collision(spritePosition,plateformePos[i], &saut)==2){
 	    spritePosition.x = plateformePos[i].x + BLOC_SIZE;
 	      }
-	  if (collision(spritePosition,plateformePos[i])==3){
+	  if (collision(spritePosition,plateformePos[i], &saut)==3){
 	    spritePosition.y = plateformePos[i].y - BLOC_SIZE;
 	  }
 	}
@@ -359,7 +168,7 @@ int main(int argc, char* argv[])
       if (saut == SAUT) {
 	for (int i = 0; i < NB_PLATEFORME; i++){
 	  if (plat_array[i] != 0){
-	    if (collision(spritePosition, plateformePos[i])==4){
+	    if (collision(spritePosition, plateformePos[i], &saut)==4){
 	      col_haut = 1;
 	    }
 	    if (debutsaut - SPRITE_SIZE == plateformePos[i].y){
@@ -384,7 +193,7 @@ int main(int argc, char* argv[])
       
       for (int i = 0; i <NB_PLATEFORME; i++){
 	if (plat_array[i] != 0){
-	  if (collision(spritePosition,plateformePos[i]) == 3) {
+	  if (collision(spritePosition,plateformePos[i], &saut) == 3) {
 	      spritePosition.y -= 1;
 	      finsaut = 1;
 	    }
@@ -402,44 +211,61 @@ int main(int argc, char* argv[])
       SDL_BlitSurface(sky, NULL, screen, NULL);
       
 	    /*Dans bandeau noir*/
-      SDL_BlitSurface(coeur, NULL, screen, &coeurPosition);
-      SDL_BlitSurface(x, NULL, screen, &xPosition);      
-      numberImage.x = vie * 32; 
-      SDL_BlitSurface(number, &numberImage, screen, &numberPosition);
-      
-      
+     
 	    /*draw the timer*/
-      tempsImage.x = 32 * (heures/10);
-      tempsPosition.x = 10;
-      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      fontImage.y = FONT_SIZE*3;
+	    
+      fontImage.x = 32 * (heures/10);
+      fontPosition.x = 10;
+      SDL_BlitSurface(font, &fontImage, screen, &fontPosition);
       
-      tempsImage.x = 32 * (heures%10);
-      tempsPosition.x += 20;
-      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      fontImage.x = 32 * (heures%10);
+      fontPosition.x += 20;
+      SDL_BlitSurface(font, &fontImage, screen, &fontPosition);
       
-      tempsImage.x = 320;
-      tempsPosition.x += 30;
-      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      fontImage.x = 320;
+      fontPosition.x += 30;
+      SDL_BlitSurface(font, &fontImage, screen, &fontPosition);
       
-      tempsImage.x = 32 * (minutes/10);
-      tempsPosition.x += 20;
-      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      fontImage.x = 32 * (minutes/10);
+      fontPosition.x += 20;
+      SDL_BlitSurface(font, &fontImage, screen, &fontPosition);
       
-      tempsImage.x = 32 * (minutes%10);
-      tempsPosition.x += 20;
-      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      fontImage.x = 32 * (minutes%10);
+      fontPosition.x += 20;
+      SDL_BlitSurface(font, &fontImage, screen, &fontPosition);
       
-      tempsImage.x = 320;
-      tempsPosition.x += 30;
-      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      fontImage.x = 320;
+      fontPosition.x += 30;
+      SDL_BlitSurface(font, &fontImage, screen, &fontPosition);
       
-      tempsImage.x = 32 * (secondes/10);
-      tempsPosition.x += 20;
-      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      fontImage.x = 32 * (secondes/10);
+      fontPosition.x += 20;
+      SDL_BlitSurface(font, &fontImage, screen, &fontPosition);
       
-      tempsImage.x = 32 * (secondes%10);
-      tempsPosition.x += 20;
-      SDL_BlitSurface(temps, &tempsImage, screen, &tempsPosition);
+      fontImage.x = 32 * (secondes%10);
+      fontPosition.x += 20;
+      SDL_BlitSurface(font, &fontImage, screen, &fontPosition);
+      
+      
+      /*Affichage du coeur*/
+      fontPosition.x = SCREEN_WIDTH - 90;
+      fontImage.x = 0;
+      fontImage.y = 0;
+      SDL_BlitSurface(font, &fontImage, screen, &fontPosition);
+      
+      
+      /*Affichage du x*/
+      fontPosition.x += 32;
+      fontImage.x = FONT_SIZE*8;
+      fontImage.y = FONT_SIZE*7;
+      SDL_BlitSurface(font, &fontImage, screen, &fontPosition);   
+      
+      /*Affichage de la vie restante*/
+      fontImage.x = vie * 32;
+      fontImage.y = FONT_SIZE*3;
+      fontPosition.x += 20;
+      SDL_BlitSurface(font, &fontImage, screen, &fontPosition);
 	  
 	    /*draw blocs*/
       for (int i=0; i < NB_PLATEFORME; i++){ 
@@ -464,10 +290,7 @@ int main(int argc, char* argv[])
   for (int i = 0; i < NB_PLATEFORME; i++){
     SDL_FreeSurface(plateforme[i]);
   }
-  SDL_FreeSurface(coeur);
-  SDL_FreeSurface(x);
-  SDL_FreeSurface(number);
-  SDL_FreeSurface(temps);
+  SDL_FreeSurface(font);
   SDL_FreeSurface(sprite);
   SDL_FreeSurface(sky);
   SDL_Quit();

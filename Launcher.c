@@ -1,4 +1,4 @@
-#include "Projet.h"
+#include "fonction.h"
 
 void HandleEvent(SDL_Event event,
         int *quit, int *haut, int *bas, int *space, int *entree)
