@@ -57,10 +57,11 @@ void HandleEvent(SDL_Event event,
 
 int main(int argc, char* argv[]) {
   
-  SDL_Surface *screen, *temp, *sky, *temps, *spritePause;
+  SDL_Surface *screen, *temp, *sky, *temps, *spriteDem, *spriteQuit;
   int colorkey;
   SDL_Rect tempsPosition;
-  SDL_Rect pausePosition;
+  SDL_Rect demPosition;
+  SDL_Rect quitPosition;
   int haut = 0;
   int bas = 0;
   int space = 0;
@@ -100,11 +101,18 @@ int main(int argc, char* argv[]) {
   SDL_SetColorKey(temps, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
   /*Pause*/
-  temp  = SDL_LoadBMP("Pause.bmp");
-  spritePause = SDL_DisplayFormat(temp);
-  pausePosition.x = 214;
+  temp  = SDL_LoadBMP("dem2.bmp");
+  spriteDem = SDL_DisplayFormat(temp);
+  demPosition.x = 217;
   SDL_FreeSurface(temp);
-  SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  SDL_SetColorKey(spriteDem, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  
+  /*Pause*/
+  temp  = SDL_LoadBMP("quit2.bmp");
+  spriteQuit = SDL_DisplayFormat(temp);
+  quitPosition.x = 225;
+  SDL_FreeSurface(temp);
+  SDL_SetColorKey(spriteQuit, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
   while (!gameover) {
     
@@ -136,11 +144,11 @@ int main(int argc, char* argv[]) {
     SDL_BlitSurface(sky, NULL, screen, NULL);
     
     
-    pausePosition.y = 90;
-    SDL_BlitSurface(spritePause, NULL, screen, &pausePosition);
+    demPosition.y = 90;
+    SDL_BlitSurface(spriteDem, NULL, screen, &demPosition);
     
-    pausePosition.y = 120;
-    SDL_BlitSurface(spritePause, NULL, screen, &pausePosition);
+    quitPosition.y = 120;
+    SDL_BlitSurface(spriteQuit, NULL, screen, &quitPosition);
     
     if (select == 0) {
       tempsPosition.y = 90;
