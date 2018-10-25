@@ -66,13 +66,14 @@ void HandleEvent(SDL_Event event,
 int main(int argc, char* argv[])
 {
   SDL_Surface *screen, *temp, *sprite, *sky, *font, *spritePause, 
-	      *plateforme[NB_PLATEFORME];
+	      *oneup, *plateforme[NB_PLATEFORME];
   int colorkey;
   int currentDirection = DIR_RIGHT;
   int animationFlip = 0;
   SDL_Rect spritePosition;
   SDL_Rect pausePosition;
   SDL_Rect fontPosition;
+  SDL_Rect upPosition;
   int gameover = 0;
   int hperso = spritePosition.y;
   int debutsaut;
@@ -86,7 +87,8 @@ int main(int argc, char* argv[])
   int space = 0;
   int changspace = 1;
   int vie = 5;
-  
+  int item = 0;
+  int tempsItem = 0;
   
   
   /* initialize SDL */
@@ -141,6 +143,12 @@ int main(int argc, char* argv[])
   SDL_FreeSurface(temp);
   SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
+  /*1up*/
+  temp  = SDL_LoadBMP("1up.bmp");
+  oneup = SDL_DisplayFormat(temp);
+  SDL_FreeSurface(temp);
+  SDL_SetColorKey(oneup, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  
   /*Bloc*/
   /*Initialisation du tableau plat_array qui enregistre la présence des plateformes affichées*/
   int plat_array[NB_PLATEFORME];
@@ -189,6 +197,24 @@ int main(int argc, char* argv[])
 	    plateformePos[i].y = posY;
 	    i ++;
 	    break;
+	  case 51 :
+	    plat_array[i] = 3;
+	    plateformePos[i].x = posX;
+	    plateformePos[i].y = posY;
+	    i ++;
+	    break;
+	  case 52 :
+	    plat_array[i] = 4;
+	    plateformePos[i].x = posX;
+	    plateformePos[i].y = posY;
+	    i ++;
+	    break;
+	  case 53 :
+	    plat_array[i] = 5;
+	    plateformePos[i].x = posX;
+	    plateformePos[i].y = posY;
+	    i ++;
+	    break;
 	  default:
 	    break;
 	}
@@ -233,6 +259,12 @@ int main(int argc, char* argv[])
   
         
   afficher_bloc("test.txt");
+  
+//   void afficher_bonus(int positionX, int positionY) {
+// 	
+// 	SDL_BlitSurface(oneup, NULL, screen, &upPosition);
+// 	  
+//   }
   
 
   while (!gameover)
@@ -304,13 +336,34 @@ int main(int argc, char* argv[])
       for (int i = 0; i <NB_PLATEFORME; i++){
 	if (plat_array[i] != 0) {
 	  if (collision(spritePosition,plateformePos[i])==1){
-	    spritePosition.x = plateformePos[i].x - SPRITE_SIZE ;
+	    if (plat_array[i] != 5) {
+	      spritePosition.x = plateformePos[i].x - SPRITE_SIZE ;
+	    }
+	    else if (plat_array[i] == 5) {
+	      plat_array[i] = 0;
+	      item += 1;
+	      vie += 1;
+	    }
 	  }
 	  if (collision(spritePosition,plateformePos[i])==2){
-	    spritePosition.x = plateformePos[i].x + BLOC_SIZE;
-	      }
+	    if (plat_array[i] != 5){
+	      spritePosition.x = plateformePos[i].x + BLOC_SIZE;
+	    }
+	    else if (plat_array[i] == 5) {
+	      plat_array[i] = 0;
+	      item += 1;
+	      vie += 1;
+	    }
+	  }
 	  if (collision(spritePosition,plateformePos[i])==3){
-	    spritePosition.y = plateformePos[i].y - BLOC_SIZE;
+	    if (plat_array[i] != 5){
+	      spritePosition.y = plateformePos[i].y - BLOC_SIZE;
+	    }
+	    else if (plat_array[i] == 5) {
+	      plat_array[i] = 0;
+	      item += 1;
+	      vie += 1;
+	    }
 	  }
 	}
       }
@@ -430,6 +483,18 @@ int main(int argc, char* argv[])
 	}
       }
       
+      /*Draw bonus*/
+      if (item == 1){
+	upPosition.x = spritePosition.x;
+ 	upPosition.y = spritePosition.y - 40;
+	tempsItem += 1;
+	SDL_BlitSurface(oneup, NULL, screen, &upPosition);
+	if (tempsItem == 150) {
+	  item = 0;
+	  tempsItem = 0;
+	}
+      }
+      
        /* choose image according to direction and animation flip: */
       spriteImage.x = SPRITE_SIZE*(2*currentDirection + animationFlip);	  
       SDL_BlitSurface(sprite, &spriteImage, screen, &spritePosition);
@@ -446,6 +511,7 @@ int main(int argc, char* argv[])
     SDL_FreeSurface(plateforme[i]);
   }
   SDL_FreeSurface(font);
+  SDL_FreeSurface(oneup);
   SDL_FreeSurface(sprite);
   SDL_FreeSurface(sky);
   SDL_Quit();

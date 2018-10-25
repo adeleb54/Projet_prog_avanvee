@@ -28,6 +28,7 @@
 
 #define NB_SOL 2
 #define NB_PLATEFORME 570
+#define NB_ITEMS 2
 
 /* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     1
