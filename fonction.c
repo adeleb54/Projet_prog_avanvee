@@ -182,3 +182,157 @@ void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirec
 	}
       }
 }
+
+//Replacement du sprite lors de collisions
+void replacement (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int saut){
+  if (spritePosition->x <= 0)
+    spritePosition->x = 0;
+  if (spritePosition->x >= SCREEN_WIDTH - SPRITE_SIZE) 
+    spritePosition->x = SCREEN_WIDTH - SPRITE_SIZE;
+  if (spritePosition->y >= SCREEN_HEIGHT - SPRITE_SIZE) 
+    spritePosition->y = SCREEN_HEIGHT - SPRITE_SIZE;
+    
+  for (int i = 0; i <NB_PLATEFORME; i++){
+    if (plat_array[i] != 0) {
+      if (collision(*spritePosition,plateformePos[i], &saut)==1){
+	spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;	
+      }
+      if (collision(*spritePosition,plateformePos[i], &saut)==2){
+	spritePosition->x = plateformePos[i].x + BLOC_SIZE;	
+      }
+      if (collision(*spritePosition,plateformePos[i], &saut)==3){
+	spritePosition->y = plateformePos[i].y - BLOC_SIZE;
+      }	
+    }
+  }
+}
+
+//Gestion du timer
+void fTimer (int* timer, int* heures, int* minutes, int* secondes){
+  *heures = *timer/(200*3600);
+  *minutes = (*timer/200 - 3600 * *heures)/ 60;
+  *secondes = *timer/200 - 60 * *minutes;
+}
+
+//Gestion du saut
+void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SDL_Rect *plateformePos, int *debutsaut, int *finsaut){
+  *hperso = spritePosition->y;
+  int col_haut = 0;
+  
+  if (*saut == SAUT) {
+    for (int i = 0; i < NB_PLATEFORME; i++){
+      if (plat_array[i] != 0){
+	if (collision(*spritePosition, plateformePos[i], saut)==4){
+	  col_haut = 1;
+	}
+	if (*debutsaut - SPRITE_SIZE == plateformePos[i].y){
+	  
+	}
+      }
+    }
+    if ((spritePosition->y >= *debutsaut - HSAUT) && (spritePosition->y != BLOC_SIZE) && !col_haut){
+	
+      spritePosition->y -= 1;
+    }
+    
+    
+    else { *saut = PASSAUT; }
+  }
+  
+  if (spritePosition->y != SOL) {
+    if (*saut == PASSAUT) {
+      spritePosition->y += 1;
+    }
+  }
+  
+  for (int i = 0; i <NB_PLATEFORME; i++){
+    if (plat_array[i] != 0){
+      if (collision(*spritePosition,plateformePos[i], saut) == 3) {
+	  spritePosition->y -= 1;
+	  *finsaut = 1;
+	}
+    }
+  }
+  if (spritePosition->y == SOL) {
+    *finsaut = 1;      
+  }
+}
+
+
+//Affichages
+
+void drawSky (SDL_Surface *sky, SDL_Surface *screen){
+  SDL_BlitSurface(sky, NULL, screen, NULL);
+}
+
+void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_Rect *fontPosition, int *heures, int *minutes, int *secondes, int *vie){
+  
+  fontImage->y = FONT_SIZE*3;
+  
+  //Affichage du timer
+  fontImage->x = 32 * (*heures/10);
+  fontPosition->x = 10;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+
+  fontImage->x = 32 * (*heures%10);
+  fontPosition->x += 20;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+
+  fontImage->x = 320;
+  fontPosition->x += 30;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+
+  fontImage->x = 32 * (*minutes/10);
+  fontPosition->x += 20;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+
+  fontImage->x = 32 * (*minutes%10);
+  fontPosition->x += 20;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+
+  fontImage->x = 320;
+  fontPosition->x += 30;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+
+  fontImage->x = 32 * (*secondes/10);
+  fontPosition->x += 20;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+
+  fontImage->x = 32 * (*secondes%10);
+  fontPosition->x += 20;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+
+
+  /*Affichage du coeur*/
+  fontPosition->x = SCREEN_WIDTH - 90;
+  fontImage->x = 0;
+  fontImage->y = 0;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+
+
+  /*Affichage du x*/
+  fontPosition->x += 32;
+  fontImage->x = FONT_SIZE*8;
+  fontImage->y = FONT_SIZE*7;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);   
+
+  /*Affichage de la vie restante*/
+  fontImage->x = *vie * 32;
+  fontImage->y = FONT_SIZE*3;
+  fontPosition->x += 20;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+}
+
+void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage, SDL_Rect *plateformePos, int *plat_array){
+  for (int i=0; i < NB_PLATEFORME; i++){ 
+    if (plat_array[i] != 0){
+      blocImage->x = (plat_array[i] - 1)* BLOC_SIZE;
+      SDL_BlitSurface(plateforme[i],blocImage, screen, &plateformePos[i]);   
+    }
+  }
+}
+
+void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, int *currentDirection, int *animationFlip){
+  spriteImage->x = SPRITE_SIZE*(2* *currentDirection + *animationFlip);	  
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+}
