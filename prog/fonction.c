@@ -121,6 +121,24 @@ void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateforme
 	    plateformePos[i].y = posY;
 	    i ++;
 	    break;
+	  case 51 :
+	    plat_array[i] = 3;
+	    plateformePos[i].x = posX;
+	    plateformePos[i].y = posY;
+	    i ++;
+	    break;
+	  case 52 :
+	    plat_array[i] = 4;
+	    plateformePos[i].x = posX;
+	    plateformePos[i].y = posY;
+	    i ++;
+	    break;
+	  case 53 :
+	    plat_array[i] = 5;
+	    plateformePos[i].x = posX;
+	    plateformePos[i].y = posY;
+	    i ++;
+	    break;
 	  default:
 	    break;
 	}
@@ -184,49 +202,51 @@ void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirec
 }
 
 // Gestion des items
-void gestion_items (int collision, int *plat_array, int cote_collision, SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *vie, int *item, int *clef, int *tempsItem, int i) {
-  if (cote_collision == 0) {
-  }
-  if (cote_collision == 3) {
-    if (*clef >= 1) {
-      *clef -= 1;
+void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *vie, int *item, int *clef, int *tempsItem, int i) {
+  if (collision == 1 || collision == 2 || collision == 3){
+    if (bloc == 0) {
+    }
+    if (bloc == 3) {
+      if (*clef >= 1) {
+	*clef -= 1;
+	plat_array[i] = 0;
+      }
+      else {
+	if (collision == 1) {
+	  spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;
+	}
+	if (collision == 2) {
+	  spritePosition->x = plateformePos[i].x + BLOC_SIZE ;
+	}
+	if (collision ==3) {
+	  spritePosition->y = plateformePos[i].y - BLOC_SIZE ;
+	}
+      }
+    }
+    if (bloc == 4) {
       plat_array[i] = 0;
-    }
-    else {
-      if (collision == 1) {
-	spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;
+      if (*item == 1) {
+	*vie += 1;
+	*tempsItem = 0;
       }
-      if (collision == 2) {
-	spritePosition->x = plateformePos[i].x + BLOC_SIZE ;
+      else {
+	*vie += 1;
+	*item = 1;
       }
-      if (collision ==3) {
-	spritePosition->y = plateformePos[i].y - BLOC_SIZE ;
+      return;
+    }
+    if (bloc == 5) {
+      plat_array[i] = 0;
+      if (*item == 2) {
+	*clef += 1;
+	*tempsItem = 0;
       }
-    }
-  }
-  if (cote_collision == 4) {
-    plat_array[i] = 0;
-    if (*item == 1) {
-      *vie += 1;
-      *tempsItem = 0;
-    }
-    else {
-      *vie += 1;
-      *item = 1;
-    }
+      else {
+	*clef += 1;
+	*item = 2;
+      }
     return;
-  }
-  if (cote_collision == 5) {
-    plat_array[i] = 0;
-    if (*item == 2) {
-      *clef += 1;
-      *tempsItem = 0;
     }
-    else {
-      *clef += 1;
-      *item = 2;
-    }
-   return;
   }
 }
 
@@ -240,7 +260,7 @@ void replacement (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_a
     spritePosition->y = SCREEN_HEIGHT - SPRITE_SIZE;
     
   for (int i = 0; i <NB_PLATEFORME; i++){
-    if (plat_array[i] < 3) {
+    if (plat_array[i] < 3 && plat_array[i] != 0) {
       if (collision(*spritePosition,plateformePos[i], &saut)==1){
 	spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;	
       }
@@ -296,7 +316,7 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
   }
   
   for (int i = 0; i <NB_PLATEFORME; i++){
-    if (plat_array[i] != 0){
+    if (plat_array[i] != 0 && plat_array[i] < 4){
       if (collision(*spritePosition,plateformePos[i], saut) == 3) {
 	  spritePosition->y -= 1;
 	  *finsaut = 1;
@@ -315,7 +335,7 @@ void drawSky (SDL_Surface *sky, SDL_Surface *screen){
   SDL_BlitSurface(sky, NULL, screen, NULL);
 }
 
-void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_Rect *fontPosition, int *heures, int *minutes, int *secondes, int *vie){
+void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_Rect *fontPosition, int *heures, int *minutes, int *secondes, int *vie, int *clef){
   
   fontImage->y = FONT_SIZE*3;
   
@@ -352,7 +372,25 @@ void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_
   fontPosition->x += 20;
   SDL_BlitSurface(font, fontImage, screen, fontPosition);
 
-
+  /*Affichage de la clef*/
+  fontPosition->x = SCREEN_WIDTH - 180;
+  fontImage->x = 31;
+  fontImage->y = 0;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  
+  
+  /*Affichage du x*/
+  fontPosition->x += 32;
+  fontImage->x = FONT_SIZE*8;
+  fontImage->y = FONT_SIZE*7;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  
+  /*Affichage ddu nombre de clefs*/
+  fontImage->x = *clef * 32;
+  fontImage->y = FONT_SIZE*3;
+  fontPosition->x += 20;
+  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  
   /*Affichage du coeur*/
   fontPosition->x = SCREEN_WIDTH - 90;
   fontImage->x = 0;
@@ -376,9 +414,24 @@ void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_
 void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage, SDL_Rect *plateformePos, int *plat_array){
   for (int i=0; i < NB_PLATEFORME; i++){ 
     if (plat_array[i] != 0){
-      blocImage->x = (plat_array[i] - 1)* BLOC_SIZE;
+      blocImage->x = (plat_array[i] - 1)* 32;
       SDL_BlitSurface(plateforme[i],blocImage, screen, &plateformePos[i]);   
     }
+  }
+}
+
+void drawBonus (SDL_Surface *oneup, SDL_Surface *screen, SDL_Rect *upImage, SDL_Rect *upPosition, int *item, int *tempsItem, SDL_Rect *spritePosition){
+  /*Draw bonus*/
+  if (*item != 0){
+    upPosition->x = spritePosition->x;
+    upPosition->y = spritePosition->y - 40;
+    upImage->x = (*item - 1)*31;
+    *tempsItem += 1;
+    SDL_BlitSurface(oneup, upImage, screen, upPosition);
+    if (*tempsItem == 150) {
+      *item = 0;
+      *tempsItem = 0;      
+    }    
   }
 }
 
