@@ -51,7 +51,7 @@ void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirec
 
 void enemyMove(SDL_Rect *enemyPosition, int *enDirection, int *enAnimFlip, int *delaiEN);
 
-void replacement (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int saut);
+void replacement (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int saut, int *vie, int *item, int *clef, int *tempsItem);
 
 void fTimer (int* timer, int* heures, int* minutes, int* secondes);
 
