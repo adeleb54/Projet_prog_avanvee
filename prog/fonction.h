@@ -51,11 +51,15 @@ void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirec
 
 void enemyMove(SDL_Rect *enemyPosition, int *enDirection, int *enAnimFlip, int *delaiEN);
 
-void replacement (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int saut, int *vie, int *item, int *clef, int *tempsItem);
+void replacement (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int saut, int *vie, int *item, int *clef, int *tempsItem, int *damage);
+
+void lose_life (int *damage, int *tempsDamage, int *vie);
 
 void fTimer (int* timer, int* heures, int* minutes, int* secondes);
 
-void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SDL_Rect *plateformePos, int *debutsaut, int *finsaut);
+void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SDL_Rect *plateformePos, int *debutsaut, int *finsaut, int *damage);
+
+int game_over (int *vie, SDL_Rect gameoverPosition, SDL_Surface *spriteGameover, SDL_Surface *screen);
 
 void drawSky (SDL_Surface *sky, SDL_Surface *screen);
 

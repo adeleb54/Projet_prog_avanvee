@@ -3,7 +3,7 @@
 int main(int argc, char* argv[])
 {
   SDL_Surface *screen, *temp, *sprite, *sky, *font, *spritePause, 
-	      *enemy, 
+	      *enemy, *spriteGameover,
 	      *oneup, *plateforme[NB_PLATEFORME];
   int colorkey;
   int currentDirection = DIR_RIGHT;
@@ -15,6 +15,7 @@ int main(int argc, char* argv[])
   SDL_Rect pausePosition;
   SDL_Rect fontPosition;
   SDL_Rect upPosition;
+  SDL_Rect gameoverPosition;
   int gameover = 0;
   int hperso = spritePosition.y;
   int debutsaut;
@@ -33,6 +34,8 @@ int main(int argc, char* argv[])
   int item = 0;
   int tempsItem = 0;
   int clef = 0;
+  int damage = 0;
+  int tempsDamage = 0;
   
   
   /* initialize SDL */
@@ -91,10 +94,18 @@ int main(int argc, char* argv[])
   /*Pause*/
   temp  = SDL_LoadBMP("Pause.bmp");
   spritePause = SDL_DisplayFormat(temp);
-  pausePosition.x = 281;
-  pausePosition.y = 235;
+  pausePosition.x = (SCREEN_WIDTH - 72)/2;
+  pausePosition.y = (SCREEN_HEIGHT - 20)/2;
   SDL_FreeSurface(temp);
   SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  
+  /*Game Over*/
+  temp  = SDL_LoadBMP("gameover.bmp");
+  spriteGameover = SDL_DisplayFormat(temp);
+  gameoverPosition.x = (SCREEN_WIDTH - 126)/2;
+  gameoverPosition.y = (SCREEN_HEIGHT - 20)/2;
+  SDL_FreeSurface(temp);
+  SDL_SetColorKey(spriteGameover, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
   /*1up*/
   temp  = SDL_LoadBMP("items.bmp");
@@ -139,7 +150,7 @@ int main(int argc, char* argv[])
     }
     
     //Pause
-    if (pause (&space, &changspace, &pauseV, pausePosition, spritePause, screen) == 1){
+    if ((pause (&space, &changspace, &pauseV, pausePosition, spritePause, screen) == 1)  && (game_over(&vie, gameoverPosition, spriteGameover, screen) == 0)){
     
       
     //Jeu
@@ -153,10 +164,13 @@ int main(int argc, char* argv[])
       move (&droite, &gauche, &spritePosition, &currentDirection, &finsaut, &delai, &animationFlip);
       
       /*Collisions*/      
-      replacement (&spritePosition, plateformePos, plat_array, saut, &vie, &item, &clef, &tempsItem);
+      replacement (&spritePosition, plateformePos, plat_array, saut, &vie, &item, &clef, &tempsItem, &damage);
+      
+      /*Gestion des dégâts*/
+      lose_life (&damage, &tempsDamage, &vie);
 
       /*Saut*/
-      Saut (&hperso, &spritePosition, &saut, plat_array, plateformePos, &debutsaut, &finsaut);
+      Saut (&hperso, &spritePosition, &saut, plat_array, plateformePos, &debutsaut, &finsaut, &damage);
       
 		    /******Affichage*******/
 		    
