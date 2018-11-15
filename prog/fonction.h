@@ -6,8 +6,8 @@
 #include <stdlib.h>
 
 /* Size of the window */
-#define SCREEN_WIDTH  930
-#define SCREEN_HEIGHT 589
+#define SCREEN_WIDTH  960
+#define SCREEN_HEIGHT 608
 
 /* Size of the grass texture picture */
 #define SKY_WIDTH    500
@@ -15,18 +15,21 @@
 
 /* Size of one image: */
 #define SPRITE_SIZE 	32
-#define BLOC_SIZE       31
+#define BLOC_SIZE       32
 #define FONT_SIZE 	32
 
 /* Order of the different directions in the picture: */
 #define DIR_RIGHT       1
 #define DIR_LEFT        3
 
+#define EN_DIR_RIGHT   	3
+#define EN_DIR_LEFT	2
+
 #define SAUT 1
 #define PASSAUT 0
 
 #define HSAUT 50
-#define SOL 557
+#define SOL 576
 
 #define NB_SOL 2
 #define NB_PLATEFORME 570
@@ -46,7 +49,7 @@ int pause (int *space, int *changspace, int *pause, SDL_Rect pausePosition, SDL_
 
 void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirection, int *finsaut, int *delai, int *animationFlip);
 
-void gestion_items (int collision, int *plat_array, int cote_collision, SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *vie, int *item, int *clef, int *tempsItem, int i);
+void enemyMove(SDL_Rect *enemyPosition, int *enDirection, int *enAnimFlip, int *delaiEN);
 
 void replacement (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int saut, int *vie, int *item, int *clef, int *tempsItem);
 
@@ -60,9 +63,10 @@ void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_
 
 void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage, SDL_Rect *plateformePos, int *plat_array);
 
-void drawBonus (SDL_Surface *oneup, SDL_Surface *screen, SDL_Rect *upImage, SDL_Rect *upPosition, int *item, int *tempsItem, SDL_Rect *spritePosition);
-
 void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, int *currentDirection, int *animationFlip);
 
+void drawEnemy (SDL_Surface *enemy, SDL_Surface *screen, SDL_Rect *enemyImage, SDL_Rect *enemyPosition, int *enDirection, int *enAnimFlip);
+
+void drawBonus (SDL_Surface *oneup, SDL_Surface *screen, SDL_Rect *upImage, SDL_Rect *upPosition, int *item, int *tempsItem, SDL_Rect *spritePosition);
 
 #endif 

@@ -3,13 +3,15 @@
 int main(int argc, char* argv[])
 {
   SDL_Surface *screen, *temp, *sprite, *sky, *font, *spritePause, 
-	      *oneup,
-	      *plateforme[NB_PLATEFORME];
+	      *enemy, 
+	      *oneup, *plateforme[NB_PLATEFORME];
   int colorkey;
   int currentDirection = DIR_RIGHT;
+  int enDirection = EN_DIR_LEFT;
   int animationFlip = 0;
+  int enAnimFlip = 0;
   SDL_Rect spritePosition;
-  //SDL_Rect persoPosition;
+  SDL_Rect enemyPosition;
   SDL_Rect pausePosition;
   SDL_Rect fontPosition;
   SDL_Rect upPosition;
@@ -21,15 +23,16 @@ int main(int argc, char* argv[])
   int droite = 0;
   int gauche = 0;
   int delai = 0;
+  int delaiEn = 0;
   int timer = 0;
   int pauseV = 1;
   int space = 0;
   int changspace = 1;
   int vie = 5;
-  int clef = 0;
+  int secondes, minutes, heures;
   int item = 0;
   int tempsItem = 0;
-  int secondes, minutes, heures;
+  int clef = 0;
   
   
   /* initialize SDL */
@@ -57,17 +60,18 @@ int main(int argc, char* argv[])
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
-  /*temp   = SDL_LoadBMP("persos.bmp");
-  perso = SDL_DisplayFormat(temp);
+  /*Enemi*/
+  temp   = SDL_LoadBMP("enemy.bmp");
+  enemy = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
-  SDL_Rect persoImage;
-  persoImage.w = SPRITE_SIZE;
-  persoImage.h = SPRITE_SIZE;
-  persoPosition.w = SPRITE_SIZE;
-  persoPosition.h = SPRITE_SIZE;
-  persoPosition.x = 150;
-  persoPosition.y = SOL;
-  SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);*/
+  SDL_Rect enemyImage;
+  enemyImage.w = SPRITE_SIZE/2;
+  enemyImage.h = SPRITE_SIZE/2;
+  enemyPosition.w = SPRITE_SIZE/2;
+  enemyPosition.h = SPRITE_SIZE/2;
+  enemyPosition.x = 500;
+  enemyPosition.y = SOL + SPRITE_SIZE/2;
+  SDL_SetColorKey(enemy, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
   /*Font*/
   temp   = SDL_LoadBMP("franklin.bmp");
@@ -92,7 +96,7 @@ int main(int argc, char* argv[])
   SDL_FreeSurface(temp);
   SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
-  /*items*/
+  /*1up*/
   temp  = SDL_LoadBMP("items.bmp");
   oneup = SDL_DisplayFormat(temp);
   SDL_Rect upImage;
@@ -107,10 +111,8 @@ int main(int argc, char* argv[])
   int plat_array[NB_PLATEFORME];
   for(int i=0; i < NB_PLATEFORME; i++){
     plat_array[i] = 0;
-  }
-  
-  /*Initialisation de plateforme[] qui contient les images des blocs*/
-  
+  }  
+  /*Initialisation de plateforme[] qui contient les images des blocs*/  
   for (int i=0; i<NB_PLATEFORME; i++){
     temp = SDL_LoadBMP("bloc.bmp"); 
     plateforme[i] = SDL_DisplayFormat(temp);
@@ -121,8 +123,8 @@ int main(int argc, char* argv[])
   blocImage.y = 0;
   blocImage.w = BLOC_SIZE;
   blocImage.h = BLOC_SIZE;
-
   SDL_Rect plateformePos [NB_PLATEFORME];
+  
   
   afficher_bloc("test.txt", plat_array, plateformePos);
   
@@ -135,7 +137,7 @@ int main(int argc, char* argv[])
       HandleEvent(event, &gameover, &currentDirection,
 		  &animationFlip, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space);
     }
-
+    
     //Pause
     if (pause (&space, &changspace, &pauseV, pausePosition, spritePause, screen) == 1){
     
@@ -145,7 +147,8 @@ int main(int argc, char* argv[])
       timer += 1;
       fTimer (&timer, &heures, &minutes, &secondes);
 
-
+      enemyMove(&enemyPosition, &enDirection, &enAnimFlip, &delaiEn);
+      
       /*handle the movement of the sprite*/
       move (&droite, &gauche, &spritePosition, &currentDirection, &finsaut, &delai, &animationFlip);
       
@@ -162,7 +165,7 @@ int main(int argc, char* argv[])
       drawSky(sky, screen);
       
 	    /*Dans bandeau noir*/
-      drawFont (font, screen, &fontImage, &fontPosition, &heures, &minutes, &secondes, &vie, &clef);     
+     drawFont (font, screen, &fontImage, &fontPosition, &heures, &minutes, &secondes, &vie, &clef);     
 	  
 	    /*draw blocs*/
       drawBloc(plateforme, screen, &blocImage, plateformePos, plat_array);
@@ -170,7 +173,8 @@ int main(int argc, char* argv[])
 	    //draw sprites
       drawSprite (sprite, screen, &spriteImage, &spritePosition, &currentDirection, &animationFlip);
       
-      /*Draw bonus*/
+      drawEnemy (enemy, screen, &enemyImage, &enemyPosition, &enDirection, &enAnimFlip);
+      
       drawBonus (oneup, screen, &upImage, &upPosition, &item, &tempsItem, &spritePosition);
       
        SDL_Delay(4);

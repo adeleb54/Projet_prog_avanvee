@@ -139,6 +139,12 @@ void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateforme
 	    plateformePos[i].y = posY;
 	    i ++;
 	    break;
+	  case 54 :
+	    plat_array[i] = 6;
+	    plateformePos[i].x = posX;
+	    plateformePos[i].y = posY;
+	    i ++;
+	    break;
 	  default:
 	    break;
 	}
@@ -201,11 +207,35 @@ void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirec
       }
 }
 
+//Deplacement enemy
+void enemyMove(SDL_Rect *enemyPosition, int *enDirection, int *enAnimFlip, int *delaiEN){
+  if (*enDirection == EN_DIR_LEFT){  
+    enemyPosition->x -= SPRITE_STEP;
+    if(enemyPosition->x <= 200){
+      *enDirection = EN_DIR_RIGHT;
+    }
+  }
+  else {
+    enemyPosition->x += SPRITE_STEP;
+    if (enemyPosition->x >= 500){
+      *enDirection = EN_DIR_LEFT;
+    }
+  }
+  *delaiEN += 1;
+  if (*delaiEN == 50){
+    *enAnimFlip += 1;
+    if (*enAnimFlip == 3){
+      *enAnimFlip = 0;
+    }
+    *delaiEN = 0;
+  }
+  
+}
+
 // Gestion des items
 void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *vie, int *item, int *clef, int *tempsItem, int i) {
-  if (collision == 1 || collision == 2 || collision == 3){
-    if (bloc == 0) {
-    }
+  
+  if (collision == 1 || collision == 2 || collision == 3 ){
     if (bloc == 3) {
       if (*clef >= 1) {
 	*clef -= 1;
@@ -233,7 +263,6 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
 	*vie += 1;
 	*item = 1;
       }
-      return;
     }
     if (bloc == 5) {
       plat_array[i] = 0;
@@ -245,11 +274,11 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
 	*clef += 1;
 	*item = 2;
       }
-    return;
     }
   }
 }
 
+  
 //Replacement du sprite lors de collisions
 void replacement (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int saut, int *vie, int *item, int *clef, int *tempsItem){
   if (spritePosition->x <= 0)
@@ -269,11 +298,11 @@ void replacement (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_a
       }
       if (collision(*spritePosition,plateformePos[i], &saut)==3){
 	spritePosition->y = plateformePos[i].y - BLOC_SIZE;
-      }
+      }	
     }
-     else {
+    else{
        gestion_items(collision(*spritePosition,plateformePos[i], &saut), plat_array, plat_array[i], spritePosition, plateformePos, vie, item, clef, tempsItem, i);
-     }
+    }
   }
 }
 
@@ -289,9 +318,11 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
   *hperso = spritePosition->y;
   int col_haut = 0;
   
+  //Si on a demandé au perso de sauter
   if (*saut == SAUT) {
     for (int i = 0; i < NB_PLATEFORME; i++){
       if (plat_array[i] != 0){
+	//Gestion de la collision avec le haut du perso
 	if (collision(*spritePosition, plateformePos[i], saut)==4){
 	  col_haut = 1;
 	}
@@ -316,7 +347,7 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
   }
   
   for (int i = 0; i <NB_PLATEFORME; i++){
-    if (plat_array[i] != 0 && plat_array[i] < 4){
+    if (plat_array[i] != 0 && plat_array[i]<4){
       if (collision(*spritePosition,plateformePos[i], saut) == 3) {
 	  spritePosition->y -= 1;
 	  *finsaut = 1;
@@ -335,7 +366,8 @@ void drawSky (SDL_Surface *sky, SDL_Surface *screen){
   SDL_BlitSurface(sky, NULL, screen, NULL);
 }
 
-void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_Rect *fontPosition, int *heures, int *minutes, int *secondes, int *vie, int *clef){
+void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_Rect *fontPosition, int *heures,
+	       int *minutes, int *secondes, int *vie, int *clef){
   
   fontImage->y = FONT_SIZE*3;
   
@@ -371,13 +403,13 @@ void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_
   fontImage->x = 32 * (*secondes%10);
   fontPosition->x += 20;
   SDL_BlitSurface(font, fontImage, screen, fontPosition);
-
+  
+  /***Clef***/
   /*Affichage de la clef*/
   fontPosition->x = SCREEN_WIDTH - 180;
   fontImage->x = 31;
   fontImage->y = 0;
   SDL_BlitSurface(font, fontImage, screen, fontPosition);
-  
   
   /*Affichage du x*/
   fontPosition->x += 32;
@@ -385,12 +417,13 @@ void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_
   fontImage->y = FONT_SIZE*7;
   SDL_BlitSurface(font, fontImage, screen, fontPosition);
   
-  /*Affichage ddu nombre de clefs*/
+  /*Affichage du nombre de clefs*/
   fontImage->x = *clef * 32;
   fontImage->y = FONT_SIZE*3;
   fontPosition->x += 20;
   SDL_BlitSurface(font, fontImage, screen, fontPosition);
   
+  /***Vie***/
   /*Affichage du coeur*/
   fontPosition->x = SCREEN_WIDTH - 90;
   fontImage->x = 0;
@@ -414,7 +447,7 @@ void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_
 void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage, SDL_Rect *plateformePos, int *plat_array){
   for (int i=0; i < NB_PLATEFORME; i++){ 
     if (plat_array[i] != 0){
-      blocImage->x = (plat_array[i] - 1)* 32;
+      blocImage->x = (plat_array[i] - 1)* BLOC_SIZE;
       SDL_BlitSurface(plateforme[i],blocImage, screen, &plateformePos[i]);   
     }
   }
@@ -436,6 +469,12 @@ void drawBonus (SDL_Surface *oneup, SDL_Surface *screen, SDL_Rect *upImage, SDL_
 }
 
 void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, int *currentDirection, int *animationFlip){
-  spriteImage->x = SPRITE_SIZE*(2* *currentDirection + *animationFlip);	  
+  spriteImage->x = SPRITE_SIZE * (2 * *currentDirection + *animationFlip);	  
   SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+}
+
+void drawEnemy (SDL_Surface *enemy, SDL_Surface *screen, SDL_Rect *enemyImage, SDL_Rect *enemyPosition, int *enDirection, int *enAnimFlip){
+  enemyImage->y = SPRITE_SIZE/2 * *enDirection;
+  enemyImage->x = SPRITE_SIZE/2 * *enAnimFlip;	  
+  SDL_BlitSurface(enemy, enemyImage, screen, enemyPosition);
 }
