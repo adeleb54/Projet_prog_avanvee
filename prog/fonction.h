@@ -67,7 +67,7 @@ void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_
 
 void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage, SDL_Rect *plateformePos, int *plat_array);
 
-void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, int *currentDirection, int *animationFlip);
+void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, int *currentDirection, int *animationFlip, int *damage, int *tempsDamage);
 
 void drawEnemy (SDL_Surface *enemy, SDL_Surface *screen, SDL_Rect *enemyImage, SDL_Rect *enemyPosition, int *enDirection, int *enAnimFlip);
 

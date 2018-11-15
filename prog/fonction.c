@@ -511,9 +511,16 @@ void drawBonus (SDL_Surface *oneup, SDL_Surface *screen, SDL_Rect *upImage, SDL_
   }
 }
 
-void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, int *currentDirection, int *animationFlip){
-  spriteImage->x = SPRITE_SIZE * (2 * *currentDirection + *animationFlip);	  
-  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, int *currentDirection, int *animationFlip, int *damage, int *tempsDamage){
+  spriteImage->x = SPRITE_SIZE * (2 * *currentDirection + *animationFlip);
+  if(*damage == 0) { 
+    SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  }
+  if(*damage == 1) {
+    if ((*tempsDamage/45)%2 == 0) {
+      SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+    }
+  }
 }
 
 void drawEnemy (SDL_Surface *enemy, SDL_Surface *screen, SDL_Rect *enemyImage, SDL_Rect *enemyPosition, int *enDirection, int *enAnimFlip){

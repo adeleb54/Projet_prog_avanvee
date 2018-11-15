@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
       drawBloc(plateforme, screen, &blocImage, plateformePos, plat_array);
       
 	    //draw sprites
-      drawSprite (sprite, screen, &spriteImage, &spritePosition, &currentDirection, &animationFlip);
+      drawSprite (sprite, screen, &spriteImage, &spritePosition, &currentDirection, &animationFlip, &damage, &tempsDamage);
       
       drawEnemy (enemy, screen, &enemyImage, &enemyPosition, &enDirection, &enAnimFlip);
       
