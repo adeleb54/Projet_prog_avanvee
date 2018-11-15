@@ -41,7 +41,7 @@ int collision(SDL_Rect A, SDL_Rect B, int *saut);
 
 void HandleEvent(SDL_Event event,
         int *quit, int *currDirection, int *animFlip, int *saut, int *debutsaut, 
-	int *hperso, int *finsaut, int *droite, int *gauche, int *space );
+	int *hperso, int *finsaut, int *droite, int *gauche, int *space, int *haut, int *bas, int *entree);
 
 void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateformePos);
 

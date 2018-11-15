@@ -3,7 +3,7 @@
 //Gestion des evenements
 void HandleEvent(SDL_Event event,
         int *quit, int *currDirection, int *animFlip, int *saut, int *debutsaut, 
-	int *hperso, int *finsaut, int *droite, int *gauche, int *space )
+	int *hperso, int *finsaut, int *droite, int *gauche, int *space, int *haut, int *bas, int *entree)
 {
     switch (event.type) {
         /* close button clicked */
@@ -20,11 +20,18 @@ void HandleEvent(SDL_Event event,
                     break;
 		    
 		case SDLK_UP:
+		  if (*quit != 1) {
 		    if (*finsaut != 0) {
 		      *finsaut = 0;
 		      *saut = SAUT;
 		      *debutsaut = *hperso;
 		    }
+		  }
+		  *haut = 1;
+		  break;
+		  
+		case SDLK_DOWN:
+		    *bas = 1;
 		    break;
 		    
                 case SDLK_LEFT:
@@ -37,7 +44,10 @@ void HandleEvent(SDL_Event event,
 		
 		case SDLK_SPACE:
 		    *space = 1;
-		break;
+		    break;
+		case SDLK_RETURN:
+		    *entree = 1;
+		    break;
 		
                 default:
                     break;
@@ -46,6 +56,12 @@ void HandleEvent(SDL_Event event,
 	    
 	case SDL_KEYUP:
 	    switch (event.key.keysym.sym) {
+		case SDLK_UP:
+		    *haut = 0;
+		    break;
+		case SDLK_DOWN:
+		    *bas = 0;
+		    break;
 		case SDLK_LEFT:
 		    *gauche = 0;
 		    break;
@@ -56,6 +72,10 @@ void HandleEvent(SDL_Event event,
 		    
 		case SDLK_SPACE:
 		    *space = 0;
+		    break;
+		case SDLK_RETURN:
+		    *entree = 0;
+		    break;
 		    
 		default :
 		    break;
@@ -449,6 +469,7 @@ void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_
   
   /***Clef***/
   /*Affichage de la clef*/
+  fontPosition->y = 0;
   fontPosition->x = SCREEN_WIDTH - 180;
   fontImage->x = 31;
   fontImage->y = 0;
@@ -517,7 +538,7 @@ void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage
     SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
   }
   if(*damage == 1) {
-    if ((*tempsDamage/45)%2 == 0) {
+    if ((*tempsDamage/45)%2 == 1) {
       SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
     }
   }

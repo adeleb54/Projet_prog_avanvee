@@ -3,7 +3,7 @@
 int main(int argc, char* argv[])
 {
   SDL_Surface *screen, *temp, *sprite, *sky, *font, *spritePause, 
-	      *enemy, *spriteGameover,
+	      *enemy, *spriteGameover, *spriteDem, *spriteQuit, *skyL,
 	      *oneup, *plateforme[NB_PLATEFORME];
   int colorkey;
   int currentDirection = DIR_RIGHT;
@@ -16,7 +16,9 @@ int main(int argc, char* argv[])
   SDL_Rect fontPosition;
   SDL_Rect upPosition;
   SDL_Rect gameoverPosition;
-  int gameover = 0;
+  SDL_Rect demPosition;
+  SDL_Rect quitPosition;
+  int gameover = 1;
   int hperso = spritePosition.y;
   int debutsaut;
   int finsaut = 1;
@@ -36,6 +38,12 @@ int main(int argc, char* argv[])
   int clef = 0;
   int damage = 0;
   int tempsDamage = 0;
+  int haut = 0;
+  int bas = 0;
+  int entree = 0;
+  int changbas = 0;
+  int changhaut = 0;
+  int select = 0;
   
   
   /* initialize SDL */
@@ -43,7 +51,7 @@ int main(int argc, char* argv[])
   /* set the title bar */
   SDL_WM_SetCaption("SDL Animation", "SDL Animation");
   /* create window */
-  screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+  screen = SDL_SetVideoMode(500, 190, 0, 0);
   /* set keyboard repeat */
   SDL_EnableKeyRepeat(10, 10);
 
@@ -84,12 +92,37 @@ int main(int argc, char* argv[])
   fontImage.w = FONT_SIZE;
   fontImage.h = FONT_SIZE; 
   fontPosition.y = 0;
-  SDL_SetColorKey(font, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);  
+  
+  SDL_Rect selectImage;
+  selectImage.w = FONT_SIZE;
+  selectImage.h = FONT_SIZE;
+  selectImage.x = FONT_SIZE * 14;
+  selectImage.y = FONT_SIZE * 3;
+  SDL_SetColorKey(font, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+
+  /*Sky Launcher*/
+  temp  = SDL_LoadBMP("ciel1.bmp");
+  skyL = SDL_DisplayFormat(temp);
+  SDL_FreeSurface(temp);
   
   /*Sky*/
   temp  = SDL_LoadBMP("ciel.bmp");
   sky = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
+  
+  /*Start*/
+  temp  = SDL_LoadBMP("dem2.bmp");
+  spriteDem = SDL_DisplayFormat(temp);
+  demPosition.x = 217;
+  SDL_FreeSurface(temp);
+  SDL_SetColorKey(spriteDem, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  
+  /*Quit*/
+  temp  = SDL_LoadBMP("quit2.bmp");
+  spriteQuit = SDL_DisplayFormat(temp);
+  quitPosition.x = 225;
+  SDL_FreeSurface(temp);
+  SDL_SetColorKey(spriteQuit, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
       
   /*Pause*/
   temp  = SDL_LoadBMP("Pause.bmp");
@@ -139,14 +172,102 @@ int main(int argc, char* argv[])
   
   afficher_bloc("test.txt", plat_array, plateformePos);
   
+  while (gameover == 1)
+  {
+    
+    SDL_Event event;
+	
+    if (SDL_PollEvent(&event)) {
+      HandleEvent(event, &gameover, &currentDirection,
+		  &animationFlip, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space, &haut, &bas, &entree);
+    }
+    
+    if (haut == 0) {
+	changhaut = 1;
+    }
+    
+    if (changhaut == 1 && haut == 1) {
+      changhaut = 0;
+      select = 1 - select;
+    }
+    
+    if (bas == 0) {
+	changbas = 1;
+    }
+    
+    if (changbas == 1 && bas == 1) {
+      changbas = 0;
+      select = 1 - select;
+    }
+    
+    /* draw the background */
+    SDL_BlitSurface(skyL, NULL, screen, NULL);
+    
+    
+    demPosition.y = 90;
+    SDL_BlitSurface(spriteDem, NULL, screen, &demPosition);
+    
+    quitPosition.y = 120;
+    SDL_BlitSurface(spriteQuit, NULL, screen, &quitPosition);
+    
+    if (select == 0) {
+      fontPosition.x = 190;
+      fontPosition.y = 90;
+      SDL_BlitSurface(font, &selectImage, screen, &fontPosition);
 
-  while (!gameover)
+    }
+    
+    if (select == 1) {
+      fontPosition.x = 190;
+      fontPosition.y = 120;
+      SDL_BlitSurface(font, &selectImage, screen, &fontPosition);
+
+    }
+    
+    if (entree == 1) {
+      
+      if (select == 0) {
+	
+	/* clean up */
+	SDL_FreeSurface(skyL);
+	SDL_Quit();
+	
+	/* initialize SDL */
+	SDL_Init(SDL_INIT_VIDEO);
+	/* set the title bar */
+	SDL_WM_SetCaption("SDL Animation", "SDL Animation");
+	/* create window */
+	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+	/* set keyboard repeat */
+	SDL_EnableKeyRepeat(10, 10);
+	
+	gameover = 2;
+      }
+      
+      if (select == 1) {
+	  
+	/* clean up */
+	SDL_FreeSurface(skyL);
+	SDL_Quit();
+	  
+	return 0;
+	
+      }
+      
+    }
+    
+    /* update the screen */
+    SDL_UpdateRect(screen, 0, 0, 0, 0);
+    
+  }
+
+  while (gameover == 2)
   {
     SDL_Event event;
 	
     if (SDL_PollEvent(&event)) {
       HandleEvent(event, &gameover, &currentDirection,
-		  &animationFlip, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space);
+		  &animationFlip, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space, &haut, &bas, &entree);
     }
     
     //Pause
