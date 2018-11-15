@@ -254,6 +254,18 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
       }
     }
     if (bloc == 4) {
+      if (collision == 1) {
+	spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;
+      }
+      if (collision == 2) {
+	spritePosition->x = plateformePos[i].x + BLOC_SIZE ;
+      }
+      if (collision ==3) {
+	spritePosition->y = plateformePos[i].y - BLOC_SIZE ;
+	*damage = 1;
+      }
+    }
+    if (bloc == 5) {
       plat_array[i] = 0;
       if (*item == 1) {
 	*vie += 1;
@@ -264,7 +276,7 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
 	*item = 1;
       }
     }
-    if (bloc == 5) {
+    if (bloc == 6) {
       plat_array[i] = 0;
       if (*item == 2) {
 	*clef += 1;
@@ -273,18 +285,6 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
       else {
 	*clef += 1;
 	*item = 2;
-      }
-    }
-    if (bloc == 6) {
-      if (collision == 1) {
-	spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;
-      }
-      if (collision == 2) {
-	spritePosition->x = plateformePos[i].x + BLOC_SIZE ;
-      }
-      if (collision ==3) {
-	spritePosition->y = plateformePos[i].y - BLOC_SIZE ;
-	*damage = 1;
       }
     }
   }
@@ -376,9 +376,9 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
   }
   
   for (int i = 0; i <NB_PLATEFORME; i++){
-    if (plat_array[i] != 0 && (plat_array[i]<4 || plat_array[i]>5)){
+    if (plat_array[i] != 0 && plat_array[i]<4){
       if (collision(*spritePosition,plateformePos[i], saut) == 3) {
-	  if (plat_array[i] == 6) {
+	  if (plat_array[i] == 4) {
 	    *damage = 1;
 	  }
 	  spritePosition->y -= 1;
