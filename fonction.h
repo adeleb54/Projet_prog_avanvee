@@ -28,7 +28,7 @@
 #define SAUT 1
 #define PASSAUT 0
 
-#define HSAUT 50
+#define HSAUT 70
 #define SOL 576
 
 #define NB_ENNEMY  2
@@ -49,11 +49,14 @@ int pause (int *space, int *changspace, int *pause, SDL_Rect pausePosition, SDL_
 
 void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirection, int *finsaut, int *delai, int *animationFlip);
 
-void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_array, int *enDirection, int *enAnimFlip, int *delaiEN, SDL_Rect *plateformePos, int *plat_array);
+void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_array, int *enDirection, int *enAnimFlip, int *delaiEN, SDL_Rect *plateformePos, int *plat_array, 
+		SDL_Rect *spritePosition, int *damage, int *tempsDamage, int *vie, int *saut, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage);
 
-void replacement (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int saut, int *vie, int *item, int *clef, int *tempsItem, int *damage);
+void spriteCollide (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, int saut, int *vie, int *item, int *clef, int *tempsItem, int *damage);
 
 void lose_life (int *damage, int *tempsDamage, int *vie);
+
+void stopEnnemy (int *EnDamage, int *enTempsDamage);
 
 void fTimer (int* timer, int* heures, int* minutes, int* secondes);
 
@@ -69,7 +72,8 @@ void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage
 
 void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, int *currentDirection, int *animationFlip, int *damage, int *tempsDamage);
 
-void drawEnnemy (SDL_Surface **ennemy, SDL_Surface *screen, SDL_Rect *ennemyImage, SDL_Rect *ennemyPosition, int *enDirection, int *enAnimFlip, int *ennemy_array);
+void drawEnnemy (SDL_Surface **ennemy, SDL_Surface *screen, SDL_Rect *ennemyImage, SDL_Rect *ennemyPosition, int *enDirection, int *enAnimFlip, 
+		 int *ennemy_array, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage);
 
 void drawBonus (SDL_Surface *oneup, SDL_Surface *screen, SDL_Rect *upImage, SDL_Rect *upPosition, int *item, int *tempsItem, SDL_Rect *spritePosition);
 

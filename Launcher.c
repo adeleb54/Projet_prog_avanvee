@@ -1,4 +1,7 @@
-#include "fonction.h"
+//#include "fonction.h"
+#include <SDL.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void HandleEvent(SDL_Event event,
         int *quit, int *haut, int *bas, int *space, int *entree)
