@@ -2,66 +2,235 @@
   
 //Gestion des evenements
 void HandleEvent(SDL_Event event,
-        int *quit, int *currDirection, int *animFlip, int *saut, int *debutsaut, 
-	int *hperso, int *finsaut, int *droite, int *gauche, int *space )
+        int *quit, int *saut, int *debutsaut, 
+	int *hperso, int *finsaut, int *droite, int *gauche, int *space, int *haut, int *bas, int *entree )
 {
-    switch (event.type) {
-        /* close button clicked */
-        case SDL_QUIT:
-            *quit = 1;
-            break;
+  switch (event.type) {
+    /* close button clicked */
+    case SDL_QUIT:
+	*quit = 1;
+	break;
 
-        /* handle the keyboard */
-        case SDL_KEYDOWN:
-            switch (event.key.keysym.sym) {
-                case SDLK_ESCAPE:
-                case SDLK_q:
-                    *quit = 1;
-                    break;
-		    
-		case SDLK_UP:
-		    if (*finsaut != 0) {
-		      *finsaut = 0;
-		      *saut = SAUT;
-		      *debutsaut = *hperso;
-		    }
-		    break;
-		    
-                case SDLK_LEFT:
-                    *gauche = 1;
-                    break;
-		    
-                case SDLK_RIGHT:
-                    *droite = 1;
-                    break;
-		
-		case SDLK_SPACE:
-		    *space = 1;
+    /* handle the keyboard */
+    case SDL_KEYDOWN:
+	switch (event.key.keysym.sym) {
+	    case SDLK_ESCAPE:
+	    case SDLK_q:
+		*quit = 1;
 		break;
 		
-                default:
-                    break;
-	    }
-	    break;
+	    case SDLK_UP:
+	      if (*quit != 1) {
+		if (*finsaut != 0) {
+		  *finsaut = 0;
+		  *saut = SAUT;
+		  *debutsaut = *hperso;
+		}
+	      }
+	      *haut = 1;
+	      break;
+	      
+	    case SDLK_DOWN:
+	      *bas = 1;
+	      break;
+		
+	    case SDLK_LEFT:
+	      *gauche = 1;
+	      break;
+		
+	    case SDLK_RIGHT:
+	      *droite = 1;
+	      break;
 	    
-	case SDL_KEYUP:
-	    switch (event.key.keysym.sym) {
-		case SDLK_LEFT:
-		    *gauche = 0;
-		    break;
-		    
-		case SDLK_RIGHT:
-		    *droite = 0;
-		    break;
-		    
-		case SDLK_SPACE:
-		    *space = 0;
-		    
-		default :
-		    break;
-	    }
-	    break;
+	    case SDLK_SPACE:
+	      *space = 1;
+	      break;
+	      
+	    case SDLK_RETURN:
+	      *entree = 1;
+	      break;
+	    
+	    default:
+	      break;
+	}
+	break;
+	
+    case SDL_KEYUP:
+	switch (event.key.keysym.sym) {
+	    case SDLK_UP:
+	      *haut = 0;
+	      break;
+	    
+	    case SDLK_DOWN:
+	      *bas = 0;
+	      break;
+	    
+	    case SDLK_LEFT:
+	      *gauche = 0;
+	      break;
+		
+	    case SDLK_RIGHT:
+	      *droite = 0;
+	      break;
+		
+	    case SDLK_SPACE:
+	      *space = 0;
+	      break;
+	      
+	    case SDLK_RETURN:
+	      *entree = 0;
+	      break;
+		
+	    default :
+	      break;
+	}
+	break;
+  }
+}
+  
+void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entree)
+{
+  switch (event.type) {
+    /* close button clicked */
+    case SDL_QUIT:
+	*quit = 1;
+	break;
+
+    /* handle the keyboard */
+    case SDL_KEYDOWN:
+	switch (event.key.keysym.sym) {
+	    case SDLK_ESCAPE:
+	    case SDLK_q:
+		*quit = 1;
+		break;
+		
+	    case SDLK_UP:
+	      *haut = 1;
+	      break;
+	      
+	    case SDLK_DOWN:
+	      *bas = 1;
+	      break;
+	      
+	    case SDLK_RETURN:
+	      *entree = 1;
+	      break;
+	    
+	    default:
+	      break;
+	}
+	break;
+	
+    case SDL_KEYUP:
+	switch (event.key.keysym.sym) {
+	    case SDLK_UP:
+	      *haut = 0;
+	      break;
+	    
+	    case SDLK_DOWN:
+	      *bas = 0;
+	      break;
+	      
+	    case SDLK_RETURN:
+	      *entree = 0;
+	      break;
+		
+	    default :
+	      break;
+	}
+	break;
+  }
+}
+
+int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, SDL_Surface *skyL, SDL_Surface *spriteDem, SDL_Surface *spriteQuit, 
+	    SDL_Surface *screen, SDL_Surface *font, SDL_Rect *demPosition, SDL_Rect *quitPosition, SDL_Rect *fontPosition, SDL_Rect *selectImage){
+  
+  int changhaut, changbas;
+  while (*gameover == 2){  
+    
+    SDL_Event event;
+    if (SDL_PollEvent(&event)) {
+      HandleEventStart(event, gameover, haut, bas, entree);
     }
+    
+    if (*haut == 0) {
+	changhaut = 1;
+    }
+    
+    if (changhaut == 1 && *haut == 1) {
+      changhaut = 0;
+      *select = 1 - *select;
+    }
+    
+    if (*bas == 0) {
+	changbas = 1;
+    }
+    
+    if (changbas == 1 && *bas == 1) {
+      changbas = 0;
+      *select = 1 - *select;
+    }
+    
+    /* draw the background */
+    SDL_BlitSurface(skyL, NULL, screen, NULL);
+    
+    
+    demPosition->y = 90;
+    SDL_BlitSurface(spriteDem, NULL, screen, demPosition);
+    
+    quitPosition->y = 120;
+    SDL_BlitSurface(spriteQuit, NULL, screen, quitPosition);
+    
+    if (*select == 0) {
+      fontPosition->x = 190;
+      fontPosition->y = 90;
+      SDL_BlitSurface(font, selectImage, screen, fontPosition);
+
+    }
+    
+    if (*select == 1) {
+      fontPosition->x = 190;
+      fontPosition->y = 120;
+      SDL_BlitSurface(font, selectImage, screen, fontPosition);
+
+    }
+    
+    /* update the screen */
+     SDL_UpdateRect(screen, 0, 0, 0, 0);
+     
+    if (*entree == 1) {
+      
+      if (*select == 0) {
+	
+	/* clean up */
+	SDL_FreeSurface(skyL);
+	SDL_FreeSurface(spriteDem);
+	SDL_FreeSurface(spriteQuit);
+	
+	/* initialize SDL */
+	SDL_Init(SDL_INIT_VIDEO);
+	/* set the title bar */
+	SDL_WM_SetCaption("SDL Animation", "SDL Animation");
+	/* create window */
+	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+	/* set keyboard repeat */
+	SDL_EnableKeyRepeat(10, 10);
+	
+	*gameover = 0;
+      }
+          
+      if (*select == 1) {
+	  
+	/* clean up */
+	SDL_FreeSurface(skyL);
+	*gameover = 1;
+	SDL_Quit();
+	return 0;
+      }
+      
+    }    
+  }
+  return 1;
 }
 
 //Gestion des collisions
@@ -108,10 +277,6 @@ void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateforme
       c = fgetc(pFile);
       while(c != EOF){
 	switch (c){
-	  case 48 :
-	    plat_array[i] = 0;
-	    i ++;
-	    break;
 	  case 49 :
 	    plat_array[i] = 1;
 	    plateformePos[i].x = posX;
