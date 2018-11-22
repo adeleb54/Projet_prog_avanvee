@@ -37,16 +37,14 @@ int main(int argc, char* argv[])
   int tempsItem = 0;
   int clef = 0;  
   int damage = 0;
+  int enDamage = 0;
   int tempsDamage = 0;
   int enTempsDamage = 0;
   int haut = 0;
   int bas =  0; 
   int entree = 0;
   int select = 0;
-<<<<<<< HEAD
   int niveau = 1;
-=======
->>>>>>> d73fdd5f84b7fbe2540898011dd0ea620ebcb966
   
   
   /* initialize SDL */
@@ -69,7 +67,7 @@ int main(int argc, char* argv[])
   spriteImage.h = SPRITE_SIZE;
   spritePosition.w = SPRITE_SIZE;
   spritePosition.h = SPRITE_SIZE;
-  spritePosition.x = 32;
+  spritePosition.x = 150;
   spritePosition.y = SOL;
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
@@ -158,7 +156,7 @@ int main(int argc, char* argv[])
   SDL_Rect ennemyImage;
   ennemyImage.w = SPRITE_SIZE/2;
   ennemyImage.h = SPRITE_SIZE/2; 
-  SDL_Rect ennemyPosDamage[NB_ENNEMY];
+  SDL_Rect ennemyPosDamage;
   
   /*Initialisation de ennemyPosStart[] qui enregistre la position de depart des ennemis*/
   SDL_Rect ennemyPosStart[NB_ENNEMY];
@@ -170,11 +168,6 @@ int main(int argc, char* argv[])
   int ennemyDir[NB_ENNEMY];
   for (int i =0; i<NB_ENNEMY; i++){
     ennemyDir[i] = EN_DIR_LEFT;
-  }
-  
-  int enDamage[NB_ENNEMY];
-  for (int i =0; i<NB_ENNEMY; i++){
-    enDamage[i] = 0;
   }
   
   /*Bloc*/
@@ -198,21 +191,19 @@ int main(int argc, char* argv[])
   
   afficher_bloc("test.txt", plat_array, plateformePos, ennemy_array, ennemyPos, ennemyPosStart);
   
-
   if (start (&haut, &finsaut, &select, &bas, &entree, &gameover, skyL, spriteDem, spriteQuit,screen, font, &demPosition, &quitPosition, &fontPosition, &selectImage) == 1){
     while (gameover != 1)
     {
-      fontPosition.y = 0;
-      
       SDL_Event event;
 	  
       if (SDL_PollEvent(&event)) {
-	HandleEvent(event, &gameover, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space, &haut, &bas);
+	HandleEvent(event, &gameover, &currentDirection,
+		    &animationFlip, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space);
       }
       
       //Pause
       if ((pause (&space, &changspace, &pauseV, pausePosition, spritePause, screen) == 1) && (game_over(&vie, gameoverPosition, spriteGameover, screen) == 0)){
-
+      
 	
       //Jeu
 	//Handle timer
@@ -220,23 +211,19 @@ int main(int argc, char* argv[])
 	fTimer (&timer, &heures, &minutes, &secondes);
 	
 	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, &delaiEn, plateformePos, 
-		  plat_array, &spritePosition, &damage, &tempsDamage, &vie, &saut, enDamage, &enTempsDamage, ennemyPosDamage);
+		  plat_array, &spritePosition, &damage, &tempsDamage, &vie, &saut, &enDamage, &enTempsDamage, &ennemyPosDamage);
 	
 	/*handle the movement of the sprite*/
 	move (&droite, &gauche, &spritePosition, &currentDirection, &finsaut, &delai, &animationFlip);
 	
-	/*Collisions*/      
-<<<<<<< HEAD
-	spriteCollide (&spritePosition, plateformePos, plat_array, ennemy_array, saut, &vie, &item, &clef, &tempsItem, &damage,
-		       &niveau, ennemyPos, ennemyPosStart);
-=======
-	spriteCollide (&spritePosition, plateformePos, plat_array, ennemy_array, saut, &vie, &item, &clef, &tempsItem, &damage);
->>>>>>> d73fdd5f84b7fbe2540898011dd0ea620ebcb966
+	/*Collisions*/
+	spriteCollide (&spritePosition, plateformePos, plat_array, ennemy_array, saut, &vie, &item, &clef, &tempsItem, &damage, &niveau, ennemyPos, ennemyPosStart);
   
 	/*Gestion des dégâts*/
+	
 	lose_life (&damage, &tempsDamage, &vie);
 	
-	stopEnnemy (enDamage, &enTempsDamage);
+	stopEnnemy (&enDamage, &enTempsDamage);
 
 	/*Saut*/
 	Saut (&hperso, &spritePosition, &saut, plat_array, plateformePos, &debutsaut, &finsaut, &damage);
@@ -254,9 +241,10 @@ int main(int argc, char* argv[])
       drawBloc(plateforme, screen, &blocImage, plateformePos, plat_array);
 	
 	      /*draw sprites*/
+	        
       drawSprite (sprite, screen, &spriteImage, &spritePosition, &currentDirection, &animationFlip, &damage, &tempsDamage);
       
-      drawEnnemy (ennemy, screen, &ennemyImage, ennemyPos, ennemyDir, &enAnimFlip, ennemy_array, enDamage, &enTempsDamage, ennemyPosDamage);
+      drawEnnemy (ennemy, screen, &ennemyImage, ennemyPos, ennemyDir, &enAnimFlip, ennemy_array, &enDamage, &enTempsDamage, &ennemyPosDamage);
 	
       drawBonus (oneup, screen, &upImage, &upPosition, &item, &tempsItem, &spritePosition);
   
@@ -264,20 +252,20 @@ int main(int argc, char* argv[])
       }
       /* update the screen */
       SDL_UpdateRect(screen, 0, 0, 0, 0);
-    }  
-    /* clean up */
-    for (int i = 0; i < NB_PLATEFORME; i++){
-      SDL_FreeSurface(plateforme[i]);
-    }
-    for (int i = 0; i <NB_ENNEMY; i++){
-      SDL_FreeSurface(ennemy[i]);
-    }
-    SDL_FreeSurface(font);
-    SDL_FreeSurface(sprite);
-    SDL_FreeSurface(sky);
-    SDL_FreeSurface(oneup);
-    SDL_Quit();
-    return 0;
+      }  
+      /* clean up */
+      for (int i = 0; i < NB_PLATEFORME; i++){
+	SDL_FreeSurface(plateforme[i]);
+      }
+      for (int i = 0; i <NB_ENNEMY; i++){
+	SDL_FreeSurface(ennemy[i]);
+      }
+      SDL_FreeSurface(font);
+      SDL_FreeSurface(sprite);
+      SDL_FreeSurface(sky);
+      SDL_FreeSurface(oneup);
+      SDL_Quit();
+      return 0;
   }
   else {
     return 0;
