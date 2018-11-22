@@ -64,6 +64,151 @@ void HandleEvent(SDL_Event event,
     }
 }
 
+void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entree)
+{
+  switch (event.type) {
+    /* close button clicked */
+    case SDL_QUIT:
+	*quit = 1;
+	break;
+
+    /* handle the keyboard */
+    case SDL_KEYDOWN:
+	switch (event.key.keysym.sym) {
+	    case SDLK_ESCAPE:
+	    case SDLK_q:
+		*quit = 1;
+		break;
+		
+	    case SDLK_UP:
+	      *haut = 1;
+	      break;
+	      
+	    case SDLK_DOWN:
+	      *bas = 1;
+	      break;
+	      
+	    case SDLK_RETURN:
+	      *entree = 1;
+	      break;
+	    
+	    default:
+	      break;
+	}
+	break;
+	
+    case SDL_KEYUP:
+	switch (event.key.keysym.sym) {
+	    case SDLK_UP:
+	      *haut = 0;
+	      break;
+	    
+	    case SDLK_DOWN:
+	      *bas = 0;
+	      break;
+	      
+	    case SDLK_RETURN:
+	      *entree = 0;
+	      break;
+		
+	    default :
+	      break;
+	}
+	break;
+  }
+}
+
+int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, SDL_Surface *skyL, SDL_Surface *spriteDem, SDL_Surface *spriteQuit, 
+	    SDL_Surface *screen, SDL_Surface *font, SDL_Rect *demPosition, SDL_Rect *quitPosition, SDL_Rect *fontPosition, SDL_Rect *selectImage){
+  
+  int changhaut, changbas;
+  while (*gameover == 2){  
+    
+    SDL_Event event;
+    if (SDL_PollEvent(&event)) {
+      HandleEventStart(event, gameover, haut, bas, entree);
+    }
+    
+    if (*haut == 0) {
+	changhaut = 1;
+    }
+    
+    if (changhaut == 1 && *haut == 1) {
+      changhaut = 0;
+      *select = 1 - *select;
+    }
+    
+    if (*bas == 0) {
+	changbas = 1;
+    }
+    
+    if (changbas == 1 && *bas == 1) {
+      changbas = 0;
+      *select = 1 - *select;
+    }
+    
+    /* draw the background */
+    SDL_BlitSurface(skyL, NULL, screen, NULL);
+    
+    
+    demPosition->y = 90;
+    SDL_BlitSurface(spriteDem, NULL, screen, demPosition);
+    
+    quitPosition->y = 120;
+    SDL_BlitSurface(spriteQuit, NULL, screen, quitPosition);
+    
+    if (*select == 0) {
+      fontPosition->x = 190;
+      fontPosition->y = 90;
+      SDL_BlitSurface(font, selectImage, screen, fontPosition);
+
+    }
+    
+    if (*select == 1) {
+      fontPosition->x = 190;
+      fontPosition->y = 120;
+      SDL_BlitSurface(font, selectImage, screen, fontPosition);
+
+    }
+    
+    /* update the screen */
+     SDL_UpdateRect(screen, 0, 0, 0, 0);
+     
+    if (*entree == 1) {
+      
+      if (*select == 0) {
+	
+	/* clean up */
+	SDL_FreeSurface(skyL);
+	SDL_FreeSurface(spriteDem);
+	SDL_FreeSurface(spriteQuit);
+	
+	/* initialize SDL */
+	SDL_Init(SDL_INIT_VIDEO);
+	/* set the title bar */
+	SDL_WM_SetCaption("SDL Animation", "SDL Animation");
+	/* create window */
+	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+	/* set keyboard repeat */
+	SDL_EnableKeyRepeat(10, 10);
+	
+	*gameover = 0;
+      }
+          
+      if (*select == 1) {
+	  
+	/* clean up */
+	SDL_FreeSurface(skyL);
+	*gameover = 1;
+	SDL_Quit();
+	return 0;
+      }
+      
+    }    
+  }
+  return 1;
+}
+
 //Gestion des collisions
 int collision(SDL_Rect A, SDL_Rect B, int *saut, char* type){
     if(A.x >= B.x + B.w || A.x + A.w <= B.x || A.y >= B.y + B.h || A.y + A.h <= B.y){
@@ -99,6 +244,9 @@ int collision(SDL_Rect A, SDL_Rect B, int *saut, char* type){
 //Affichage du décor
 void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateformePos, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart ){
     FILE* pFile;
+    for(int i=0; i < NB_PLATEFORME; i++){
+    plat_array[i] = 0;
+    } 
     int c, i = 0;
     int j = 0;
     int posX = 0, posY = BLOC_SIZE;
@@ -367,19 +515,20 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
       }
     }
     if (bloc == 7) {
-      if (*niveau == 1) {
-	afficher_bloc("niveau2.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
-	set_pos(spritePosition, 50, 50);
-	niveau += 1;
-      }
-      if (*niveau == 2) {
+     
+      if (*niveau == 3) {
 	afficher_bloc("niveau3.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
 	set_pos(spritePosition, 50, 50);
 	niveau += 1;
       }
-      if (*niveau == 3) {
+      if (*niveau == 2) {
 	afficher_bloc("niveau4.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
 	set_pos(spritePosition, 50, 50);
+	niveau += 1;
+      }
+      if (*niveau == 1) {
+	afficher_bloc("niveau2.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
+	set_pos(spritePosition, 128, SOL);
 	niveau += 1;
       }
     }
@@ -399,13 +548,13 @@ void spriteCollide (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat
   for (int i = 0; i <NB_PLATEFORME; i++){
     if (plat_array[i] < 3 && plat_array[i] != 0) {
       if (collision(*spritePosition,plateformePos[i], &saut, "perso")==1){
-	spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;	
+	spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;
       }
       if (collision(*spritePosition,plateformePos[i], &saut, "perso")==2){
-	spritePosition->x = plateformePos[i].x + BLOC_SIZE;	
+	spritePosition->x = plateformePos[i].x + BLOC_SIZE;
       }
     }
-    else{
+    else if (plat_array[i] >= 3 && plat_array[i]<=7){
        gestion_items(collision(*spritePosition,plateformePos[i], &saut, "perso"), plat_array, plat_array[i], spritePosition, plateformePos, vie, item, clef, tempsItem, i, damage, niveau, ennemy_array, ennemyPosition, ennemyPosStart);
     }
   }
@@ -529,6 +678,7 @@ void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_
   fontImage->y = FONT_SIZE*3;
   
   //Affichage du timer
+  fontPosition->y = 0;
   fontImage->x = 32 * (*heures/10);
   fontPosition->x = 10;
   SDL_BlitSurface(font, fontImage, screen, fontPosition);
