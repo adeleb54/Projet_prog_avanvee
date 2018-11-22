@@ -43,7 +43,7 @@ int collision(SDL_Rect A, SDL_Rect B, int *saut, char* type);
 
 void HandleEvent(SDL_Event event,
         int *quit, int *saut, int *debutsaut, 
-	int *hperso, int *finsaut, int *droite, int *gauche, int *space, int *haut, int *bas, int *entree );
+	int *hperso, int *finsaut, int *droite, int *gauche, int *space, int *haut, int *bas);
 
 int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, SDL_Surface *skyL, SDL_Surface *spriteDem, SDL_Surface *spriteQuit, 
 	    SDL_Surface *screen, SDL_Surface *font, SDL_Rect *demPosition, SDL_Rect *quitPosition, SDL_Rect *fontPosition, SDL_Rect *selectImage);

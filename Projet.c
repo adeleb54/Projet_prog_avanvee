@@ -37,7 +37,6 @@ int main(int argc, char* argv[])
   int tempsItem = 0;
   int clef = 0;  
   int damage = 0;
-  int enDamage = 0;
   int tempsDamage = 0;
   int enTempsDamage = 0;
   int haut = 0;
@@ -66,7 +65,7 @@ int main(int argc, char* argv[])
   spriteImage.h = SPRITE_SIZE;
   spritePosition.w = SPRITE_SIZE;
   spritePosition.h = SPRITE_SIZE;
-  spritePosition.x = 150;
+  spritePosition.x = 32;
   spritePosition.y = SOL;
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
@@ -155,7 +154,7 @@ int main(int argc, char* argv[])
   SDL_Rect ennemyImage;
   ennemyImage.w = SPRITE_SIZE/2;
   ennemyImage.h = SPRITE_SIZE/2; 
-  SDL_Rect ennemyPosDamage;
+  SDL_Rect ennemyPosDamage[NB_ENNEMY];
   
   /*Initialisation de ennemyPosStart[] qui enregistre la position de depart des ennemis*/
   SDL_Rect ennemyPosStart[NB_ENNEMY];
@@ -167,6 +166,11 @@ int main(int argc, char* argv[])
   int ennemyDir[NB_ENNEMY];
   for (int i =0; i<NB_ENNEMY; i++){
     ennemyDir[i] = EN_DIR_LEFT;
+  }
+  
+  int enDamage[NB_ENNEMY];
+  for (int i =0; i<NB_ENNEMY; i++){
+    enDamage[i] = 0;
   }
   
   /*Bloc*/
@@ -199,7 +203,7 @@ int main(int argc, char* argv[])
       SDL_Event event;
 	  
       if (SDL_PollEvent(&event)) {
-	HandleEvent(event, &gameover, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space, &haut, &bas, &entree);
+	HandleEvent(event, &gameover, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space, &haut, &bas);
       }
       
       //Pause
@@ -212,7 +216,7 @@ int main(int argc, char* argv[])
 	fTimer (&timer, &heures, &minutes, &secondes);
 	
 	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, &delaiEn, plateformePos, 
-		  plat_array, &spritePosition, &damage, &tempsDamage, &vie, &saut, &enDamage, &enTempsDamage, &ennemyPosDamage);
+		  plat_array, &spritePosition, &damage, &tempsDamage, &vie, &saut, enDamage, &enTempsDamage, ennemyPosDamage);
 	
 	/*handle the movement of the sprite*/
 	move (&droite, &gauche, &spritePosition, &currentDirection, &finsaut, &delai, &animationFlip);
@@ -223,7 +227,7 @@ int main(int argc, char* argv[])
 	/*Gestion des dégâts*/
 	lose_life (&damage, &tempsDamage, &vie);
 	
-	stopEnnemy (&enDamage, &enTempsDamage);
+	stopEnnemy (enDamage, &enTempsDamage);
 
 	/*Saut*/
 	Saut (&hperso, &spritePosition, &saut, plat_array, plateformePos, &debutsaut, &finsaut, &damage);
@@ -243,7 +247,7 @@ int main(int argc, char* argv[])
 	      /*draw sprites*/
       drawSprite (sprite, screen, &spriteImage, &spritePosition, &currentDirection, &animationFlip, &damage, &tempsDamage);
       
-      drawEnnemy (ennemy, screen, &ennemyImage, ennemyPos, ennemyDir, &enAnimFlip, ennemy_array, &enDamage, &enTempsDamage, &ennemyPosDamage);
+      drawEnnemy (ennemy, screen, &ennemyImage, ennemyPos, ennemyDir, &enAnimFlip, ennemy_array, enDamage, &enTempsDamage, ennemyPosDamage);
 	
       drawBonus (oneup, screen, &upImage, &upPosition, &item, &tempsItem, &spritePosition);
   
