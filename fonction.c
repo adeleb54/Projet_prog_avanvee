@@ -337,7 +337,6 @@ void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateforme
       fclose(pFile);
     } 
   }
-<<<<<<< HEAD
     
 //Replacement du personnage
 void set_pos (SDL_Rect *spritePosition, int a, int b) {
@@ -345,9 +344,6 @@ void set_pos (SDL_Rect *spritePosition, int a, int b) {
   spritePosition->y = b;
 }
 
-=======
-  
->>>>>>> d73fdd5f84b7fbe2540898011dd0ea620ebcb966
 //Gestion de la pause
 int pause (int *space, int *changspace, int *pause, SDL_Rect pausePosition, SDL_Surface *spritePause, SDL_Surface *screen){
   

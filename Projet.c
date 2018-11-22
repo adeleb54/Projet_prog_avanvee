@@ -43,10 +43,7 @@ int main(int argc, char* argv[])
   int bas =  0; 
   int entree = 0;
   int select = 0;
-<<<<<<< HEAD
   int niveau = 1;
-=======
->>>>>>> d73fdd5f84b7fbe2540898011dd0ea620ebcb966
   
   
   /* initialize SDL */
@@ -225,13 +222,10 @@ int main(int argc, char* argv[])
 	/*handle the movement of the sprite*/
 	move (&droite, &gauche, &spritePosition, &currentDirection, &finsaut, &delai, &animationFlip);
 	
-	/*Collisions*/      
-<<<<<<< HEAD
+	/*Collisions*/    
+	
 	spriteCollide (&spritePosition, plateformePos, plat_array, ennemy_array, saut, &vie, &item, &clef, &tempsItem, &damage,
 		       &niveau, ennemyPos, ennemyPosStart);
-=======
-	spriteCollide (&spritePosition, plateformePos, plat_array, ennemy_array, saut, &vie, &item, &clef, &tempsItem, &damage);
->>>>>>> d73fdd5f84b7fbe2540898011dd0ea620ebcb966
   
 	/*Gestion des dégâts*/
 	lose_life (&damage, &tempsDamage, &vie);
