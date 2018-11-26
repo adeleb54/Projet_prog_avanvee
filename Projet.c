@@ -44,6 +44,7 @@ int main(int argc, char* argv[])
   int entree = 0;
   int select = 0;
   int niveau = 1;
+  int change = 1;
   
   
   /* initialize SDL */
@@ -204,7 +205,8 @@ int main(int argc, char* argv[])
       SDL_Event event;
 	  
       if (SDL_PollEvent(&event)) {
-	HandleEvent(event, &gameover, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space, &haut, &bas);
+	HandleEvent(event, &gameover, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space, &haut, &bas, 
+		    pause (&space, &changspace, &pauseV, pausePosition, spritePause, screen), pausePosition);
       }
       
       //Pause
@@ -216,7 +218,7 @@ int main(int argc, char* argv[])
 	timer += 1;
 	fTimer (&timer, &heures, &minutes, &secondes);
 	
-	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, &delaiEn, plateformePos, 
+	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, &change, &delaiEn, plateformePos, 
 		  plat_array, &spritePosition, &damage, &tempsDamage, &vie, &saut, enDamage, &enTempsDamage, ennemyPosDamage);
 	
 	/*handle the movement of the sprite*/
