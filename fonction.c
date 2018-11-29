@@ -561,7 +561,7 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
       }
       else if (*niveau == 1) {
 	afficher_bloc("niveau2.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
-	set_pos(spritePosition, 50, 50);
+	set_pos(spritePosition, 0, SOL);
 	niveau += 1;
       }
     }
@@ -710,82 +710,115 @@ void drawSky (Image *sky, SDL_Surface *screen){
   SDL_BlitSurface(sky->image, NULL, screen, NULL);
 }
 
-void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_Rect *fontPosition, int *heures,
-	       int *minutes, int *secondes, int *vie, int *clef){
+void drawFont (Image *font, SDL_Surface *screen,int *heures, int *minutes, int *secondes, int *vie, int *clef){
   
-  fontImage->y = FONT_SIZE*3;
+  setImY(font, FONT_SIZE*3);
   
   //Affichage du timer
-  fontImage->x = 32 * (*heures/10);
-  fontPosition->x = 10;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  //Affichage heures
+  //Dizaines
+  setImX(font, FONT_SIZE * (*heures/10));
+  setPosX(font, 10);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 
-  fontImage->x = 32 * (*heures%10);
-  fontPosition->x += 20;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  //Unités
+  setImX(font, FONT_SIZE * (*heures%10));
+  setPosX(font, font->position.x + 20);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
+  
+  //Deux points
+  setImX(font, 320);
+  setPosX(font, font->position.x + 30);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 
-  fontImage->x = 320;
-  fontPosition->x += 30;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
-
-  fontImage->x = 32 * (*minutes/10);
-  fontPosition->x += 20;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
-
-  fontImage->x = 32 * (*minutes%10);
-  fontPosition->x += 20;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
-
-  fontImage->x = 320;
-  fontPosition->x += 30;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
-
-  fontImage->x = 32 * (*secondes/10);
-  fontPosition->x += 20;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
-
-  fontImage->x = 32 * (*secondes%10);
-  fontPosition->x += 20;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  
+  //Affichage minutes
+  //Dizaines
+  setImX(font, FONT_SIZE * (*minutes/10));
+  setPosX(font, font->position.x + 20);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
+  
+  
+  //Unités
+  setImX(font, FONT_SIZE * (*minutes%10));
+  setPosX(font, font->position.x + 20);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
+  
+  
+  //Deux points
+  setImX(font, 320);
+  setPosX(font, font->position.x + 30);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
+  
+  
+  //Affichage secondes
+  //Dizaines
+  setImX(font, FONT_SIZE * (*secondes/10));
+  setPosX(font, font->position.x + 20);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
+  
+  
+  //Unités
+  setImX(font, FONT_SIZE * (*secondes%10));
+  setPosX(font, font->position.x + 20);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   /***Clef***/
   /*Affichage de la clef*/
-  fontPosition->x = SCREEN_WIDTH - 180;
-  fontImage->x = 31;
-  fontImage->y = 0;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
-  
-  /*Affichage du x*/
-  fontPosition->x += 32;
-  fontImage->x = FONT_SIZE*8;
-  fontImage->y = FONT_SIZE*7;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
-  
-  /*Affichage du nombre de clefs*/
-  fontImage->x = *clef * 32;
-  fontImage->y = FONT_SIZE*3;
-  fontPosition->x += 20;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
-  
-  /***Vie***/
-  /*Affichage du coeur*/
-  fontPosition->x = SCREEN_WIDTH - 90;
-  fontImage->x = 0;
-  fontImage->y = 0;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
-
-
-  /*Affichage du x*/
-  fontPosition->x += 32;
-  fontImage->x = FONT_SIZE*8;
-  fontImage->y = FONT_SIZE*7;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);   
-
-  /*Affichage de la vie restante*/
-  fontImage->x = *vie * 32;
-  fontImage->y = FONT_SIZE*3;
-  fontPosition->x += 20;
-  SDL_BlitSurface(font, fontImage, screen, fontPosition);
+//   fontPosition->x = SCREEN_WIDTH - 180;
+//   fontImage->x = 31;
+//   fontImage->y = 0;
+//   SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  setPosX(font, SCREEN_WIDTH - 180);
+  setIm(font, 31, 0);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
+//   
+//   /*Affichage du x*/
+//   fontPosition->x += 32;
+//   fontImage->x = FONT_SIZE*8;
+//   fontImage->y = FONT_SIZE*7;
+//   SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  setPosX(font, font->position.x + FONT_SIZE);
+  setIm(font, FONT_SIZE*8, FONT_SIZE*7);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
+//   
+//   /*Affichage du nombre de clefs*/
+//   fontImage->x = *clef * 32;
+//   fontImage->y = FONT_SIZE*3;
+//   fontPosition->x += 20;
+//   SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  setPosX(font, font->position.x + 20);
+  setIm(font, FONT_SIZE* *clef, FONT_SIZE*3);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
+//   
+//   /***Vie***/
+//   /*Affichage du coeur*/
+//   fontPosition->x = SCREEN_WIDTH - 90;
+//   fontImage->x = 0;
+//   fontImage->y = 0;
+//   SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  setPosX(font, SCREEN_WIDTH - 90);
+  setIm(font, 0, 0);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
+// 
+// 
+//   /*Affichage du x*/
+//   fontPosition->x += 32;
+//   fontImage->x = FONT_SIZE*8;
+//   fontImage->y = FONT_SIZE*7;
+//   SDL_BlitSurface(font, fontImage, screen, fontPosition);  
+  setPosX(font, font->position.x + FONT_SIZE);
+  setIm(font, FONT_SIZE*8, FONT_SIZE*7);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position); 
+// 
+//   /*Affichage de la vie restante*/
+//   fontImage->x = *vie * 32;
+//   fontImage->y = FONT_SIZE*3;
+//   fontPosition->x += 20;
+//   SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  setPosX(font, font->position.x + 20);
+  setIm(font, FONT_SIZE* *vie, FONT_SIZE*3);
+  SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 }
 
 void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage, SDL_Rect *plateformePos, int *plat_array){

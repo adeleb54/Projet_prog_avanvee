@@ -71,7 +71,7 @@ int game_over (int *vie, Image *spriteGameover, SDL_Surface *screen);
 
 void drawSky (Image *sky, SDL_Surface *screen);
 
-void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_Rect *fontPosition, int *heures, int *minutes, int *secondes, int *vie, int *clef);
+void drawFont (Image *font, SDL_Surface *screen, int *heures, int *minutes, int *secondes, int *vie, int *clef);
 
 void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage, SDL_Rect *plateformePos, int *plat_array);
 

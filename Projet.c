@@ -3,7 +3,7 @@
 
 int main(int argc, char* argv[])
 {
-  SDL_Surface *screen, *temp, *sprite, *font, 
+  SDL_Surface *screen, *temp, *sprite,
 	      *ennemy[NB_ENNEMY],/* *spriteDem, *spriteQuit, *skyL,*/
 	      *oneup, *plateforme[NB_PLATEFORME];
   int colorkey;
@@ -11,7 +11,6 @@ int main(int argc, char* argv[])
   int animationFlip = 0;
   int enAnimFlip = 0;
   SDL_Rect spritePosition;
-  SDL_Rect fontPosition;
   SDL_Rect upPosition;
   SDL_Rect ennemyPos [NB_ENNEMY];
   SDL_Rect plateformePos [NB_PLATEFORME];
@@ -72,14 +71,12 @@ int main(int argc, char* argv[])
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
   /*Font*/
-  temp   = SDL_LoadBMP("franklin.bmp");
-  font = SDL_DisplayFormat(temp);
-  SDL_FreeSurface(temp);
-  SDL_Rect fontImage;
-  fontImage.w = FONT_SIZE;
-  fontImage.h = FONT_SIZE; 
-  fontPosition.y = 0;
-  SDL_SetColorKey(font, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);  
+  Image * font = createImage("franklin.bmp",0,0,FONT_SIZE,FONT_SIZE,0,0);
+//   SDL_Rect fontImage;
+//   fontImage.w = FONT_SIZE;
+//   fontImage.h = FONT_SIZE; 
+//   fontPosition.y = 0;
+  SDL_SetColorKey(font->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);  
     
 //   SDL_Rect selectImage;
 //   selectImage.w = FONT_SIZE;
@@ -192,7 +189,8 @@ int main(int argc, char* argv[])
   //if (start (&haut, &finsaut, &select, &bas, &entree, &gameover, skyL, spriteDem, spriteQuit,screen, font, &demPosition, &quitPosition, &fontPosition, &selectImage) == 1){
     while (gameover != 1)
     {
-      fontPosition.y = 0;
+      //fontPosition.y = 0;
+      setPosY(font, 0);
       
       SDL_Event event;
 	  
@@ -235,7 +233,7 @@ int main(int argc, char* argv[])
       drawSky(sky, screen);
 	
 	      /*Dans bandeau noir*/
-      drawFont (font, screen, &fontImage, &fontPosition, &heures, &minutes, &secondes, &vie, &clef);     
+      drawFont (font, screen, &heures, &minutes, &secondes, &vie, &clef);     
 	    
 	      /*draw blocs*/
       drawBloc(plateforme, screen, &blocImage, plateformePos, plat_array);
@@ -259,11 +257,11 @@ int main(int argc, char* argv[])
     for (int i = 0; i <NB_ENNEMY; i++){
       SDL_FreeSurface(ennemy[i]);
     }
-    SDL_FreeSurface(font);
     SDL_FreeSurface(sprite);
-//     destroyImage(sky);
-//     destroyImage(spritePause);
-//     destroyImage(spriteGameover);
+    destroyImage(sky);
+    destroyImage(spritePause);
+    destroyImage(spriteGameover);
+    destroyImage(font);
     SDL_FreeSurface(oneup);
     SDL_Quit();
     return 0;
