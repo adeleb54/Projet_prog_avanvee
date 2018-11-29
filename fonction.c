@@ -694,9 +694,9 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
 }
  
   /*Gestion du game over*/
-int game_over (int *vie, SDL_Rect gameoverPosition, SDL_Surface *spriteGameover, SDL_Surface *screen){
+int game_over (int *vie, Image *spriteGameover, SDL_Surface *screen){
   if (*vie == 0) {
-    SDL_BlitSurface(spriteGameover, NULL, screen, &gameoverPosition);
+    SDL_BlitSurface(spriteGameover->image, NULL, screen, &spriteGameover->position);
     return 1;
   }
   else {

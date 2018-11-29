@@ -3,7 +3,7 @@
 Image* createImage(char* nom, int x, int y, int width, int height, int imX, int imY){
   
   Image* picture = malloc(sizeof(Image*));	
-  printf("picture : %p\n", picture);
+//   printf("picture : %p\n", picture);
   SDL_Surface* temp   = SDL_LoadBMP(nom);
   picture->image =  SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);

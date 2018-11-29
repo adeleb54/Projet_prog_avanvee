@@ -4,7 +4,7 @@
 int main(int argc, char* argv[])
 {
   SDL_Surface *screen, *temp, *sprite, *font, 
-	      *ennemy[NB_ENNEMY], *spriteGameover,/* *spriteDem, *spriteQuit, *skyL,*/
+	      *ennemy[NB_ENNEMY],/* *spriteDem, *spriteQuit, *skyL,*/
 	      *oneup, *plateforme[NB_PLATEFORME];
   int colorkey;
   int currentDirection = DIR_RIGHT;
@@ -15,7 +15,6 @@ int main(int argc, char* argv[])
   SDL_Rect upPosition;
   SDL_Rect ennemyPos [NB_ENNEMY];
   SDL_Rect plateformePos [NB_PLATEFORME];
-  SDL_Rect gameoverPosition;
 //   SDL_Rect demPosition;
 //   SDL_Rect quitPosition;
   int gameover = 2;
@@ -117,12 +116,11 @@ int main(int argc, char* argv[])
   SDL_SetColorKey(spritePause->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
     
   /*Game Over*/
-  temp  = SDL_LoadBMP("gameover.bmp");
-  spriteGameover = SDL_DisplayFormat(temp);
-  gameoverPosition.x = (SCREEN_WIDTH - 126)/2;
-  gameoverPosition.y = (SCREEN_HEIGHT - 20)/2;
-  SDL_FreeSurface(temp);
-  SDL_SetColorKey(spriteGameover, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  Image* spriteGameover = createImage("gameover.bmp", (SCREEN_WIDTH - 126)/2, (SCREEN_HEIGHT - 20)/2, 0, 0, 0, 0);
+//   gameoverPosition.x = (SCREEN_WIDTH - 126)/2;
+//   gameoverPosition.y = (SCREEN_HEIGHT - 20)/2;
+//   SDL_FreeSurface(temp);
+  SDL_SetColorKey(spriteGameover->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
   /*1up*/
   temp  = SDL_LoadBMP("items.bmp");
@@ -204,7 +202,7 @@ int main(int argc, char* argv[])
       }
       
       //Pause
-      if ((pause (&space, &changspace, &pauseV, spritePause, screen) == 1) && (game_over(&vie, gameoverPosition, spriteGameover, screen) == 0)){
+      if ((pause (&space, &changspace, &pauseV, spritePause, screen) == 1) && (game_over(&vie, spriteGameover, screen) == 0)){
 
 	
       //Jeu
@@ -255,8 +253,6 @@ int main(int argc, char* argv[])
       SDL_UpdateRect(screen, 0, 0, 0, 0);
     }  
     /* clean up */
-    printf("sky : %p\n", sky);
-    printf("spritePause : %p\n", spritePause);
     for (int i = 0; i < NB_PLATEFORME; i++){
       SDL_FreeSurface(plateforme[i]);
     }
@@ -267,6 +263,7 @@ int main(int argc, char* argv[])
     SDL_FreeSurface(sprite);
 //     destroyImage(sky);
 //     destroyImage(spritePause);
+//     destroyImage(spriteGameover);
     SDL_FreeSurface(oneup);
     SDL_Quit();
     return 0;
