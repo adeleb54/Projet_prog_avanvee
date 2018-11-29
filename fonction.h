@@ -1,9 +1,8 @@
 #ifndef FONCTION_H
 #define FONCTION_H
 
-#include <SDL.h>
-#include <stdio.h>
-#include <stdlib.h>
+
+#include "structure.h"
 
 /* Size of the window */
 #define SCREEN_WIDTH_START  500
@@ -43,14 +42,14 @@ int collision(SDL_Rect A, SDL_Rect B, int *saut, char* type);
 
 void HandleEvent(SDL_Event event,
         int *quit, int *saut, int *debutsaut, 
-	int *hperso, int *finsaut, int *droite, int *gauche, int *space, int *haut, int *bas, int pause, SDL_Rect pausePosition);
+	int *hperso, int *finsaut, int *droite, int *gauche, int *space, int *haut, int *bas, int pause);
 
 int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, SDL_Surface *skyL, SDL_Surface *spriteDem, SDL_Surface *spriteQuit, 
 	    SDL_Surface *screen, SDL_Surface *font, SDL_Rect *demPosition, SDL_Rect *quitPosition, SDL_Rect *fontPosition, SDL_Rect *selectImage);
 
 void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateformePos, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart );
 
-int pause (int *space, int *changspace, int *pause, SDL_Rect pausePosition, SDL_Surface *spritePause, SDL_Surface *screen);
+int pause (int *space, int *changspace, int *pause, Image *spritePause, SDL_Surface *screen);
 
 void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirection, int *finsaut, int *delai, int *animationFlip);
 
@@ -70,7 +69,7 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
 
 int game_over (int *vie, SDL_Rect gameoverPosition, SDL_Surface *spriteGameover, SDL_Surface *screen);
 
-void drawSky (SDL_Surface *sky, SDL_Surface *screen);
+void drawSky (Image *sky, SDL_Surface *screen);
 
 void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_Rect *fontPosition, int *heures, int *minutes, int *secondes, int *vie, int *clef);
 

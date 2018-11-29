@@ -1,23 +1,23 @@
 #include "fonction.h"
+#include "structure.h"
 
 int main(int argc, char* argv[])
 {
-  SDL_Surface *screen, *temp, *sprite, *sky, *font, *spritePause, 
-	      *ennemy[NB_ENNEMY], *spriteGameover, *spriteDem, *spriteQuit, *skyL,
+  SDL_Surface *screen, *temp, *sprite, *font, 
+	      *ennemy[NB_ENNEMY], *spriteGameover,/* *spriteDem, *spriteQuit, *skyL,*/
 	      *oneup, *plateforme[NB_PLATEFORME];
   int colorkey;
   int currentDirection = DIR_RIGHT;
   int animationFlip = 0;
   int enAnimFlip = 0;
   SDL_Rect spritePosition;
-  SDL_Rect pausePosition;
   SDL_Rect fontPosition;
   SDL_Rect upPosition;
   SDL_Rect ennemyPos [NB_ENNEMY];
   SDL_Rect plateformePos [NB_PLATEFORME];
   SDL_Rect gameoverPosition;
-  SDL_Rect demPosition;
-  SDL_Rect quitPosition;
+//   SDL_Rect demPosition;
+//   SDL_Rect quitPosition;
   int gameover = 2;
   int hperso = spritePosition.y;
   int debutsaut;
@@ -41,8 +41,8 @@ int main(int argc, char* argv[])
   int enTempsDamage = 0;
   int haut = 0;
   int bas =  0; 
-  int entree = 0;
-  int select = 0;
+//   int entree = 0;
+//   int select = 0;
   int niveau = 1;
   int change = 1;
   
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
   /* set the title bar */
   SDL_WM_SetCaption("SDL Animation", "SDL Animation");
   /* create window */
-  screen = SDL_SetVideoMode(SCREEN_WIDTH_START, SCREEN_HEIGHT_START, 0, 0);
+  screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
   /* set keyboard repeat */
   SDL_EnableKeyRepeat(10, 10);
 
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
   spriteImage.h = SPRITE_SIZE;
   spritePosition.w = SPRITE_SIZE;
   spritePosition.h = SPRITE_SIZE;
-  spritePosition.x = 32;
+  spritePosition.x = 50;
   spritePosition.y = SOL;
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
@@ -82,45 +82,39 @@ int main(int argc, char* argv[])
   fontPosition.y = 0;
   SDL_SetColorKey(font, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);  
     
-  SDL_Rect selectImage;
-  selectImage.w = FONT_SIZE;
-  selectImage.h = FONT_SIZE;
-  selectImage.x = FONT_SIZE * 14;
-  selectImage.y = FONT_SIZE * 3;
-  SDL_SetColorKey(font, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+//   SDL_Rect selectImage;
+//   selectImage.w = FONT_SIZE;
+//   selectImage.h = FONT_SIZE;
+//   selectImage.x = FONT_SIZE * 14;
+//   selectImage.y = FONT_SIZE * 3;
+//   SDL_SetColorKey(font, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
   
- /*Sky Launcher*/
-  temp  = SDL_LoadBMP("ciel1.bmp");
-  skyL = SDL_DisplayFormat(temp);
-  SDL_FreeSurface(temp);
+//  /*Sky Launcher*/
+//   temp  = SDL_LoadBMP("ciel1.bmp");
+//   skyL = SDL_DisplayFormat(temp);
+//   SDL_FreeSurface(temp);
 
   /*Sky*/
-  temp  = SDL_LoadBMP("ciel.bmp");
-  sky = SDL_DisplayFormat(temp);
-  SDL_FreeSurface(temp);
+  Image* sky = createImage("ciel.bmp",0,0,0,0,0,0);
       
-  /*Start*/
-  temp  = SDL_LoadBMP("dem2.bmp");
-  spriteDem = SDL_DisplayFormat(temp);
-  demPosition.x = 217;
-  SDL_FreeSurface(temp);
-  SDL_SetColorKey(spriteDem, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
-  
-  /*Quit*/
-  temp  = SDL_LoadBMP("quit2.bmp");
-  spriteQuit = SDL_DisplayFormat(temp);
-  quitPosition.x = 225;
-  SDL_FreeSurface(temp);
-  SDL_SetColorKey(spriteQuit, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+//   /*Start*/
+//   temp  = SDL_LoadBMP("dem2.bmp");
+//   spriteDem = SDL_DisplayFormat(temp);
+//   demPosition.x = 217;
+//   SDL_FreeSurface(temp);
+//   SDL_SetColorKey(spriteDem, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+//   
+//   /*Quit*/
+//   temp  = SDL_LoadBMP("quit2.bmp");
+//   spriteQuit = SDL_DisplayFormat(temp);
+//   quitPosition.x = 225;
+//   SDL_FreeSurface(temp);
+//   SDL_SetColorKey(spriteQuit, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
   /*Pause*/
-  temp  = SDL_LoadBMP("Pause.bmp");
-  spritePause = SDL_DisplayFormat(temp);
-  pausePosition.x = (SCREEN_WIDTH - 72)/2;
-  pausePosition.y = (SCREEN_HEIGHT - 20)/2;
-  SDL_FreeSurface(temp);
-  SDL_SetColorKey(spritePause, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  Image * spritePause = createImage("Pause.bmp", (SCREEN_WIDTH - 72)/2, (SCREEN_HEIGHT - 20)/2, 0, 0, 0, 0);
+  SDL_SetColorKey(spritePause->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
     
   /*Game Over*/
   temp  = SDL_LoadBMP("gameover.bmp");
@@ -197,7 +191,7 @@ int main(int argc, char* argv[])
   afficher_bloc("test.txt", plat_array, plateformePos, ennemy_array, ennemyPos, ennemyPosStart);
   
 
-  if (start (&haut, &finsaut, &select, &bas, &entree, &gameover, skyL, spriteDem, spriteQuit,screen, font, &demPosition, &quitPosition, &fontPosition, &selectImage) == 1){
+  //if (start (&haut, &finsaut, &select, &bas, &entree, &gameover, skyL, spriteDem, spriteQuit,screen, font, &demPosition, &quitPosition, &fontPosition, &selectImage) == 1){
     while (gameover != 1)
     {
       fontPosition.y = 0;
@@ -206,11 +200,11 @@ int main(int argc, char* argv[])
 	  
       if (SDL_PollEvent(&event)) {
 	HandleEvent(event, &gameover, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space, &haut, &bas, 
-		    pause (&space, &changspace, &pauseV, pausePosition, spritePause, screen), pausePosition);
+		    pause (&space, &changspace, &pauseV, spritePause, screen));
       }
       
       //Pause
-      if ((pause (&space, &changspace, &pauseV, pausePosition, spritePause, screen) == 1) && (game_over(&vie, gameoverPosition, spriteGameover, screen) == 0)){
+      if ((pause (&space, &changspace, &pauseV, spritePause, screen) == 1) && (game_over(&vie, gameoverPosition, spriteGameover, screen) == 0)){
 
 	
       //Jeu
@@ -261,6 +255,8 @@ int main(int argc, char* argv[])
       SDL_UpdateRect(screen, 0, 0, 0, 0);
     }  
     /* clean up */
+    printf("sky : %p\n", sky);
+    printf("spritePause : %p\n", spritePause);
     for (int i = 0; i < NB_PLATEFORME; i++){
       SDL_FreeSurface(plateforme[i]);
     }
@@ -269,13 +265,14 @@ int main(int argc, char* argv[])
     }
     SDL_FreeSurface(font);
     SDL_FreeSurface(sprite);
-    SDL_FreeSurface(sky);
+//     destroyImage(sky);
+//     destroyImage(spritePause);
     SDL_FreeSurface(oneup);
     SDL_Quit();
     return 0;
-  }
-  else {
-    return 0;
-  }
+  // }
+  // else {
+  //   return 0;
+  // }
     
 }
