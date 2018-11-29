@@ -1,9 +1,9 @@
+
 #ifndef FONCTION_H
 #define FONCTION_H
 
-#include <SDL.h>
-#include <stdio.h>
-#include <stdlib.h>
+
+#include "structure.h"
 
 /* Size of the window */
 #define SCREEN_WIDTH_START  500
@@ -33,7 +33,7 @@
 #define HSAUT 70
 #define SOL 576
 
-#define NB_ENNEMY  2
+#define NB_ENNEMY  10
 #define NB_PLATEFORME 570
 
 /* Number of pixels for one step of the sprite */
@@ -43,7 +43,7 @@ int collision(SDL_Rect A, SDL_Rect B, int *saut, char* type);
 
 void HandleEvent(SDL_Event event,
         int *quit, int *saut, int *debutsaut, 
-	int *hperso, int *finsaut, int *droite, int *gauche, int *space, int *haut, int *bas);
+	int *hperso, int *finsaut, int *droite, int *gauche, int *space, int *haut, int *bas, int pause, SDL_Rect pausePosition);
 
 int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, SDL_Surface *skyL, SDL_Surface *spriteDem, SDL_Surface *spriteQuit, 
 	    SDL_Surface *screen, SDL_Surface *font, SDL_Rect *demPosition, SDL_Rect *quitPosition, SDL_Rect *fontPosition, SDL_Rect *selectImage);
@@ -54,11 +54,11 @@ int pause (int *space, int *changspace, int *pause, SDL_Rect pausePosition, SDL_
 
 void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirection, int *finsaut, int *delai, int *animationFlip);
 
-void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_array, int *enDirection, int *enAnimFlip, int *delaiEN, SDL_Rect *plateformePos, int *plat_array, 
+void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_array, int *enDirection, int *enAnimFlip, int *change, int *delaiEN, SDL_Rect *plateformePos, int *plat_array, 
 		SDL_Rect *spritePosition, int *damage, int *tempsDamage, int *vie, int *saut, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage);
 
-void spriteCollide (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, int saut, int *vie, int *item, int *clef, 
-		    int *tempsItem, int *damage, int *niveau, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart);
+void spriteCollide (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, int saut, int *vie, int *item, 
+		    int *clef, int *tempsItem, int *damage, int *niveau, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *est_passe);
 
 void lose_life (int *damage, int *tempsDamage, int *vie);
 
@@ -66,11 +66,12 @@ void stopEnnemy (int *EnDamage, int *enTempsDamage);
 
 void fTimer (int* timer, int* heures, int* minutes, int* secondes);
 
-void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SDL_Rect *plateformePos, int *debutsaut, int *finsaut, int *damage);
+void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SDL_Rect *plateformePos, int *debutsaut, int *finsaut, int *damage, 
+	   int *vie, int *clef, int *tempsItem, int *niveau, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *est_passe, int *item);
 
 int game_over (int *vie, SDL_Rect gameoverPosition, SDL_Surface *spriteGameover, SDL_Surface *screen);
 
-void drawSky (SDL_Surface *sky, SDL_Surface *screen);
+void drawSky (Image *sky, SDL_Surface *screen);
 
 void drawFont (SDL_Surface *font, SDL_Surface *screen, SDL_Rect *fontImage, SDL_Rect *fontPosition, int *heures, int *minutes, int *secondes, int *vie, int *clef);
 

@@ -1,17 +1,20 @@
+
 #include <SDL.h>
 #include <stdio.h>
-#include <stdarg.h>
+#include <stdlib.h>
 
 /* Size of the window */
-#define SCREEN_WIDTH  640
-#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH  930
+#define SCREEN_HEIGHT 589
 
 /* Size of the grass texture picture */
-#define GRASS_SIZE    32
+#define SKY_WIDTH    500
+#define SKY_HEIGHT   190
 
 /* Size of one image: */
-#define SPRITE_SIZE     32
-#define BLOC_SIZE       39
+#define SPRITE_SIZE 	32
+#define BLOC_SIZE       31
+#define FONT_SIZE 	32
 
 /* Order of the different directions in the picture: */
 #define DIR_RIGHT       1
@@ -21,10 +24,15 @@
 #define PASSAUT 0
 
 #define HSAUT 50
-#define SOL 448
+#define SOL 557
 
 #define NB_SOL 2
-#define NB_PLATEFORME 1
+#define NB_PLATEFORME 570
+#define NB_ITEMS 2
 
 /* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     1
+
+int collision(SDL_Rect A, SDL_Rect B);
+
+void afficher_bloc();
