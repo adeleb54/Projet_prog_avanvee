@@ -2,8 +2,7 @@
   
 //Gestion des evenements
 void HandleEvent(SDL_Event event,
-        int *quit, int *saut, int *debutsaut, int *hperso, int *finsaut, 
-	int *droite, int *gauche, int *space, int *haut, int *bas, int pause)
+        int *quit, Sprite* sprite, int *space, int *bas, int pause)
 {
   switch (event.type) {
     /* close button clicked */
@@ -18,16 +17,14 @@ void HandleEvent(SDL_Event event,
 	    case SDLK_q:
 		*quit = 1;
 		break;
-		
 	    case SDLK_UP:
 	      if (*quit != 1) {
-		if (*finsaut != 0) {
-		  *finsaut = 0;
-		  *saut = SAUT;
-		  *debutsaut = *hperso;
+		if (getVar(sprite)->finSaut != 0) {
+		  getVar(sprite)->saut = 0;
+		  getVar(sprite)->finsaut = SAUT;
+		  getVar(sprite)->debutSaut = getVar(sprite)->hperso;
 		}
 	      }
-	      *haut = 1;
 	      break;
 	      
 	    case SDLK_DOWN:
@@ -35,11 +32,11 @@ void HandleEvent(SDL_Event event,
 	      break;
 		
 	    case SDLK_LEFT:
-	      *gauche = 1;
+	      getVar(sprite)->gauche = 1;
 	      break;
 		
 	    case SDLK_RIGHT:
-	      *droite = 1;
+	      getVar(sprite)->droite = 1;
 	      break;
 	    
 	    case SDLK_SPACE:
@@ -53,20 +50,17 @@ void HandleEvent(SDL_Event event,
 	
     case SDL_KEYUP:
 	switch (event.key.keysym.sym) {
-	    case SDLK_UP:
-	      *haut = 0;
-	      break;
 	    
 	    case SDLK_DOWN:
 	      *bas = 0;
 	      break;
 	    
 	    case SDLK_LEFT:
-	      *gauche = 0;
+	      getVar(sprite)->gauche = 0;
 	      break;
 		
 	    case SDLK_RIGHT:
-	      *droite = 0;
+	      getVar(sprite)->droite = 0;
 	      break;
 		
 	    case SDLK_SPACE:
@@ -284,7 +278,7 @@ void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateforme
   if (pFile==NULL)  perror ("Error opening file"); 
   else {
     c = fgetc(pFile);
-    while(c != EOF){
+    while(c != EOF && i < NB_PLATEFORME){
       switch (c){
 	case 49 :
 	  plat_array[i] = 1;
@@ -381,34 +375,34 @@ int pause (int *space, int *changspace, int *pause, Image *spritePause, SDL_Surf
 }
 
 //Gestion des déplacements
-void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirection, int *finsaut, int *delai, int *animationFlip){
-  if (*droite == 1){
-    spritePosition->x += SPRITE_STEP;
-    *currentDirection = DIR_RIGHT;
-    if (finsaut != 0) {
-      *delai = *delai + 1;
+void move (Sprite* sprite){
+  if (getVar(sprite)->droite == 1){
+    setPosX(getImage(sprite), getImage(sprite)->position.x + SPRITE_STEP);
+    setDir(sprite, DIR_RIGHT);
+    if (getVar(sprite)->finSaut != 0) {
+      incrDelai(sprite);
     }
-    if (*delai == 15) {
-      *animationFlip = 1 - *animationFlip;
-      *delai = 0;
+    if (getVar(sprite)->delai == 15) {
+      anim(sprite, 1 - getVar(sprite->anim));
+      initDelai(sprite);
     }
   }
-  if (*gauche == 1) {
-    spritePosition->x -= SPRITE_STEP;
-    *currentDirection = DIR_LEFT;
-    if (*finsaut != 0) {
-      *delai = *delai + 1;
+  if (getVar(sprite)->gauche == 1) {
+    setPosX(getImage(sprite), getImage(sprite)->position.x - SPRITE_STEP);
+    setDir(sprite, DIR_LEFT);
+    if (getVar(sprite)->finSaut != 0) {
+      incrDelai(sprite);
     }
-    if (*delai == 15) {
-      *animationFlip = 1 - *animationFlip;
-      *delai = 0;
+    if (getVar(sprite)->delai == 15) {
+      anim(sprite, 1 - getVar(sprite->anim));
+      initDelai(sprite);
     }
   }
 }
 
 //Replacement de l'ennemi lors de collisions
-void ennemyCollide (SDL_Rect *spritePosition, SDL_Rect *ennemyPosition, int *ennemy_array, SDL_Rect *plateformePos, int *plat_array, int* enDirection, 
-			int *damage, int *tempsDamage, int *vie, int *saut, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage){
+void ennemyCollide (Sprite *sprite, SDL_Rect *ennemyPosition, int *ennemy_array, SDL_Rect *plateformePos, int *plat_array, int* enDirection, 
+			int *tempsDamage, int *vie, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage){
   for (int i = 0; i<NB_ENNEMY; i++){  
     if ( ennemyPosition[i].x <= 0)
       ennemyPosition[i].x = 0;
@@ -429,10 +423,10 @@ void ennemyCollide (SDL_Rect *spritePosition, SDL_Rect *ennemyPosition, int *enn
       }
     }
     //collison avec le perso
-    if (collision(ennemyPosition[i], *spritePosition, saut, "ennemi")==1 /*|| collision(ennemyPosition[i], *spritePosition, saut, "ennemi")== 2 || collision(ennemyPosition[i], *spritePosition, saut, "ennemi")== 4*/){
+    if (collision(ennemyPosition[i], getImage(sprite)->position, getVar(sprite)->saut, "ennemi")==1 /*|| collision(ennemyPosition[i], *spritePosition, saut, "ennemi")== 2 || collision(ennemyPosition[i], *spritePosition, saut, "ennemi")== 4*/){
       if(ennemy_array[i] != 0){
-	if(*damage == 0 && enDamage[i] == 0){
-	  *damage = 1;
+	if(getVar(sprite)->damage == 0 && enDamage[i] == 0){
+	  setDamage(sprite, 1);
 	  ennemyPosDamage[i].x = ennemyPosition[i].x;
 	  ennemyPosDamage[i].y = ennemyPosition[i].y;
 	  enDamage[i] = 1;
@@ -444,7 +438,7 @@ void ennemyCollide (SDL_Rect *spritePosition, SDL_Rect *ennemyPosition, int *enn
 
 //Deplacement ennemi
 void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_array, int *enDirection, int *enAnimFlip, int *change, int *delaiEN, SDL_Rect *plateformePos, int *plat_array, 
-		SDL_Rect *spritePosition, int *damage, int *tempsDamage, int *vie, int *saut, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage){
+		int *vie, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage){
   for (int i = 0; i<NB_ENNEMY; i++){  
     if (ennemy_array[i] != 0){
       if (enDirection[i] == EN_DIR_LEFT){
@@ -483,7 +477,7 @@ void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_
       }
     }
   }
-  ennemyCollide (spritePosition, ennemyPosition, ennemy_array, plateformePos, plat_array, enDirection, damage, tempsDamage, vie, saut, enDamage, enTempsDamage, ennemyPosDamage);
+  ennemyCollide (sprite, ennemyPosition, ennemy_array, plateformePos, plat_array, enDirection, tempsDamage, vie, enDamage, enTempsDamage, ennemyPosDamage);
 }  
 
 
@@ -570,11 +564,11 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
 
   
 //Replacement du sprite lors de collisions
-void spriteCollide (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, int saut, int *vie, int *item, 
+void spriteCollide (Image *sprite, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, int *vie, int *item, 
 		    int *clef, int *tempsItem, int *damage, int *niveau, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart){
   
-  if (spritePosition->x <= 0)
-    spritePosition->x = 0;
+  if (getPosX(getImage(sprite)) <= 0)
+    setPosX(getImage(sprite),0);
   if (spritePosition->x >= SCREEN_WIDTH - SPRITE_SIZE) 
     spritePosition->x = SCREEN_WIDTH - SPRITE_SIZE;
   if (spritePosition->y >= SCREEN_HEIGHT - SPRITE_SIZE) 
@@ -714,7 +708,8 @@ void drawFont (Image *font, SDL_Surface *screen,int *heures, int *minutes, int *
   
   setImY(font, FONT_SIZE*3);
   
-  //Affichage du timer
+  /***Timer***/
+  
   //Affichage heures
   //Dizaines
   setImX(font, FONT_SIZE * (*heures/10));
@@ -764,6 +759,7 @@ void drawFont (Image *font, SDL_Surface *screen,int *heures, int *minutes, int *
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   /***Clef***/
+  
   /*Affichage de la clef*/
   setPosX(font, SCREEN_WIDTH - 180);
   setIm(font, 31, 0);
@@ -780,6 +776,7 @@ void drawFont (Image *font, SDL_Surface *screen,int *heures, int *minutes, int *
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   /***Vie***/
+  
   /*Affichage du coeur*/
   setPosX(font, SCREEN_WIDTH - 90);
   setIm(font, 0, 0);

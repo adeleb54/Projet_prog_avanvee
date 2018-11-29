@@ -3,27 +3,19 @@
 
 int main(int argc, char* argv[])
 {
-  SDL_Surface *screen, *temp, *sprite,
+  SDL_Surface *screen, *temp,
 	      *ennemy[NB_ENNEMY],/* *spriteDem, *spriteQuit, *skyL,*/
 	      *oneup, *plateforme[NB_PLATEFORME];
   int colorkey;
   int currentDirection = DIR_RIGHT;
   int animationFlip = 0;
   int enAnimFlip = 0;
-  SDL_Rect spritePosition;
   SDL_Rect upPosition;
   SDL_Rect ennemyPos [NB_ENNEMY];
   SDL_Rect plateformePos [NB_PLATEFORME];
 //   SDL_Rect demPosition;
 //   SDL_Rect quitPosition;
   int gameover = 2;
-  int hperso = spritePosition.y;
-  int debutsaut;
-  int finsaut = 1;
-  int saut = 0;
-  int droite = 0;
-  int gauche = 0;
-  int delai = 0;
   int delaiEn = 0;
   int timer = 0;
   int pauseV = 1;
@@ -34,8 +26,6 @@ int main(int argc, char* argv[])
   int item = 0;
   int tempsItem = 0;
   int clef = 0;  
-  int damage = 0;
-  int tempsDamage = 0;
   int enTempsDamage = 0;
   int haut = 0;
   int bas =  0; 
@@ -43,6 +33,7 @@ int main(int argc, char* argv[])
 //   int select = 0;
   int niveau = 1;
   int change = 1;
+  colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   
   
   /* initialize SDL */
@@ -56,26 +47,20 @@ int main(int argc, char* argv[])
 
   
   /*Sprites*/
-  temp   = SDL_LoadBMP("sprite.bmp");
-  sprite = SDL_DisplayFormat(temp);
-  SDL_FreeSurface(temp);
-  SDL_Rect spriteImage;
-  spriteImage.y = 0;
-  spriteImage.w = SPRITE_SIZE;
-  spriteImage.h = SPRITE_SIZE;
-  spritePosition.w = SPRITE_SIZE;
-  spritePosition.h = SPRITE_SIZE;
-  spritePosition.x = 50;
-  spritePosition.y = SOL;
-  colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
-  SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  Image* spriteIm = createImage("sprite.bmp", 50, SOL, 0, 0, SPRITE_SIZE, SPRITE_SIZE);
+  Sprite* sprite = createSprite(spriteIm);
+//   SDL_Rect spriteImage;
+//   spriteImage.y = 0;
+//   spriteImage.w = SPRITE_SIZE;
+//   spriteImage.h = SPRITE_SIZE;
+//   spritePosition.w = SPRITE_SIZE;
+//   spritePosition.h = SPRITE_SIZE;
+//   spritePosition.x = 50;
+//   spritePosition.y = SOL;
+  SDL_SetColorKey(getImage(sprite)->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
   /*Font*/
   Image * font = createImage("franklin.bmp",0,0,FONT_SIZE,FONT_SIZE,0,0);
-//   SDL_Rect fontImage;
-//   fontImage.w = FONT_SIZE;
-//   fontImage.h = FONT_SIZE; 
-//   fontPosition.y = 0;
   SDL_SetColorKey(font->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);  
     
 //   SDL_Rect selectImage;
@@ -114,9 +99,6 @@ int main(int argc, char* argv[])
     
   /*Game Over*/
   Image* spriteGameover = createImage("gameover.bmp", (SCREEN_WIDTH - 126)/2, (SCREEN_HEIGHT - 20)/2, 0, 0, 0, 0);
-//   gameoverPosition.x = (SCREEN_WIDTH - 126)/2;
-//   gameoverPosition.y = (SCREEN_HEIGHT - 20)/2;
-//   SDL_FreeSurface(temp);
   SDL_SetColorKey(spriteGameover->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
   /*1up*/
@@ -195,8 +177,7 @@ int main(int argc, char* argv[])
       SDL_Event event;
 	  
       if (SDL_PollEvent(&event)) {
-	HandleEvent(event, &gameover, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space, &haut, &bas, 
-		    pause (&space, &changspace, &pauseV, spritePause, screen));
+	HandleEvent(event, &gameover, sprite, &space, &haut, &bas, pause (&space, &changspace, &pauseV, spritePause, screen));
       }
       
       //Pause
@@ -209,14 +190,13 @@ int main(int argc, char* argv[])
 	fTimer (&timer, &heures, &minutes, &secondes);
 	
 	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, &change, &delaiEn, plateformePos, 
-		  plat_array, &spritePosition, &damage, &tempsDamage, &vie, &saut, enDamage, &enTempsDamage, ennemyPosDamage);
+		  plat_array, sprite, &vie, enDamage, &enTempsDamage, ennemyPosDamage);
 	
 	/*handle the movement of the sprite*/
-	move (&droite, &gauche, &spritePosition, &currentDirection, &finsaut, &delai, &animationFlip);
+	move (sprite);
 	
 	/*Collisions*/      
-	spriteCollide (&spritePosition, plateformePos, plat_array, ennemy_array, saut, &vie, &item, &clef, 
-		       &tempsItem, &damage, &niveau, ennemyPos, ennemyPosStart);
+	spriteCollide (sprite, plateformePos, plat_array, ennemy_array, &vie, &item, &clef, &tempsItem, &niveau, ennemyPos, ennemyPosStart);
   
 	/*Gestion des dégâts*/
 	lose_life (&damage, &tempsDamage, &vie);
