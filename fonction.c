@@ -765,57 +765,32 @@ void drawFont (Image *font, SDL_Surface *screen,int *heures, int *minutes, int *
   
   /***Clef***/
   /*Affichage de la clef*/
-//   fontPosition->x = SCREEN_WIDTH - 180;
-//   fontImage->x = 31;
-//   fontImage->y = 0;
-//   SDL_BlitSurface(font, fontImage, screen, fontPosition);
   setPosX(font, SCREEN_WIDTH - 180);
   setIm(font, 31, 0);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
-//   
-//   /*Affichage du x*/
-//   fontPosition->x += 32;
-//   fontImage->x = FONT_SIZE*8;
-//   fontImage->y = FONT_SIZE*7;
-//   SDL_BlitSurface(font, fontImage, screen, fontPosition);
+   
+   /*Affichage du x*/
   setPosX(font, font->position.x + FONT_SIZE);
   setIm(font, FONT_SIZE*8, FONT_SIZE*7);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
-//   
-//   /*Affichage du nombre de clefs*/
-//   fontImage->x = *clef * 32;
-//   fontImage->y = FONT_SIZE*3;
-//   fontPosition->x += 20;
-//   SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  
+  /*Affichage du nombre de clefs*/
   setPosX(font, font->position.x + 20);
   setIm(font, FONT_SIZE* *clef, FONT_SIZE*3);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
-//   
-//   /***Vie***/
-//   /*Affichage du coeur*/
-//   fontPosition->x = SCREEN_WIDTH - 90;
-//   fontImage->x = 0;
-//   fontImage->y = 0;
-//   SDL_BlitSurface(font, fontImage, screen, fontPosition);
+  
+  /***Vie***/
+  /*Affichage du coeur*/
   setPosX(font, SCREEN_WIDTH - 90);
   setIm(font, 0, 0);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
-// 
-// 
-//   /*Affichage du x*/
-//   fontPosition->x += 32;
-//   fontImage->x = FONT_SIZE*8;
-//   fontImage->y = FONT_SIZE*7;
-//   SDL_BlitSurface(font, fontImage, screen, fontPosition);  
+
+  /*Affichage du x*/ 
   setPosX(font, font->position.x + FONT_SIZE);
   setIm(font, FONT_SIZE*8, FONT_SIZE*7);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position); 
-// 
-//   /*Affichage de la vie restante*/
-//   fontImage->x = *vie * 32;
-//   fontImage->y = FONT_SIZE*3;
-//   fontPosition->x += 20;
-//   SDL_BlitSurface(font, fontImage, screen, fontPosition);
+
+  /*Affichage de la vie restante*/
   setPosX(font, font->position.x + 20);
   setIm(font, FONT_SIZE* *vie, FONT_SIZE*3);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
