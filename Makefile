@@ -1,4 +1,4 @@
-SRC = Projet.c fonction.c fonction.h structure.c structure.h
+SRC = Projet.c fonction.c fonction.h structure.c structure.h constante.h
 BIN = projet
 
 

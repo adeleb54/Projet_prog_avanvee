@@ -7,8 +7,8 @@ int main(int argc, char* argv[])
 	      *ennemy[NB_ENNEMY],/* *spriteDem, *spriteQuit, *skyL,*/
 	      *oneup, *plateforme[NB_PLATEFORME];
   int colorkey;
-  int currentDirection = DIR_RIGHT;
-  int animationFlip = 0;
+  // int currentDirection = DIR_RIGHT;
+  // int animationFlip = 0;
   int enAnimFlip = 0;
   SDL_Rect upPosition;
   SDL_Rect ennemyPos [NB_ENNEMY];
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
   int pauseV = 1;
   int space = 0;
   int changspace = 1;
-  int vie = 5;
+   int vie = 5;
   int secondes, minutes, heures;
   int item = 0;
   int tempsItem = 0;
@@ -33,7 +33,6 @@ int main(int argc, char* argv[])
 //   int select = 0;
   int niveau = 1;
   int change = 1;
-  colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   
   
   /* initialize SDL */
@@ -44,10 +43,11 @@ int main(int argc, char* argv[])
   screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
   /* set keyboard repeat */
   SDL_EnableKeyRepeat(10, 10);
+  colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
 
   
   /*Sprites*/
-  Image* spriteIm = createImage("sprite.bmp", 50, SOL, 0, 0, SPRITE_SIZE, SPRITE_SIZE);
+  Image* spriteIm = createImage("sprite.bmp", 0, SOL, SPRITE_SIZE, SPRITE_SIZE, 0, 0);
   Sprite* sprite = createSprite(spriteIm);
 //   SDL_Rect spriteImage;
 //   spriteImage.y = 0;
@@ -171,17 +171,18 @@ int main(int argc, char* argv[])
   //if (start (&haut, &finsaut, &select, &bas, &entree, &gameover, skyL, spriteDem, spriteQuit,screen, font, &demPosition, &quitPosition, &fontPosition, &selectImage) == 1){
     while (gameover != 1)
     {
+      // printf("gameover = %d \n",gameover);
       //fontPosition.y = 0;
       setPosY(font, 0);
       
       SDL_Event event;
 	  
       if (SDL_PollEvent(&event)) {
-	HandleEvent(event, &gameover, sprite, &space, &haut, &bas, pause (&space, &changspace, &pauseV, spritePause, screen));
+	HandleEvent(event, &gameover, sprite, &space, &bas, pause (&space, &changspace, &pauseV, spritePause, screen));
       }
       
       //Pause
-      if ((pause (&space, &changspace, &pauseV, spritePause, screen) == 1) && (game_over(&vie, spriteGameover, screen) == 0)){
+      if ((pause (&space, &changspace, &pauseV, spritePause, screen) == 1) && (game_over(sprite, spriteGameover, screen) == 0)){
 
 	
       //Jeu
@@ -190,21 +191,21 @@ int main(int argc, char* argv[])
 	fTimer (&timer, &heures, &minutes, &secondes);
 	
 	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, &change, &delaiEn, plateformePos, 
-		  plat_array, sprite, &vie, enDamage, &enTempsDamage, ennemyPosDamage);
+		  plat_array, sprite, enDamage, &enTempsDamage, ennemyPosDamage);
 	
 	/*handle the movement of the sprite*/
 	move (sprite);
 	
 	/*Collisions*/      
-	spriteCollide (sprite, plateformePos, plat_array, ennemy_array, &vie, &item, &clef, &tempsItem, &niveau, ennemyPos, ennemyPosStart);
+	spriteCollide (sprite, plateformePos, plat_array, ennemy_array, &item, &clef, &tempsItem, &niveau, ennemyPos, ennemyPosStart);
   
 	/*Gestion des dégâts*/
-	lose_life (&damage, &tempsDamage, &vie);
+	lose_life (sprite);
 	
 	stopEnnemy (enDamage, &enTempsDamage);
 
 	/*Saut*/
-	Saut (&hperso, &spritePosition, &saut, plat_array, plateformePos, &debutsaut, &finsaut, &damage);
+	Saut (sprite, plat_array, plateformePos);
 	
 		      /******Affichage*******/
 		      
@@ -213,17 +214,17 @@ int main(int argc, char* argv[])
       drawSky(sky, screen);
 	
 	      /*Dans bandeau noir*/
-      drawFont (font, screen, &heures, &minutes, &secondes, &vie, &clef);     
+      drawFont (font, screen, &heures, &minutes, &secondes, &clef, sprite);     
 	    
 	      /*draw blocs*/
       drawBloc(plateforme, screen, &blocImage, plateformePos, plat_array);
 	
 	      /*draw sprites*/
-      drawSprite (sprite, screen, &spriteImage, &spritePosition, &currentDirection, &animationFlip, &damage, &tempsDamage);
+      drawSprite (sprite, screen);
       
       drawEnnemy (ennemy, screen, &ennemyImage, ennemyPos, ennemyDir, &enAnimFlip, ennemy_array, enDamage, &enTempsDamage, ennemyPosDamage);
 	
-      drawBonus (oneup, screen, &upImage, &upPosition, &item, &tempsItem, &spritePosition);
+      drawBonus (oneup, screen, &upImage, &upPosition, &item, &tempsItem, sprite);
   
       SDL_Delay(4);
       }
@@ -237,7 +238,7 @@ int main(int argc, char* argv[])
     for (int i = 0; i <NB_ENNEMY; i++){
       SDL_FreeSurface(ennemy[i]);
     }
-    SDL_FreeSurface(sprite);
+    destroyImage(getImage(sprite));
     destroyImage(sky);
     destroyImage(spritePause);
     destroyImage(spriteGameover);
