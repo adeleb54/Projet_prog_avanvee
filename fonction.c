@@ -2,7 +2,7 @@
   
 //Gestion des evenements
 void HandleEvent(SDL_Event event,
-        int *quit, Sprite* sprite, int *space, int *bas, int pause)
+        int *quit, Sprite* sprite, VariablesG* var)
 {
   switch (event.type) {
     /* close button clicked */
@@ -24,10 +24,6 @@ void HandleEvent(SDL_Event event,
 		    }
 	      }
 	      break;
-	      
-	    case SDLK_DOWN:
-	      *bas = 1;
-	      break;
 		
 	    case SDLK_LEFT:
 	      getVar(sprite)->gauche = 1;
@@ -38,7 +34,7 @@ void HandleEvent(SDL_Event event,
 	      break;
 	    
 	    case SDLK_SPACE:
-	      *space = 1;
+	      var->space = 1;
 	      break;
 	    
 	    default:
@@ -49,10 +45,6 @@ void HandleEvent(SDL_Event event,
     case SDL_KEYUP:
 	switch (event.key.keysym.sym) {
 	    
-	    case SDLK_DOWN:
-	      *bas = 0;
-	      break;
-	    
 	    case SDLK_LEFT:
 	      getVar(sprite)->gauche = 0;
 	      break;
@@ -62,7 +54,7 @@ void HandleEvent(SDL_Event event,
 	      break;
 		
 	    case SDLK_SPACE:
-	      *space = 0;
+	      var->space = 0;
 	      break;
 		
 	    default :
@@ -82,12 +74,12 @@ void HandleEvent(SDL_Event event,
   }
 }
   
-void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entree)
+void HandleEventStart(SDL_Event event, VariablesG* var)
 {
   switch (event.type) {
     /* close button clicked */
     case SDL_QUIT:
-	*quit = 1;
+	setGameOver(var, 1);
 	break;
 
     /* handle the keyboard */
@@ -95,19 +87,19 @@ void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entr
 	switch (event.key.keysym.sym) {
 	    case SDLK_ESCAPE:
 	    case SDLK_q:
-		*quit = 1;
+		setGameOver(var, 1);
 		break;
 		
 	    case SDLK_UP:
-	      *haut = 1;
+	      setHaut(var, 1);
 	      break;
 	      
 	    case SDLK_DOWN:
-	      *bas = 1;
+	      setBas(var,  1);
 	      break;
 	      
 	    case SDLK_RETURN:
-	      *entree = 1;
+	      setEntree(var,  1);
 	      break;
 	    
 	    default:
@@ -118,15 +110,15 @@ void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entr
     case SDL_KEYUP:
 	switch (event.key.keysym.sym) {
 	    case SDLK_UP:
-	      *haut = 0;
+	      setHaut(var, 0);
 	      break;
 	    
 	    case SDLK_DOWN:
-	      *bas = 0;
+	      setBas(var,  0);
 	      break;
 	      
 	    case SDLK_RETURN:
-	      *entree = 0;
+	      setEntree(var, 0);
 	      break;
 		
 	    default :
@@ -136,70 +128,64 @@ void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entr
   }
 }
 
-int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, SDL_Surface *skyL, SDL_Surface *spriteDem, SDL_Surface *spriteQuit, 
-	    SDL_Surface *screen, SDL_Surface *font, SDL_Rect *demPosition, SDL_Rect *quitPosition, SDL_Rect *fontPosition, SDL_Rect *selectImage){
+int start (VariablesG* var, Image *skyL, Image *spriteDem, Image *spriteQuit, SDL_Surface *screen, Image *font){
   
   int changhaut, changbas;
-  while (*gameover == 2){  
+  while (getGameOver(var) == 2){  
     
     SDL_Event event;
     if (SDL_PollEvent(&event)) {
-      HandleEventStart(event, gameover, haut, bas, entree);
+      HandleEventStart(event, var);
     }
     
-    if (*haut == 0) {
+    if (getHaut(var) == 0) {
 	changhaut = 1;
     }
     
-    if (changhaut == 1 && *haut == 1) {
+    if (changhaut == 1 && getHaut(var) == 1) {
       changhaut = 0;
-      *select = 1 - *select;
+      setSelect(var, 1 - getSelect(var));
     }
     
-    if (*bas == 0) {
+    if (getBas(var) == 0) {
 	changbas = 1;
     }
     
-    if (changbas == 1 && *bas == 1) {
+    if (changbas == 1 && getBas(var) == 1) {
       changbas = 0;
-      *select = 1 - *select;
+      setSelect(var, 1 - getSelect(var));
     }
     
     /* draw the background */
-    SDL_BlitSurface(skyL, NULL, screen, NULL);
+    SDL_BlitSurface(skyL->image, NULL, screen, NULL);
     
+    SDL_BlitSurface(spriteDem->image, NULL, screen, &spriteDem->position);
     
-    demPosition->y = 90;
-    SDL_BlitSurface(spriteDem, NULL, screen, demPosition);
+    SDL_BlitSurface(spriteQuit->image, NULL, screen, &spriteQuit->position);
     
-    quitPosition->y = 120;
-    SDL_BlitSurface(spriteQuit, NULL, screen, quitPosition);
-    
-    if (*select == 0) {
-      fontPosition->x = 190;
-      fontPosition->y = 90;
-      SDL_BlitSurface(font, selectImage, screen, fontPosition);
+    setPosX(font, 190);
+    if (getSelect(var) == 0) {
+      setPosY(font, 90);
+      SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 
     }
     
-    if (*select == 1) {
-      fontPosition->x = 190;
-      fontPosition->y = 120;
-      SDL_BlitSurface(font, selectImage, screen, fontPosition);
-
+    if (getSelect(var) == 1) {
+      setPosY(font, 120);
+      SDL_BlitSurface(font->image,  &font->taille, screen, &font->position);
     }
     
     /* update the screen */
      SDL_UpdateRect(screen, 0, 0, 0, 0);
      
-    if (*entree == 1) {
+    if (getEntree(var) == 1) {
       
-      if (*select == 0) {
+      if (getSelect(var) == 0) {
 	
 	/* clean up */
-	SDL_FreeSurface(skyL);
-	SDL_FreeSurface(spriteDem);
-	SDL_FreeSurface(spriteQuit);
+	destroyImage(skyL);
+	destroyImage(spriteDem);
+	destroyImage(spriteQuit);
 	
 	/* initialize SDL */
 	SDL_Init(SDL_INIT_VIDEO);
@@ -210,14 +196,16 @@ int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gam
 	/* set keyboard repeat */
 	SDL_EnableKeyRepeat(10, 10);
 	
-	*gameover = 0;
+	setGameOver(var, 0);
       }
           
-      if (*select == 1) {
+      if (getSelect(var) == 1) {
 	  
 	/* clean up */
-	SDL_FreeSurface(skyL);
-	*gameover = 1;
+	destroyImage(skyL);
+	destroyImage(spriteDem);
+	destroyImage(spriteQuit);
+	setGameOver(var, 1);
 	SDL_Quit();
 	return 0;
       }
@@ -354,22 +342,24 @@ void set_pos (Sprite* sprite, int a, int b) {
 }
 
 //Gestion de la pause
-int pause (int *space, int *changspace, int *pause, Image *spritePause, SDL_Surface *screen){
+int pause (VariablesG *var, Image *spritePause, SDL_Surface *screen){
   
-  if (*space == 0) {
-      *changspace = 1;  
+  int changeSpace = 0;
+  if (getSpace(var) == 0) {
+      changeSpace = 1;  
   }
   
-  if (*changspace == 1 && *space == 1) {
-    *changspace = 0;
-    *pause = 1 - *pause;
+  if (changeSpace == 0 && getSpace(var) == 1) {
+    changeSpace = 0;
+    setPause(var, 1 - getPause(var));
   }
   
-  if (*pause == 0) {
+  printf("pause : %d\n", getPause(var)); 
+  if (getPause(var) == 1) {
     SDL_BlitSurface(spritePause->image, NULL, screen, &spritePause->position);
   }
   
-  return *pause;
+  return getPause(var);
 }
 
 //Gestion des déplacements
@@ -799,17 +789,19 @@ void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage
   }
 }
 
-void drawBonus (SDL_Surface *oneup, SDL_Surface *screen, SDL_Rect *upImage, SDL_Rect *upPosition, int *item, int *tempsItem, Sprite *sprite){
+void drawBonus (Image *oneup, SDL_Surface *screen,VariablesG* var, Sprite *sprite){
   /*Draw bonus*/
-  if (*item != 0){
-    upPosition->x = getPosX(getImage(sprite));
-    upPosition->y = getPosY(getImage(sprite)) - 40;
-    upImage->x = (*item - 1)*31;
-    *tempsItem += 1;
-    SDL_BlitSurface(oneup, upImage, screen, upPosition);
-    if (*tempsItem == 150) {
-      *item = 0;
-      *tempsItem = 0;      
+  if (getItem(var) != 0){
+    setPosX(oneup, getPosX(getImage(sprite)));
+    setPosY(oneup, getPosY(getImage(sprite)) - 40);
+    //upPosition->x = getPosX(getImage(sprite));
+    //upPosition->y = getPosY(getImage(sprite)) - 40;
+    setImX(oneup, (getItem(var) - 1)*31);
+    //upImage->x = (*item - 1)*31;
+    incrTempsIt(var);
+    SDL_BlitSurface(oneup->image, &oneup->taille, screen, &oneup->position);
+    if (getTempsIt(var) == 150) {
+      initItem(var);      
     }    
   }
 }

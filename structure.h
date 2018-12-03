@@ -17,7 +17,6 @@ typedef struct Image{
 
 typedef struct VariablesGenerales{
   int gameOver;
-  int vie;
   int secondes;
   int minutes;
   int heures;
@@ -29,7 +28,8 @@ typedef struct VariablesGenerales{
   int entree;
   int select;
   int niveau;
-  int change;
+  int pause;
+  int space;
 }VariablesG;
 
 typedef struct VariablesSprite{
@@ -82,5 +82,25 @@ void incrDelai(Sprite* sprite);
 void incrVie(Sprite* sprite);
 void desincrVie(Sprite* sprite);
 void initHPerso(Sprite* sprite);
+
+VariablesG* createVarG();
+int getGameOver(VariablesG* var);
+int getHaut(VariablesG* var);
+int getBas(VariablesG* var);
+int getEntree(VariablesG* var);
+int getSelect(VariablesG* var);
+int getItem(VariablesG* var);
+int getTempsIt(VariablesG* var);
+int getSpace(VariablesG* var);
+int getPause(VariablesG* var);
+void setSelect(VariablesG* var, int select);
+void setGameOver(VariablesG* var, int gameO);
+void setHaut(VariablesG* var, int haut);
+void setBas(VariablesG* var, int bas);
+void setEntree(VariablesG* var, int entree);
+void setPause(VariablesG* var, int pause);
+void incrTempsIt(VariablesG* var);
+void initItem(VariablesG* var);
+
 
 #endif 

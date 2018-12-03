@@ -63,6 +63,77 @@ VariablesS* createVarS(int debutSaut, int saut, int finSaut, int hperso, int dro
   var->vie = 5;
   return var;
 }
+VariablesG* createVarG(){
+  VariablesG* var = malloc(sizeof(VariablesG));
+  var->gameOver = 2;
+  var->secondes = 0;
+  var->minutes = 0;
+  var->heures = 0;
+  var->item = 0;
+  var->tempsItem = 0;
+  var->clef = 0;
+  var->haut = 0;
+  var->bas = 0;
+  var->entree = 0;
+  var->select = 0;
+  var->niveau = 1;
+  var->pause = 0;
+  var->space = 0;
+  return var;
+}
+void setSelect(VariablesG* var, int select){
+  var->select = select;
+}
+void setGameOver(VariablesG* var, int gameO){
+  var->gameOver = gameO;
+}
+void setHaut(VariablesG* var, int haut){
+  var->haut = haut;
+}
+void setBas(VariablesG* var, int bas){
+  var->bas = bas;
+}
+void setEntree(VariablesG* var, int entree){
+  var->entree = entree;
+}
+void incrTempsIt(VariablesG* var){
+  var->tempsItem++;
+}
+void initItem(VariablesG* var){
+  var->tempsItem = 0;
+  var->item = 0;
+}
+void setPause(VariablesG* var, int pause){
+  var->pause = pause;
+}
+int getGameOver(VariablesG* var){
+  return var->gameOver;
+}
+int getHaut(VariablesG* var){
+  return var->haut;
+}
+int getBas(VariablesG* var){
+  return var->bas;
+}
+int getEntree(VariablesG* var){
+  return var->entree;
+}
+int getSelect(VariablesG* var){
+  return var->select;
+}
+int getItem(VariablesG* var){
+  return var->item;
+}
+int getTempsIt(VariablesG* var){
+    return var->tempsItem;
+}
+int getSpace(VariablesG* var){
+    return var->space;
+}
+int getPause(VariablesG* var){
+    return var->pause;
+}
+
 
 Sprite* createSprite(Image* image){
   Sprite* sprite = malloc(sizeof(Sprite));
