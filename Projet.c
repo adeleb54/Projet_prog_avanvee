@@ -171,8 +171,6 @@ int main(int argc, char* argv[])
   //if (start (&haut, &finsaut, &select, &bas, &entree, &gameover, skyL, spriteDem, spriteQuit,screen, font, &demPosition, &quitPosition, &fontPosition, &selectImage) == 1){
     while (gameover != 1)
     {
-      // printf("gameover = %d \n",gameover);
-      //fontPosition.y = 0;
       setPosY(font, 0);
       
       SDL_Event event;

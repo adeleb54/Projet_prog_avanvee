@@ -19,8 +19,6 @@ void HandleEvent(SDL_Event event,
 		break;
 	    case SDLK_UP:
 	      if (*quit != 1) {
-	      	printf("finsaut %d\n",getVar(sprite)->finSaut);
-	      	printf("saut %d\n",getVar(sprite)->saut);
 		    if (getVar(sprite)->finSaut && getVar(sprite)->saut == PASSAUT) {
 		      setSaut(sprite, 0, getVar(sprite)->hperso, SAUT);
 		    }
@@ -644,7 +642,6 @@ void fTimer (int* timer, int* heures, int* minutes, int* secondes){
 void Saut (Sprite* sprite, int *plat_array, SDL_Rect *plateformePos){
   initHPerso(sprite);
   int col_haut = 0;
-  // printf("debut saut = %d\n", getVar(sprite)->debutSaut);
   //Si on a demandé au perso de sauter
   if (getVar(sprite)->saut == SAUT) {
     for (int i = 0; i < NB_PLATEFORME; i++){
@@ -662,7 +659,7 @@ void Saut (Sprite* sprite, int *plat_array, SDL_Rect *plateformePos){
     }
     
     
-    else {setSaut(sprite, 1, SOL, PASSAUT); }
+    else {setSaut(sprite, getVar(sprite)->finSaut, getVar(sprite)->debutSaut, PASSAUT); }
   }
   
   if (getPosY(getImage(sprite)) != SOL) {
