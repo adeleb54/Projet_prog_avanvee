@@ -11,7 +11,7 @@ void HandleEvent(SDL_Event event,
 
 int start (VariablesG* var, Image *skyL, Image *spriteDem, Image *spriteQuit, SDL_Surface *screen, Image *font);
 
-void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateformePos, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart );
+void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateformePos, Sprite *ennemy[]);
 
 int pause (VariablesG *var, Image *spritePause, SDL_Surface *screen);
 

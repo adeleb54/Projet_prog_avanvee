@@ -4,18 +4,18 @@
 int main(int argc, char* argv[])
 {
   SDL_Surface *screen, *temp,
-	      *ennemy[NB_ENNEMY],/* *spriteDem, *spriteQuit, *skyL,*/
+	      /*ennemy[NB_ENNEMY], *spriteDem, *spriteQuit, *skyL,*/
 	       *plateforme[NB_PLATEFORME];
   int colorkey;
   // int currentDirection = DIR_RIGHT;
   // int animationFlip = 0;
-  int enAnimFlip = 0;
-  SDL_Rect ennemyPos [NB_ENNEMY];
+  //int enAnimFlip = 0;
+  //SDL_Rect ennemyPos [NB_ENNEMY];
   SDL_Rect plateformePos [NB_PLATEFORME];
 //   SDL_Rect demPosition;
 //   SDL_Rect quitPosition;
   int gameover = 2;
-  int delaiEn = 0;
+  //int delaiEn = 0;
   //int timer = 0;
   //int pauseV = 1;
   //int space = 0;
@@ -25,13 +25,13 @@ int main(int argc, char* argv[])
   //int item = 0;
   //int tempsItem = 0;
   //int clef = 0;  
-  int enTempsDamage = 0;
+  //int enTempsDamage = 0;
 //   int haut = 0;
 //   int bas =  0; 
 //   int entree = 0;
 //   int select = 0;
   //int niveau = 1;
-  int change = 1;
+  //int change = 1;
   
   VariablesG* varGlobal = createVarG();
   /* initialize SDL */
@@ -91,38 +91,46 @@ int main(int argc, char* argv[])
   
     /*Enemi*/  
   /*Initialisation du tableau ennemy_array[] qui enregistre la présence des enemis affichés*/
-  int ennemy_array[NB_ENNEMY];
-  for(int i=0; i < NB_ENNEMY; i++){
-    ennemy_array[i] = 0;
-  }    
+  
+//   int ennemy_array[NB_ENNEMY];
+//   for(int i=0; i < NB_ENNEMY; i++){
+//     ennemy_array[i] = 0;
+//   }    
   /*Initialisation de ennemy[] qui contient les images des enemis*/  
-  for (int i=0; i<NB_ENNEMY; i++){
-    temp   = SDL_LoadBMP("enemy.bmp");
-    ennemy[i] = SDL_DisplayFormat(temp);
-    SDL_SetColorKey(ennemy[i], SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
-    SDL_FreeSurface(temp);
+  Sprite* ennemi[NB_ENNEMY];
+  for(int i = 0; i<NB_ENNEMY; i++){
+    Image* imEnnemy = createImage("enemy.bmp", 0, 0, SPRITE_SIZE/2, SPRITE_SIZE/2, 0, 0);
+    ennemi[i] = createSprite(imEnnemy);
+    SDL_SetColorKey(getImage(ennemi[i])->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   }
-  SDL_Rect ennemyImage;
-  ennemyImage.w = SPRITE_SIZE/2;
-  ennemyImage.h = SPRITE_SIZE/2; 
-  SDL_Rect ennemyPosDamage[NB_ENNEMY];
+  
+//   for (int i=0; i<NB_ENNEMY; i++){
+//     temp   = SDL_LoadBMP("enemy.bmp");
+//     ennemy[i] = SDL_DisplayFormat(temp);
+//     SDL_SetColorKey(ennemy[i], SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+//     SDL_FreeSurface(temp);
+//   }
+//   SDL_Rect ennemyImage;
+//   ennemyImage.w = SPRITE_SIZE/2;
+//   ennemyImage.h = SPRITE_SIZE/2; 
+//   SDL_Rect ennemyPosDamage[NB_ENNEMY];
   
   /*Initialisation de ennemyPosStart[] qui enregistre la position de depart des ennemis*/
-  SDL_Rect ennemyPosStart[NB_ENNEMY];
-  for (int i =0; i<NB_ENNEMY; i++){
-    ennemyPosStart[i] = ennemyPos[i];
-  }  
+//   SDL_Rect ennemyPosStart[NB_ENNEMY];
+//   for (int i =0; i<NB_ENNEMY; i++){
+//     ennemyPosStart[i] = ennemyPos[i];
+//   }  
   
   /*Initialisation de ennemyDir[] qui enregistre la direction de chaque ennemi*/
-  int ennemyDir[NB_ENNEMY];
-  for (int i =0; i<NB_ENNEMY; i++){
-    ennemyDir[i] = EN_DIR_LEFT;
-  }
-  
-  int enDamage[NB_ENNEMY];
-  for (int i =0; i<NB_ENNEMY; i++){
-    enDamage[i] = 0;
-  }
+//   int ennemyDir[NB_ENNEMY];
+//   for (int i =0; i<NB_ENNEMY; i++){
+//     ennemyDir[i] = EN_DIR_LEFT;
+//   }
+//   
+//   int enDamage[NB_ENNEMY];
+//   for (int i =0; i<NB_ENNEMY; i++){
+//     enDamage[i] = 0;
+//   }
   
   /******************Bloc******************/
   /*Initialisation du tableau plat_array qui enregistre la présence des plateformes affichées*/
@@ -143,7 +151,7 @@ int main(int argc, char* argv[])
   blocImage.h = BLOC_SIZE;
   
   
-  afficher_bloc("test.txt", plat_array, plateformePos, ennemy_array, ennemyPos, ennemyPosStart);
+  afficher_bloc("test.txt", plat_array, plateformePos, ennemi);
   
 
   if (start (varGlobal, skyL, spriteDem, spriteQuit, screen, font) == 1){
@@ -166,19 +174,22 @@ int main(int argc, char* argv[])
 	incrTimer(varGlobal);
 	fTimer (varGlobal);
 	
-	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, &change, &delaiEn, plateformePos, 
-		  plat_array, sprite, enDamage, &enTempsDamage, ennemyPosDamage);
+// 	ennemyMove(ennemi, plateformePos, plat_array, sprite)
+// 	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, &change, &delaiEn, plateformePos, 
+// 		  plat_array, sprite, enDamage, &enTempsDamage, ennemyPosDamage);
 	
 	/*handle the movement of the sprite*/
 	move (sprite);
 	
 	/*Collisions*/      
-	spriteCollide (sprite, plateformePos, plat_array, ennemy_array, varGlobal, ennemyPos, ennemyPosStart);
+	//spriteCollide (sprite, plateformePos, plat_array, ennemi, varGlobal);
+	//spriteCollide (sprite, plateformePos, plat_array, ennemy_array, varGlobal, ennemyPos, ennemyPosStart);
   
 	/*Gestion des dégâts*/
 	lose_life (sprite);
 	
-	stopEnnemy (enDamage, &enTempsDamage);
+// 	stopEnnemy (ennemi);
+// 	stopEnnemy (enDamage, &enTempsDamage);
 
 	/*Saut*/
 	Saut (sprite, plat_array, plateformePos);
@@ -198,7 +209,8 @@ int main(int argc, char* argv[])
 	      /*draw sprites*/
       drawSprite (sprite, screen);
       
-      drawEnnemy (ennemy, screen, &ennemyImage, ennemyPos, ennemyDir, &enAnimFlip, ennemy_array, enDamage, &enTempsDamage, ennemyPosDamage);
+      //drawEnnemy (ennemi, screen);
+      //drawEnnemy (ennemy, screen, &ennemyImage, ennemyPos, ennemyDir, &enAnimFlip, ennemy_array, enDamage, &enTempsDamage, ennemyPosDamage);
 	
       drawBonus (oneUp, screen, varGlobal, sprite);
   
@@ -212,7 +224,8 @@ int main(int argc, char* argv[])
       SDL_FreeSurface(plateforme[i]);
     }
     for (int i = 0; i <NB_ENNEMY; i++){
-      SDL_FreeSurface(ennemy[i]);
+      //SDL_FreeSurface(ennemy[i]);
+      destroyImage(getImage(ennemi[i]));
     }
     destroyImage(getImage(sprite));
     destroyImage(sky);

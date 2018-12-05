@@ -63,6 +63,8 @@ VariablesS* createVarS(int debutSaut, int saut, int finSaut, int hperso, int dro
   var->vie = 5;
   return var;
 }
+
+
 VariablesG* createVarG(){
   VariablesG* var = malloc(sizeof(VariablesG));
   var->gameOver = 2;
@@ -189,6 +191,7 @@ int getNiveau(VariablesG* var){
 	return var->niveau;
 }
 
+
 Sprite* createSprite(Image* image){
   Sprite* sprite = malloc(sizeof(Sprite));
   sprite->image = image;  
@@ -231,6 +234,19 @@ void desincrVie(Sprite* sprite){
 void initHPerso(Sprite* sprite){
   sprite->var->hperso = getPosY(getImage(sprite));
 }
+void isHere(Sprite* sprite){
+  sprite->here = 1;
+}
+void initHere(Sprite* sprite){
+  sprite->here = 0;
+}
+void initPosStart(Sprite* sprite){
+  sprite->posStart.x = 0;
+  sprite->posStart.y = 0;
+}
+void setPosStart(Sprite* sprite, SDL_Rect pos){
+  sprite->posStart = pos;
+}
 Image* getImage(Sprite* sprite){
   return sprite->image;
 }
@@ -248,6 +264,6 @@ int* pointeurSaut(Sprite* sprite){
   pSaut = &sprite->var->saut;
   return pSaut;
 }
-// int main(){
-//   return 0;
-// }
+int getPresence(Sprite* sprite){
+  return sprite->here;
+}
