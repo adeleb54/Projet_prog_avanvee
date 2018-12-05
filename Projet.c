@@ -5,33 +5,32 @@ int main(int argc, char* argv[])
 {
   SDL_Surface *screen, *temp,
 	      *ennemy[NB_ENNEMY],/* *spriteDem, *spriteQuit, *skyL,*/
-	      *oneup, *plateforme[NB_PLATEFORME];
+	       *plateforme[NB_PLATEFORME];
   int colorkey;
   // int currentDirection = DIR_RIGHT;
   // int animationFlip = 0;
   int enAnimFlip = 0;
-  SDL_Rect upPosition;
   SDL_Rect ennemyPos [NB_ENNEMY];
   SDL_Rect plateformePos [NB_PLATEFORME];
 //   SDL_Rect demPosition;
 //   SDL_Rect quitPosition;
   int gameover = 2;
   int delaiEn = 0;
-  int timer = 0;
-  int pauseV = 1;
-  int space = 0;
-  int changspace = 1;
+  //int timer = 0;
+  //int pauseV = 1;
+  //int space = 0;
+  //int changspace = 1;
   // int vie = 5;
-  int secondes, minutes, heures;
-  int item = 0;
-  int tempsItem = 0;
-  int clef = 0;  
+  //int secondes, minutes, heures;
+  //int item = 0;
+  //int tempsItem = 0;
+  //int clef = 0;  
   int enTempsDamage = 0;
 //   int haut = 0;
 //   int bas =  0; 
 //   int entree = 0;
 //   int select = 0;
-  int niveau = 1;
+  //int niveau = 1;
   int change = 1;
   
   VariablesG* varGlobal = createVarG();
@@ -125,7 +124,7 @@ int main(int argc, char* argv[])
     enDamage[i] = 0;
   }
   
-  /*Bloc*/
+  /******************Bloc******************/
   /*Initialisation du tableau plat_array qui enregistre la présence des plateformes affichées*/
   int plat_array[NB_PLATEFORME];
   for(int i=0; i < NB_PLATEFORME; i++){
@@ -164,8 +163,8 @@ int main(int argc, char* argv[])
 	
       //Jeu
 	//Handle timer
-	timer += 1;
-	fTimer (&timer, &heures, &minutes, &secondes);
+	incrTimer(varGlobal);
+	fTimer (varGlobal);
 	
 	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, &change, &delaiEn, plateformePos, 
 		  plat_array, sprite, enDamage, &enTempsDamage, ennemyPosDamage);
@@ -174,7 +173,7 @@ int main(int argc, char* argv[])
 	move (sprite);
 	
 	/*Collisions*/      
-	spriteCollide (sprite, plateformePos, plat_array, ennemy_array, &item, &clef, &tempsItem, &niveau, ennemyPos, ennemyPosStart);
+	spriteCollide (sprite, plateformePos, plat_array, ennemy_array, varGlobal, ennemyPos, ennemyPosStart);
   
 	/*Gestion des dégâts*/
 	lose_life (sprite);
@@ -191,7 +190,7 @@ int main(int argc, char* argv[])
       drawSky(sky, screen);
 	
 	      /*Dans bandeau noir*/
-      drawFont (font, screen, &heures, &minutes, &secondes, &clef, sprite);     
+      drawFont (font, screen, varGlobal, sprite);     
 	    
 	      /*draw blocs*/
       drawBloc(plateforme, screen, &blocImage, plateformePos, plat_array);

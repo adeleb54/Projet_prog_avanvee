@@ -344,17 +344,17 @@ void set_pos (Sprite* sprite, int a, int b) {
 //Gestion de la pause
 int pause (VariablesG *var, Image *spritePause, SDL_Surface *screen){
   
-  int changeSpace = 0;
+
   if (getSpace(var) == 0) {
-      changeSpace = 1;  
+      setChangeSp(var, 1);  
   }
   
-  if (changeSpace == 0 && getSpace(var) == 1) {
-    changeSpace = 0;
+  if (getChangeSp(var) == 1 && getSpace(var) == 1) {
+    setChangeSp(var, 0);
     setPause(var, 1 - getPause(var));
   }
   
-  printf("pause : %d\n", getPause(var)); 
+  //printf("pause : %d\n", getPause(var)); 
   if (getPause(var) == 1) {
     SDL_BlitSurface(spritePause->image, NULL, screen, &spritePause->position);
   }
@@ -470,14 +470,14 @@ void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_
 
 
 // Gestion des items
-void gestion_items (int collision, int *plat_array, int bloc, Sprite *sprite, SDL_Rect *plateformePos, int *item, int *clef, 
-		    int *tempsItem, int i, int *niveau, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart) {
+void gestion_items (int collision, int *plat_array, int bloc, Sprite *sprite, SDL_Rect *plateformePos, int i, 
+					VariablesG *var, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart) {
   if (collision == 1 || collision == 2 || collision == 3 ){
     //Si c'est une porte
     if (bloc == 3) {
       //Si on a une clef pour l'ouvrir
-      if (*clef >= 1) {
-	    *clef -= 1;
+      if (getClef(var) >= 1) {
+      	desincrClef(var);
 	    plat_array[i] = 0;
       }
       else {
@@ -509,42 +509,30 @@ void gestion_items (int collision, int *plat_array, int bloc, Sprite *sprite, SD
     if (bloc == 5) {
       plat_array[i] = 0;      
 	  incrVie(sprite);
-	  printf("vie : %d\n", getVar(sprite)->vie);
-      if (*item == 1) {
-	*tempsItem = 0;
-      }
-      else {
-	*item = 1;
-      }
+	  handleIt(var, 1);
     }
     //Si c'est une clef
     if (bloc == 6) {
       plat_array[i] = 0;
-      if (*item == 2) {
-	*clef += 1;
-	*tempsItem = 0;
-      }
-      else {
-	*clef += 1;
-	*item = 2;
-      }
+      incrClef(var);
+      handleIt(var, 2);
     }
     
-    if (bloc == 7 /*&& passNiv == 0*/) {
-      if (*niveau == 3) {	
+    if (bloc == 7 ) {
+      if (getNiveau(var) == 3) {	
 	afficher_bloc("niveau4.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
 	set_pos(sprite, 0, SOL);
-	niveau += 1;
+	incrNiveau(var);
       }
-      else if (*niveau == 2) {
+      else if (getNiveau(var) == 2) {
 	afficher_bloc("niveau3.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
 	set_pos(sprite, 50, 50);
-	niveau += 1;
+	incrNiveau(var);
       }
-      else if (*niveau == 1) {
+      else if (getNiveau(var) == 1) {
 	afficher_bloc("niveau2.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
 	set_pos(sprite, 0, SOL);
-	niveau += 1;
+	incrNiveau(var);
       }
     }
   }
@@ -552,8 +540,8 @@ void gestion_items (int collision, int *plat_array, int bloc, Sprite *sprite, SD
 
   
 //Replacement du sprite lors de collisions
-void spriteCollide (Sprite *sprite, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, int *item, 
-		    int *clef, int *tempsItem, int *niveau, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart){
+void spriteCollide (Sprite *sprite, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, VariablesG* var, 
+					SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart){
   
   if (getPosX(getImage(sprite)) <= 0)
     setPosX(getImage(sprite),0);
@@ -575,7 +563,7 @@ void spriteCollide (Sprite *sprite, SDL_Rect *plateformePos, int *plat_array, in
     }
     else{
        gestion_items(collision(getPos(getImage(sprite)),plateformePos[i], pointeurSaut(sprite), "perso"), plat_array, plat_array[i], sprite, plateformePos, 
-		  item, clef, tempsItem, i, niveau, ennemy_array, ennemyPosition, ennemyPosStart);
+		  i, var, ennemy_array, ennemyPosition, ennemyPosStart);
     }
   }
   for (int i = 0; i<NB_ENNEMY; i++){
@@ -622,10 +610,10 @@ void lose_life (Sprite* sprite) {
 }
 
 //Gestion du timer
-void fTimer (int* timer, int* heures, int* minutes, int* secondes){
-  *heures = *timer/(200*3600);
-  *minutes = (*timer/200 - 3600 * *heures)/ 60;
-  *secondes = *timer/200 - 60 * *minutes;
+void fTimer (VariablesG* var){
+	setHeures(var, getTimer(var)/(200*3600));
+	setMinutes(var, (getTimer(var) / 200 - 3600 * getHeures(var)) / 60);
+	setSecondes(var, getTimer(var)/200 - 60 * getMinutes(var));
 }
 
 //Gestion du saut
@@ -691,7 +679,7 @@ void drawSky (Image *sky, SDL_Surface *screen){
   SDL_BlitSurface(sky->image, NULL, screen, NULL);
 }
 
-void drawFont (Image *font, SDL_Surface *screen,int *heures, int *minutes, int *secondes, int *clef, Sprite* sprite){
+void drawFont (Image *font, SDL_Surface *screen, VariablesG* var, Sprite* sprite){
   
   setImY(font, FONT_SIZE*3);
   
@@ -699,12 +687,12 @@ void drawFont (Image *font, SDL_Surface *screen,int *heures, int *minutes, int *
   
   //Affichage heures
   //Dizaines
-  setImX(font, FONT_SIZE * (*heures/10));
+  setImX(font, FONT_SIZE * (getHeures(var)/10));
   setPosX(font, 10);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 
   //Unités
-  setImX(font, FONT_SIZE * (*heures%10));
+  setImX(font, FONT_SIZE * (getHeures(var)%10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
@@ -716,13 +704,13 @@ void drawFont (Image *font, SDL_Surface *screen,int *heures, int *minutes, int *
   
   //Affichage minutes
   //Dizaines
-  setImX(font, FONT_SIZE * (*minutes/10));
+  setImX(font, FONT_SIZE * (getMinutes(var)/10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   
   //Unités
-  setImX(font, FONT_SIZE * (*minutes%10));
+  setImX(font, FONT_SIZE * (getMinutes(var)%10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
@@ -735,13 +723,13 @@ void drawFont (Image *font, SDL_Surface *screen,int *heures, int *minutes, int *
   
   //Affichage secondes
   //Dizaines
-  setImX(font, FONT_SIZE * (*secondes/10));
+  setImX(font, FONT_SIZE * (getSecondes(var)/10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   
   //Unités
-  setImX(font, FONT_SIZE * (*secondes%10));
+  setImX(font, FONT_SIZE * (getSecondes(var)%10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
@@ -759,7 +747,7 @@ void drawFont (Image *font, SDL_Surface *screen,int *heures, int *minutes, int *
   
   /*Affichage du nombre de clefs*/
   setPosX(font, font->position.x + 20);
-  setIm(font, FONT_SIZE* *clef, FONT_SIZE*3);
+  setIm(font, FONT_SIZE* getClef(var), FONT_SIZE*3);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   /***Vie***/

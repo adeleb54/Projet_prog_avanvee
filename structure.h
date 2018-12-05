@@ -20,6 +20,7 @@ typedef struct VariablesGenerales{
   int secondes;
   int minutes;
   int heures;
+  int timer;
   int item;
   int tempsItem;
   int clef;  
@@ -30,6 +31,7 @@ typedef struct VariablesGenerales{
   int niveau;
   int pause;
   int space;
+  int changeSpace;
 }VariablesG;
 
 typedef struct VariablesSprite{
@@ -92,7 +94,14 @@ int getSelect(VariablesG* var);
 int getItem(VariablesG* var);
 int getTempsIt(VariablesG* var);
 int getSpace(VariablesG* var);
+int getChangeSp(VariablesG* var);
 int getPause(VariablesG* var);
+int getTimer(VariablesG* var);
+int getHeures(VariablesG* var);
+int getMinutes(VariablesG* var);
+int getSecondes(VariablesG* var);
+int getClef(VariablesG* var);
+int getNiveau(VariablesG* var);
 void setSelect(VariablesG* var, int select);
 void setGameOver(VariablesG* var, int gameO);
 void setHaut(VariablesG* var, int haut);
@@ -101,6 +110,14 @@ void setEntree(VariablesG* var, int entree);
 void setPause(VariablesG* var, int pause);
 void incrTempsIt(VariablesG* var);
 void initItem(VariablesG* var);
-
+void setChangeSp(VariablesG* var, int change);
+void setHeures(VariablesG* var, int heure);
+void setMinutes(VariablesG* var, int minute);
+void setSecondes(VariablesG* var, int seconde);
+void incrTimer(VariablesG* var);
+void desincrClef(VariablesG* var);
+void incrClef(VariablesG* var);
+void handleIt(VariablesG* var, int item);
+void incrNiveau(VariablesG* var);
 
 #endif 
