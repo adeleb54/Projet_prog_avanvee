@@ -811,8 +811,7 @@ void drawSprite (Sprite *sprite, SDL_Surface *screen){
   }
 }
 
-// void drawEnnemy (SDL_Surface **ennemy, SDL_Surface *screen, SDL_Rect *ennemyImage, SDL_Rect *sition, int *enDirection, int *enAnimFlip, 
-// 		 int *ennemy_array, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage){
+// void drawEnnemy (Sprite **ennemy, SDL_Surface *screen){
 //   for (int i = 0; i<NB_ENNEMY; i++){
 //     if (ennemy_array[i] != 0){
 //       if (enDamage[i] == 0){
