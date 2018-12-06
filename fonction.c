@@ -1,8 +1,10 @@
 #include "fonction.h"
+
   
 //Gestion des evenements
 void HandleEvent(SDL_Event event,
-        int *quit, Sprite* sprite, VariablesG* var)
+        int *quit, int *saut, int *debutsaut, int *hperso, int *finsaut, 
+	int *droite, int *gauche, int *space, int *haut, int *bas, int pause, SDL_Rect pausePosition )
 {
   switch (event.type) {
     /* close button clicked */
@@ -17,24 +19,32 @@ void HandleEvent(SDL_Event event,
 	    case SDLK_q:
 		*quit = 1;
 		break;
+		
 	    case SDLK_UP:
 	      if (*quit != 1) {
-		    if (getVar(sprite)->finSaut && getVar(sprite)->saut == PASSAUT) {
-		      setSaut(sprite, 0, getVar(sprite)->hperso, SAUT);
-		    }
+		if (*finsaut != 0) {
+		  *finsaut = 0;
+		  *saut = SAUT;
+		  *debutsaut = *hperso;
+		}
 	      }
+	      *haut = 1;
+	      break;
+	      
+	    case SDLK_DOWN:
+	      *bas = 1;
 	      break;
 		
 	    case SDLK_LEFT:
-	      getVar(sprite)->gauche = 1;
+	      *gauche = 1;
 	      break;
 		
 	    case SDLK_RIGHT:
-	      getVar(sprite)->droite = 1;
+	      *droite = 1;
 	      break;
 	    
 	    case SDLK_SPACE:
-	      var->space = 1;
+	      *space = 1;
 	      break;
 	    
 	    default:
@@ -44,17 +54,24 @@ void HandleEvent(SDL_Event event,
 	
     case SDL_KEYUP:
 	switch (event.key.keysym.sym) {
+	    case SDLK_UP:
+	      *haut = 0;
+	      break;
+	    
+	    case SDLK_DOWN:
+	      *bas = 0;
+	      break;
 	    
 	    case SDLK_LEFT:
-	      getVar(sprite)->gauche = 0;
+	      *gauche = 0;
 	      break;
 		
 	    case SDLK_RIGHT:
-	      getVar(sprite)->droite = 0;
+	      *droite = 0;
 	      break;
 		
 	    case SDLK_SPACE:
-	      var->space = 0;
+	      *space = 0;
 	      break;
 		
 	    default :
@@ -74,12 +91,12 @@ void HandleEvent(SDL_Event event,
   }
 }
   
-void HandleEventStart(SDL_Event event, VariablesG* var)
+void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entree)
 {
   switch (event.type) {
     /* close button clicked */
     case SDL_QUIT:
-	setGameOver(var, 1);
+	*quit = 1;
 	break;
 
     /* handle the keyboard */
@@ -87,19 +104,19 @@ void HandleEventStart(SDL_Event event, VariablesG* var)
 	switch (event.key.keysym.sym) {
 	    case SDLK_ESCAPE:
 	    case SDLK_q:
-		setGameOver(var, 1);
+		*quit = 1;
 		break;
 		
 	    case SDLK_UP:
-	      setHaut(var, 1);
+	      *haut = 1;
 	      break;
 	      
 	    case SDLK_DOWN:
-	      setBas(var,  1);
+	      *bas = 1;
 	      break;
 	      
 	    case SDLK_RETURN:
-	      setEntree(var,  1);
+	      *entree = 1;
 	      break;
 	    
 	    default:
@@ -110,15 +127,15 @@ void HandleEventStart(SDL_Event event, VariablesG* var)
     case SDL_KEYUP:
 	switch (event.key.keysym.sym) {
 	    case SDLK_UP:
-	      setHaut(var, 0);
+	      *haut = 0;
 	      break;
 	    
 	    case SDLK_DOWN:
-	      setBas(var,  0);
+	      *bas = 0;
 	      break;
 	      
 	    case SDLK_RETURN:
-	      setEntree(var, 0);
+	      *entree = 0;
 	      break;
 		
 	    default :
@@ -128,64 +145,70 @@ void HandleEventStart(SDL_Event event, VariablesG* var)
   }
 }
 
-int start (VariablesG* var, Image *skyL, Image *spriteDem, Image *spriteQuit, SDL_Surface *screen, Image *font){
+int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, SDL_Surface *skyL, SDL_Surface *spriteDem, SDL_Surface *spriteQuit, 
+	    SDL_Surface *screen, SDL_Surface *font, SDL_Rect *demPosition, SDL_Rect *quitPosition, SDL_Rect *fontPosition, SDL_Rect *selectImage){
   
   int changhaut, changbas;
-  while (getGameOver(var) == 2){  
+  while (*gameover == 2){  
     
     SDL_Event event;
     if (SDL_PollEvent(&event)) {
-      HandleEventStart(event, var);
+      HandleEventStart(event, gameover, haut, bas, entree);
     }
     
-    if (getHaut(var) == 0) {
+    if (*haut == 0) {
 	changhaut = 1;
     }
     
-    if (changhaut == 1 && getHaut(var) == 1) {
+    if (changhaut == 1 && *haut == 1) {
       changhaut = 0;
-      setSelect(var, 1 - getSelect(var));
+      *select = 1 - *select;
     }
     
-    if (getBas(var) == 0) {
+    if (*bas == 0) {
 	changbas = 1;
     }
     
-    if (changbas == 1 && getBas(var) == 1) {
+    if (changbas == 1 && *bas == 1) {
       changbas = 0;
-      setSelect(var, 1 - getSelect(var));
+      *select = 1 - *select;
     }
     
     /* draw the background */
-    SDL_BlitSurface(skyL->image, NULL, screen, NULL);
+    SDL_BlitSurface(skyL, NULL, screen, NULL);
     
-    SDL_BlitSurface(spriteDem->image, NULL, screen, &spriteDem->position);
     
-    SDL_BlitSurface(spriteQuit->image, NULL, screen, &spriteQuit->position);
+    demPosition->y = 90;
+    SDL_BlitSurface(spriteDem, NULL, screen, demPosition);
     
-    setPosX(font, 190);
-    if (getSelect(var) == 0) {
-      setPosY(font, 90);
-      SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
+    quitPosition->y = 120;
+    SDL_BlitSurface(spriteQuit, NULL, screen, quitPosition);
+    
+    if (*select == 0) {
+      fontPosition->x = 190;
+      fontPosition->y = 90;
+      SDL_BlitSurface(font, selectImage, screen, fontPosition);
 
     }
     
-    if (getSelect(var) == 1) {
-      setPosY(font, 120);
-      SDL_BlitSurface(font->image,  &font->taille, screen, &font->position);
+    if (*select == 1) {
+      fontPosition->x = 190;
+      fontPosition->y = 120;
+      SDL_BlitSurface(font, selectImage, screen, fontPosition);
+
     }
     
     /* update the screen */
      SDL_UpdateRect(screen, 0, 0, 0, 0);
      
-    if (getEntree(var) == 1) {
+    if (*entree == 1) {
       
-      if (getSelect(var) == 0) {
+      if (*select == 0) {
 	
 	/* clean up */
-	destroyImage(skyL);
-	destroyImage(spriteDem);
-	destroyImage(spriteQuit);
+	SDL_FreeSurface(skyL);
+	SDL_FreeSurface(spriteDem);
+	SDL_FreeSurface(spriteQuit);
 	
 	/* initialize SDL */
 	SDL_Init(SDL_INIT_VIDEO);
@@ -196,16 +219,14 @@ int start (VariablesG* var, Image *skyL, Image *spriteDem, Image *spriteQuit, SD
 	/* set keyboard repeat */
 	SDL_EnableKeyRepeat(10, 10);
 	
-	setGameOver(var, 0);
+	*gameover = 0;
       }
           
-      if (getSelect(var) == 1) {
+      if (*select == 1) {
 	  
 	/* clean up */
-	destroyImage(skyL);
-	destroyImage(spriteDem);
-	destroyImage(spriteQuit);
-	setGameOver(var, 1);
+	SDL_FreeSurface(skyL);
+	*gameover = 1;
 	SDL_Quit();
 	return 0;
       }
@@ -248,15 +269,13 @@ int collision(SDL_Rect A, SDL_Rect B, int *saut, char* type){
   
 
 //Affichage du décor
-void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateformePos, Sprite *ennemy[]){
+void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateformePos, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart ){
   for (int i = 0; i<NB_PLATEFORME; i++){
     plat_array[i] = 0;
   }
   for (int i = 0; i<NB_ENNEMY; i++){
-    initHere(ennemy[i]);
-    initPosStart(ennemy[i]);
-//     ennemy_array[i] = 0;
-//     ennemyPosStart[i] = ennemyPosition[i];
+    ennemy_array[i] = 0;
+    ennemyPosStart[i] = ennemyPosition[i];
   }
   FILE* pFile;
   int c, i = 0;
@@ -310,16 +329,31 @@ void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateforme
 	  plateformePos[i].y = posY;
 	  i ++;
 	break;
+	case 56 :
+	  plat_array[i] = 8;
+	  plateformePos[i].x = posX;
+	  plateformePos[i].y = posY;
+	  i ++;
+	break;
+	case 57 :
+	  plat_array[i] = 9;
+	  plateformePos[i].x = posX;
+	  plateformePos[i].y = posY;
+	  i ++;
+	break;
+	case 97:
+	  plat_array[i] = 10;
+	  plateformePos[i].x = posX;
+	  plateformePos[i].y = posY;
+	  i ++;
+	break;
 	case 101:
 	  if (j < NB_ENNEMY){
-	    isHere(ennemy[j]);
-	    setPosX(getImage(ennemy[j]), posX);
-	    setPosY(getImage(ennemy[j]), posY + SPRITE_SIZE/2);
-	    setPosStart(ennemy[j], getPos(getImage(ennemy[j])));
-// 	    ennemyPosStart[j].x = posX;
-// 	    ennemyPosStart[j].y = posY;
-// 	    ennemyPosition[j].x = posX;
-// 	    ennemyPosition[j].y = posY + SPRITE_SIZE/2;
+	    ennemy_array[j] = 1;
+	    ennemyPosStart[j].x = posX;
+	    ennemyPosStart[j].y = posY;
+	    ennemyPosition[j].x = posX;
+	    ennemyPosition[j].y = posY + SPRITE_SIZE/2;
 	    plat_array[i] = 0;
 	    j++;
 	  }
@@ -341,344 +375,462 @@ void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateforme
 }
     
 //Replacement du personnage
-void set_pos (Sprite* sprite, int a, int b) {
-  setPosX(getImage(sprite),a);
-  setPosY(getImage(sprite),b);
+void set_pos (SDL_Rect *spritePosition, int a, int b) {
+  spritePosition->x = a;
+  spritePosition->y = b;
 }
 
 //Gestion de la pause
-int pause (VariablesG *var, Image *spritePause, SDL_Surface *screen){
+int pause (int *space, int *changspace, int *pause, SDL_Rect pausePosition, SDL_Surface *spritePause, SDL_Surface *screen){
   
-
-  if (getSpace(var) == 0) {
-      setChangeSp(var, 1);  
+  if (*space == 0) {
+      *changspace = 1;  
   }
   
-  if (getChangeSp(var) == 1 && getSpace(var) == 1) {
-    setChangeSp(var, 0);
-    setPause(var, 1 - getPause(var));
+  if (*changspace == 1 && *space == 1) {
+    *changspace = 0;
+    *pause = 1 - *pause;
   }
   
-  //printf("pause : %d\n", getPause(var)); 
-  if (getPause(var) == 1) {
-    SDL_BlitSurface(spritePause->image, NULL, screen, &spritePause->position);
+  if (*pause == 0) {
+    SDL_BlitSurface(spritePause, NULL, screen, &pausePosition);
   }
   
-  return getPause(var);
+  return *pause;
 }
 
 //Gestion des déplacements
-void move (Sprite* sprite){
-  if (getVar(sprite)->droite == 1){
-    setPosX(getImage(sprite), getImage(sprite)->position.x + SPRITE_STEP);
-    setDir(sprite, DIR_RIGHT);
-    if (getVar(sprite)->finSaut != 0) {
-      incrDelai(sprite);
+void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirection, int *finsaut, int *delai, int *animationFlip){
+  if (*droite == 1){
+    spritePosition->x += SPRITE_STEP;
+    *currentDirection = DIR_RIGHT;
+    if (finsaut != 0) {
+      *delai = *delai + 1;
     }
-    if (getVar(sprite)->delai == 15) {
-      anim(sprite, 1 - getVar(sprite)->anim);
-      initDelai(sprite);
+    if (*delai == 15) {
+      *animationFlip = 1 - *animationFlip;
+      *delai = 0;
     }
   }
-  if (getVar(sprite)->gauche == 1) {
-    setPosX(getImage(sprite), getImage(sprite)->position.x - SPRITE_STEP);
-    setDir(sprite, DIR_LEFT);
-    if (getVar(sprite)->finSaut != 0) {
-      incrDelai(sprite);
+  if (*gauche == 1) {
+    spritePosition->x -= SPRITE_STEP;
+    *currentDirection = DIR_LEFT;
+    if (*finsaut != 0) {
+      *delai = *delai + 1;
     }
-    if (getVar(sprite)->delai == 15) {
-      anim(sprite, 1 - getVar(sprite)->anim);
-      initDelai(sprite);
+    if (*delai == 15) {
+      *animationFlip = 1 - *animationFlip;
+      *delai = 0;
     }
   }
 }
 
 //Replacement de l'ennemi lors de collisions
-void ennemyCollide (Sprite *sprite, Sprite** ennemy, SDL_Rect *plateformePos, int *plat_array){
+void ennemyCollide (SDL_Rect *spritePosition, SDL_Rect *ennemyPosition, int *ennemy_array, SDL_Rect *plateformePos, int *plat_array, int* enDirection, 
+			int *damage, int *tempsDamage, int *vie, int *saut, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage){
   for (int i = 0; i<NB_ENNEMY; i++){  
-    if (getPosX(getImage(ennemy[i])) <= 0)
-      setPosX(getImage(ennemy[i]), 0);
-    if ( getPosX(getImage(ennemy[i])) >= SCREEN_WIDTH - SPRITE_SIZE) 
-      setPosX(getImage(ennemy[i]), SCREEN_WIDTH - SPRITE_SIZE);
-    if ( getPosY(getImage(ennemy[i])) >= SCREEN_HEIGHT - SPRITE_SIZE/2) 
-      setPosY(getImage(ennemy[i]), SCREEN_HEIGHT - SPRITE_SIZE/2);
+    if ( ennemyPosition[i].x <= 0)
+      ennemyPosition[i].x = 0;
+    if ( ennemyPosition[i].x >= SCREEN_WIDTH - SPRITE_SIZE) 
+      ennemyPosition[i].x = SCREEN_WIDTH - SPRITE_SIZE;
+    if ( ennemyPosition[i].y >= SCREEN_HEIGHT - SPRITE_SIZE/2) 
+      ennemyPosition[i].y = SCREEN_HEIGHT - SPRITE_SIZE/2;
       
     //collision avec une plateforme
     for (int j = 0; j <NB_PLATEFORME; j++){
       if (plat_array[j] < 5 && plat_array[j] != 0) {
-		if (collision(getPos(getImage(ennemy[i])),plateformePos[j], PASSAUT, "ennemi")==1){
-		  setDir(ennemy[i], EN_DIR_LEFT);
-		}
-		if (collision(getPos(getImage(ennemy[i])),plateformePos[j], PASSAUT, "ennemi")==2){
-		  setDir(ennemy[i], EN_DIR_RIGHT);
-		}
+	if (collision(ennemyPosition[i],plateformePos[j], PASSAUT, "ennemi")==1){
+	  enDirection[i] = EN_DIR_LEFT;
+	}
+	if (collision(ennemyPosition[i],plateformePos[j], PASSAUT, "ennemi")==2){
+	  enDirection[i] = EN_DIR_RIGHT;
+	}
       }
     }
     //collison avec le perso
-    if (collision(getPos(getImage(ennemy[i])), getPos(getImage(sprite)), pointeurSaut(sprite), "ennemi")==1){
-      
-      if(getPresence(ennemy[i])){
-		if(getVar(sprite)->damage == 0 && getVar(ennemy[i])->damage == 0){
-		  setDamage(sprite);
-		  setPosDamage(ennemy[i], getPosX(getImage(ennemy[i])), getPosY(getImage(ennemy[i])));
-		  // ennemyPosDamage[i].x = ennemyPosition[i].x;
-		  // ennemyPosDamage[i].y = ennemyPosition[i].y;
-		  setDamage(ennemy[i]);
-		}
+    if (collision(ennemyPosition[i], *spritePosition, saut, "ennemi")==1 /*|| collision(ennemyPosition[i], *spritePosition, saut, "ennemi")== 2 || collision(ennemyPosition[i], *spritePosition, saut, "ennemi")== 4*/){
+      if(ennemy_array[i] != 0){
+	if(*damage == 0 && enDamage[i] == 0){
+	  *damage = 1;
+	  ennemyPosDamage[i].x = ennemyPosition[i].x;
+	  ennemyPosDamage[i].y = ennemyPosition[i].y;
+	  enDamage[i] = 1;
+	}
       }
     }
   }
 }
 
 //Deplacement ennemi
-void ennemyMove(Sprite **ennemy, SDL_Rect *plateformePos, int *plat_array, Sprite* sprite){
+void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_array, int *enDirection, int *enAnimFlip, int *change, int *delaiEN, SDL_Rect *plateformePos, int *plat_array, 
+		SDL_Rect *spritePosition, int *damage, int *tempsDamage, int *vie, int *saut, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage){
   for (int i = 0; i<NB_ENNEMY; i++){  
-    if (getPresence(ennemy[i]) == 1){
-    	printf("la\n");
-      if (getVar(ennemy[i])->dir == EN_DIR_LEFT){
-      	setPosX(getImage(ennemy[i]), getPosX(getImage(ennemy[i])) - SPRITE_STEP);
-		//ennemyPosition[i].x -= SPRITE_STEP;
-		if(getPosX(getImage(ennemy[i])) <= getPosStartX(ennemy[i]) - 300 || getPosX(getImage(ennemy[i])) <= 0){
-		  	//enDirection[i] = EN_DIR_RIGHT;
-			setDir(ennemy[i], EN_DIR_LEFT);
-		}
+    if (ennemy_array[i] != 0){
+      if (enDirection[i] == EN_DIR_LEFT){
+	ennemyPosition[i].x -= SPRITE_STEP;
+	if((ennemyPosition[i].x <= ennemyPosStart[i].x - 300 || ennemyPosition[i].x <= 0) && *change){
+	  enDirection[i] = EN_DIR_RIGHT;
+	}
       }
-
       else {
-		setPosX(getImage(ennemy[i]), getPosX(getImage(ennemy[i])) + SPRITE_STEP);
-		if (getPosX(getImage(ennemy[i])) <= getPosStartX(ennemy[i]) || getPosX(getImage(ennemy[i])) >= SCREEN_WIDTH){
-		//if ((ennemyPosition[i].x >= ennemyPosStart[i].x || ennemyPosition[i].x >= SCREEN_WIDTH) && *change){
-		  setDir(ennemy[i], EN_DIR_LEFT);
-		  //enDirection[i] = EN_DIR_LEFT;
-		}
+	ennemyPosition[i].x += SPRITE_STEP;
+	if ((ennemyPosition[i].x >= ennemyPosStart[i].x || ennemyPosition[i].x >= SCREEN_WIDTH) && *change){
+	  enDirection[i] = EN_DIR_LEFT;
+	}
       }
-  //     *delaiEN += 1;
-  //     if (*delaiEN == 50){
-		// *enAnimFlip += 1;
-		// if (*enAnimFlip == 3){
-		//   *enAnimFlip = 0;
-		// }
-		// *delaiEN = 0;
-  //     }
-      //animation(ennemy[i]);
+      *delaiEN += 1;
+      if (*delaiEN == 50){
+	*enAnimFlip += 1;
+	if (*enAnimFlip == 3){
+	  *enAnimFlip = 0;
+	}
+	*delaiEN = 0;
+      }
+      
       //Chute
-      if (getPosY(getImage(ennemy[i])) != SOL + SPRITE_SIZE/2) {
-		  setPosY(getImage(ennemy[i]), getPosY(getImage(ennemy[i])) + 1);
-		  //ennemyPosition[i].y += 1;
-		  change(ennemy[i]);
-		  //*change = 0;
+      if (ennemyPosition[i].y != SOL + SPRITE_SIZE/2) {
+	  ennemyPosition[i].y += 1;
+	  *change = 0;
       }      
       for (int j = 0; j <NB_PLATEFORME; j++){
-		if (plat_array[j] != 0 && plat_array[j] <= 4){
-	  		if (collision(getPos(getImage(ennemy[i])),plateformePos[j], PASSAUT, "ennemi") == 3) {
-		      setPosY(getImage(ennemy[i]), getPosY(getImage(ennemy[i])) - 1);
-		      change(ennemy[i]);
-		      //*change = 1;
-	  		}
-		}
+	if (plat_array[j] != 0 && plat_array[j] <= 4){
+	  if (collision(ennemyPosition[i],plateformePos[j], PASSAUT, "ennemi") == 3) {
+	      ennemyPosition[i].y -= 1;
+	      *change = 1;
+	  }
+	}
       }
     }
   }
-  ennemyCollide (sprite, ennemy, plateformePos, plat_array);
+  ennemyCollide (spritePosition, ennemyPosition, ennemy_array, plateformePos, plat_array, enDirection, damage, tempsDamage, vie, saut, enDamage, enTempsDamage, ennemyPosDamage);
 }  
 
 
-//Gestion des items
-void gestion_items (int collision, int *plat_array, int bloc, Sprite *sprite, SDL_Rect *plateformePos, int i, 
-					VariablesG *var, Sprite **ennemy) {
+// Gestion des items
+void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *vie, int *item, int *clef, 
+		    int *tempsItem, int i, int *damage, int *niveau, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *est_passe) {
   if (collision == 1 || collision == 2 || collision == 3 ){
-    //Si c'est une porte
-    if (bloc == 3) {
-      //Si on a une clef pour l'ouvrir
-      if (getClef(var) >= 1) {
-      	desincrClef(var);
-	    plat_array[i] = 0;
-      }
-      else {
-	    if (collision == 1) {
-	      setPosX(getImage(sprite), plateformePos[i].x - SPRITE_SIZE) ;
+    switch (bloc){
+      case 3:
+	//Si on a une clef pour l'ouvrir
+	if (*clef >= 1) {
+	  *clef -= 1;
+	  plat_array[i] = 0;
+	}
+	else {
+	  if (collision == 1) {
+	    spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;
+	  }
+	  if (collision == 2) {
+	    spritePosition->x = plateformePos[i].x + BLOC_SIZE ;
+	  }
+	  if (collision ==3) {
+	    spritePosition->y = plateformePos[i].y - BLOC_SIZE ;
+	  }
+	}
+	break;
+      //Si c'est un bloc à pics
+      case 4:
+	if (collision == 1) {
+	  spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;
+	}
+	if (collision == 2) {
+	  spritePosition->x = plateformePos[i].x + BLOC_SIZE ;
+	}
+	if (collision ==3) {
+	  spritePosition->y = plateformePos[i].y - BLOC_SIZE ;
+	  *damage = 1;
+	}
+	break;
+      case 5:
+	if (collision == 1) {
+	spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;
+	}
+	if (collision == 2) {
+	  spritePosition->x = plateformePos[i].x + BLOC_SIZE ;
+	}
+	if (collision ==3) {
+	  spritePosition->y = plateformePos[i].y - BLOC_SIZE ;
+	}
+	break;
+      case 6:
+	if (*vie < 6) {
+	  plat_array[i] = 0;
+	  *vie += 1;
+	  if (*item == 1) {
+	    *tempsItem = 0;
+	  }
+	  else {
+	    *item = 1;
+	  }
+	}
+	break;
+      //Si c'est une clef
+      case 7 :
+	plat_array[i] = 0;
+	*clef += 1;
+	if (*item == 2) {
+	  *tempsItem = 0;
+	}
+	else {
+	  *item = 2;
+	} 
+	break;
+      case 8:
+	if (*niveau == 3) {	
+	  afficher_bloc("niveau4.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
+	  set_pos(spritePosition, 32, SOL);
+	  *niveau += 1;
+	}
+	else if (*niveau == 2) {
+	  afficher_bloc("niveau3.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
+	  set_pos(spritePosition, 0, 64);
+	  *niveau += 1;
+	}
+	else if (*niveau == 1) {
+	  afficher_bloc("niveau2.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
+	  set_pos(spritePosition, 32, 64);
+	  *niveau += 1;
+	}
+	break;
+      case 9:
+	for (int i = 0; i < NB_PLATEFORME; i++) {
+	  if (plat_array[i]==10) {
+	    if(*est_passe == 0){
+	      set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
+	      *est_passe += 1;
 	    }
-	    if (collision == 2) {
-	      setPosX(getImage(sprite), plateformePos[i].x + BLOC_SIZE) ;
+	  }
+	}
+	break;
+      case 10 :
+	for (int i = 0; i < NB_PLATEFORME; i++) {
+	  if (plat_array[i]==9) {
+	    if(*est_passe == 0){
+	      set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
+	      *est_passe += 1;
 	    }
-	    if (collision ==3) {
-	      setPosY(getImage(sprite), plateformePos[i].y - BLOC_SIZE) ;
-	    }
-      }
-    }
-    //Si c'est un bloc à pics
-    if (bloc == 4) {
-      if (collision == 1) {
-	    setPosX(getImage(sprite), plateformePos[i].x - SPRITE_SIZE) ;
-      }
-      if (collision == 2) {
-	    setPosX(getImage(sprite), plateformePos[i].x + BLOC_SIZE) ;
-      }
-      if (collision ==3) {
-	    setPosY(getImage(sprite), plateformePos[i].y - BLOC_SIZE) ;
-	    setDamage(sprite);
-      }
-    }
-    //Si c'est un coeur
-    if (bloc == 5) {
-      plat_array[i] = 0;      
-	  incrVie(sprite);
-	  handleIt(var, 1);
-    }
-    //Si c'est une clef
-    if (bloc == 6) {
-      plat_array[i] = 0;
-      incrClef(var);
-      handleIt(var, 2);
-    }
-    
-    if (bloc == 7 ) {
-      if (getNiveau(var) == 3) {	
-	afficher_bloc("niveau4.txt", plat_array, plateformePos, ennemy);
-	set_pos(sprite, 0, SOL);
-	incrNiveau(var);
-      }
-      else if (getNiveau(var) == 2) {
-	afficher_bloc("niveau3.txt", plat_array, plateformePos, ennemy);
-	set_pos(sprite, 50, 50);
-	incrNiveau(var);
-      }
-      else if (getNiveau(var) == 1) {
-	afficher_bloc("niveau2.txt", plat_array, plateformePos, ennemy);
-	set_pos(sprite, 0, SOL);
-	incrNiveau(var);
-      }
+	  }
+	}
+	break;
+      default:
+	break;
     }
   }
 }
 
   
 //Replacement du sprite lors de collisions
-void spriteCollide (Sprite *sprite, SDL_Rect *plateformePos, int *plat_array, Sprite** ennemy, VariablesG* var){
+void spriteCollide (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, int saut, int *vie, int *item, 
+		    int *clef, int *tempsItem, int *damage, int *niveau, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *est_passe){
   
-  if (getPosX(getImage(sprite)) <= 0)
-    setPosX(getImage(sprite),0);
-
-  if (getPosX(getImage(sprite)) >= SCREEN_WIDTH - SPRITE_SIZE) 
-    setPosX(getImage(sprite), SCREEN_WIDTH - SPRITE_SIZE);
-
-  if (getPosY(getImage(sprite)) >= SCREEN_HEIGHT - SPRITE_SIZE) 
-    setPosY(getImage(sprite),SCREEN_HEIGHT - SPRITE_SIZE);
+  if (spritePosition->x <= 0)
+    spritePosition->x = 0;
+  if (spritePosition->x >= SCREEN_WIDTH - SPRITE_SIZE) 
+    spritePosition->x = SCREEN_WIDTH - SPRITE_SIZE;
+  if (spritePosition->y >= SCREEN_HEIGHT - SPRITE_SIZE) 
+    spritePosition->y = SCREEN_HEIGHT - SPRITE_SIZE;
     
+  if(*est_passe > 0) {
+    *est_passe += 1;
+    if (*est_passe == 50) {
+      *est_passe = 0;
+    }
+  }
+  
   for (int i = 0; i <NB_PLATEFORME; i++){
     if (plat_array[i] < 3 && plat_array[i] != 0) {
-      if (collision(getPos(getImage(sprite)), plateformePos[i], pointeurSaut(sprite), "perso")==1){
-	setPosX(getImage(sprite),plateformePos[i].x - SPRITE_SIZE) ;	
+      if (collision(*spritePosition,plateformePos[i], &saut, "perso")==1){
+	spritePosition->x = plateformePos[i].x - SPRITE_SIZE ;	
       }
-      if (collision(getPos(getImage(sprite)), plateformePos[i], pointeurSaut(sprite), "perso")==2){
-	setPosX(getImage(sprite),plateformePos[i].x + BLOC_SIZE);	
+      if (collision(*spritePosition,plateformePos[i], &saut, "perso")==2){
+	spritePosition->x = plateformePos[i].x + BLOC_SIZE;	
       }
     }
     else{
-       gestion_items(collision(getPos(getImage(sprite)),plateformePos[i], pointeurSaut(sprite), "perso"), plat_array, plat_array[i], sprite, plateformePos, 
-		  i, var, ennemy);
+       gestion_items(collision(*spritePosition,plateformePos[i], &saut, "perso"), plat_array, plat_array[i], spritePosition, plateformePos, 
+		     vie, item, clef, tempsItem, i, damage, niveau, ennemy_array, ennemyPosition, ennemyPosStart, est_passe);
     }
   }
   for (int i = 0; i<NB_ENNEMY; i++){
-     if (getPresence(ennemy[i])){    
-      if (collision(getPos(getImage(sprite)),plateformePos[i], pointeurSaut(sprite), "perso")==3){
-	setPosY(getImage(sprite),plateformePos[i].y - BLOC_SIZE/2);
+     if (ennemy_array[i] != 0){       
+      if (collision(*spritePosition,plateformePos[i], &saut, "perso")==3){
+	spritePosition->y = plateformePos[i].y - BLOC_SIZE/2;
       }	
     }
   }
 }
 
 /*Gestion de la perte de vie*/
-// void stopEnnemy (int *EnDamage, int *enTempsDamage) {
-//   for (int i = 0; i<NB_ENNEMY; i++){
-//     if (EnDamage[i] == 1) {
-//       if (*enTempsDamage == 0) {
-// 	*enTempsDamage += 1;
-//       }
-//       if (*enTempsDamage == 350) {
-// 	EnDamage[i] = 0;
-// 	*enTempsDamage = 0;
-//       }
-//       else {
-// 	*enTempsDamage += 1;
-//       }
-//     }
-//   }
-// }
-
-/*Gestion de la perte de vie*/
-void lose_life (Sprite* sprite) {
-    if (getVar(sprite)->damage == 1) {
-      if (getVar(sprite)->tempsDam == 0) {
-	desincrVie(sprite);
-	incrTempsDam(sprite);
+void stopEnnemy (int *EnDamage, int *enTempsDamage) {
+  for (int i = 0; i<NB_ENNEMY; i++){
+    if (EnDamage[i] == 1) {
+      if (*enTempsDamage == 0) {
+	*enTempsDamage += 1;
       }
-      if (getVar(sprite)->tempsDam == 350) {
-	initDam(sprite);
+      if (*enTempsDamage == 350) {
+	EnDamage[i] = 0;
+	*enTempsDamage = 0;
       }
       else {
-	incrTempsDam(sprite);
+	*enTempsDamage += 1;
+      }
+    }
+  }
+}
+
+/*Gestion de la perte de vie*/
+void lose_life (int *damage, int *tempsDamage, int *vie) {
+    if (*damage == 1) {
+      if (*tempsDamage == 0) {
+	*vie -= 1;
+	*tempsDamage += 1;
+      }
+      if (*tempsDamage == 350) {
+	*damage = 0;
+	*tempsDamage = 0;
+      }
+      else {
+	*tempsDamage += 1;
       }
     }
 }
 
 //Gestion du timer
-void fTimer (VariablesG* var){
-	setHeures(var, getTimer(var)/(200*3600));
-	setMinutes(var, (getTimer(var) / 200 - 3600 * getHeures(var)) / 60);
-	setSecondes(var, getTimer(var)/200 - 60 * getMinutes(var));
+void fTimer (int* timer, int* heures, int* minutes, int* secondes){
+  *heures = *timer/(200*3600);
+  *minutes = (*timer/200 - 3600 * *heures)/ 60;
+  *secondes = *timer/200 - 60 * *minutes;
 }
 
 //Gestion du saut
-void Saut (Sprite* sprite, int *plat_array, SDL_Rect *plateformePos){
-  initHPerso(sprite);
+void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SDL_Rect *plateformePos, int *debutsaut, int *finsaut, int *damage, 
+	   int *vie, int *clef, int *tempsItem, int *niveau, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *est_passe, int *item){
+  *hperso = spritePosition->y;
   int col_haut = 0;
   //Si on a demandé au perso de sauter
-  if (getVar(sprite)->saut == SAUT) {
+  if (*saut == SAUT) {
     for (int i = 0; i < NB_PLATEFORME; i++){
       if (plat_array[i] != 0){
-		//Gestion de la collision avec le haut du perso
-		if (collision(getPos(getImage(sprite)), plateformePos[i], pointeurSaut(sprite), "perso")==4){
-		  col_haut = 1;
+	//Gestion de la collision avec le haut du perso
+	if (collision(*spritePosition, plateformePos[i], saut, "perso")==4){
+	  switch (plat_array[i]){
+	    case 3:
+	      //Si on a une clef pour l'ouvrir
+	      if (*clef >= 1) {
+		*clef -= 1;
+		plat_array[i] = 0;
+	      }
+	      else {
+		col_haut = 1;
+	      }
+	      break;
+	    case 5:
+	      *damage = 1;
+	      col_haut = 1;
+	      break;
+	    case 6:
+	      if (*vie < 6) {
+		plat_array[i] = 0;
+		*vie += 1;
+		if (*item == 1) {
+		  *tempsItem = 0;
 		}
+		else {
+		  *item = 1;
+		}
+	      }
+	      break;
+	    //Si c'est une clef
+	    case 7 :
+	      plat_array[i] = 0;
+	      *clef += 1;
+	      if (*item == 2) {
+		*tempsItem = 0;
+	      }
+	      else {
+		*item = 2;
+	      } 
+	      break;
+	    case 8:
+	      if (*niveau == 3) {	
+		set_pos(spritePosition, SOL, 32);
+		afficher_bloc("niveau4.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
+		*niveau += 1;
+	      }
+	      else if (*niveau == 2) {
+		afficher_bloc("niveau3.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
+		set_pos(spritePosition, 0, 64);
+		*niveau += 1;
+	      }
+	      else if (*niveau == 1) {
+		afficher_bloc("niveau2.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
+		set_pos(spritePosition, 32, 64);
+		*niveau += 1;
+	      }
+	      break;
+	    case 9:
+	      for (int i = 0; i < NB_PLATEFORME; i++) {
+		if (plat_array[i]==10) {
+		  if(*est_passe == 0){
+		    set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
+		    *est_passe += 1;
+		  }
+		}
+	      }
+	      break;
+	    case 10 :
+	      for (int i = 0; i < NB_PLATEFORME; i++) {
+		if (plat_array[i]==9) {
+		  if(*est_passe == 0){
+		    set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
+		    *est_passe += 1;
+		  }
+		}
+	      }
+	      break;
+	    default :
+	      col_haut = 1;
+	      break;
+	  }
+	}
       }
     }
-    if ((getPosY(getImage(sprite)) >= getVar(sprite)->debutSaut - HSAUT) && (getPosY(getImage(sprite)) != BLOC_SIZE) && !col_haut){
+    if ((spritePosition->y >= *debutsaut - HSAUT) && (spritePosition->y != BLOC_SIZE) && !col_haut){
 	
-      setPosY(getImage(sprite), getPosY(getImage(sprite))-1);
-      setSaut(sprite, 0, getVar(sprite)->debutSaut, SAUT);
+      spritePosition->y -= 1;
     }
     
     
-    else {setSaut(sprite, getVar(sprite)->finSaut, getVar(sprite)->debutSaut, PASSAUT); }
+    else { *saut = PASSAUT; }
   }
   
-  if (getPosY(getImage(sprite)) != SOL) {
-    if (getEtatSaut(sprite) == PASSAUT) {
-      setPosY(getImage(sprite), getPosY(getImage(sprite))+1);
+  if (spritePosition->y != SOL) {
+    if (*saut == PASSAUT) {
+      spritePosition->y += 1;
     }
   }
   
   for (int i = 0; i <NB_PLATEFORME; i++){
     if (plat_array[i] != 0 && plat_array[i]<= 4){
-      if (collision(getPos(getImage(sprite)),plateformePos[i], pointeurSaut(sprite), "perso") == 3) {
-	    if (plat_array[i] == 4) {
-	      setDamage(sprite);
-	    }
-	    setPosY(getImage(sprite), getPosY(getImage(sprite))-1);
-	    setSaut(sprite, 1, 0, PASSAUT);
+      if (collision(*spritePosition,plateformePos[i], saut, "perso") == 3) {
+	  if (plat_array[i] == 4) {
+	    *damage = 1;
 	  }
+	  spritePosition->y -= 1;
+	  *finsaut = 1;
+	}
     }
   }
-  if (getPosY(getImage(sprite)) == SOL) {
-    setSaut(sprite, 1, 0, PASSAUT);      
+  if (spritePosition->y == SOL) {
+    *finsaut = 1;      
   }
 }
  
   /*Gestion du game over*/
-int game_over (Sprite* sprite, Image *spriteGameover, SDL_Surface *screen){
-  if (getVie(sprite) == 0) {
-    SDL_BlitSurface(spriteGameover->image, NULL, screen, &spriteGameover->position);
+int game_over (int *vie, SDL_Rect gameoverPosition, SDL_Surface *spriteGameover, SDL_Surface *screen){
+  if (*vie == 0) {
+    SDL_BlitSurface(spriteGameover, NULL, screen, &gameoverPosition);
     return 1;
   }
   else {
@@ -692,7 +844,7 @@ void drawSky (Image *sky, SDL_Surface *screen){
   SDL_BlitSurface(sky->image, NULL, screen, NULL);
 }
 
-void drawFont (Image *font, SDL_Surface *screen, VariablesG* var, Sprite* sprite){
+void drawFont (Image *font, SDL_Surface *screen, int *heures, int *minutes, int *secondes, int *vie, int *clef){
   
   setImY(font, FONT_SIZE*3);
   
@@ -700,12 +852,12 @@ void drawFont (Image *font, SDL_Surface *screen, VariablesG* var, Sprite* sprite
   
   //Affichage heures
   //Dizaines
-  setImX(font, FONT_SIZE * (getHeures(var)/10));
+  setImX(font, FONT_SIZE * (*heures/10));
   setPosX(font, 10);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 
   //Unités
-  setImX(font, FONT_SIZE * (getHeures(var)%10));
+  setImX(font, FONT_SIZE * (*heures%10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
@@ -717,13 +869,13 @@ void drawFont (Image *font, SDL_Surface *screen, VariablesG* var, Sprite* sprite
   
   //Affichage minutes
   //Dizaines
-  setImX(font, FONT_SIZE * (getMinutes(var)/10));
+  setImX(font, FONT_SIZE * (*minutes/10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   
   //Unités
-  setImX(font, FONT_SIZE * (getMinutes(var)%10));
+  setImX(font, FONT_SIZE * (*minutes%10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
@@ -736,13 +888,13 @@ void drawFont (Image *font, SDL_Surface *screen, VariablesG* var, Sprite* sprite
   
   //Affichage secondes
   //Dizaines
-  setImX(font, FONT_SIZE * (getSecondes(var)/10));
+  setImX(font, FONT_SIZE * (*secondes/10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   
   //Unités
-  setImX(font, FONT_SIZE * (getSecondes(var)%10));
+  setImX(font, FONT_SIZE * (*secondes%10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
@@ -760,7 +912,7 @@ void drawFont (Image *font, SDL_Surface *screen, VariablesG* var, Sprite* sprite
   
   /*Affichage du nombre de clefs*/
   setPosX(font, font->position.x + 20);
-  setIm(font, FONT_SIZE* getClef(var), FONT_SIZE*3);
+  setIm(font, FONT_SIZE* *clef, FONT_SIZE*3);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   /***Vie***/
@@ -777,7 +929,7 @@ void drawFont (Image *font, SDL_Surface *screen, VariablesG* var, Sprite* sprite
 
   /*Affichage de la vie restante*/
   setPosX(font, font->position.x + 20);
-  setIm(font, FONT_SIZE* getVar(sprite)->vie, FONT_SIZE*3);
+  setIm(font, FONT_SIZE* *vie, FONT_SIZE*3);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 }
 
@@ -790,46 +942,48 @@ void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage
   }
 }
 
-void drawBonus (Image *oneup, SDL_Surface *screen,VariablesG* var, Sprite *sprite){
+void drawBonus (SDL_Surface *oneup, SDL_Surface *screen, SDL_Rect *upImage, SDL_Rect *upPosition, int *item, int *tempsItem, SDL_Rect *spritePosition){
   /*Draw bonus*/
-  if (getItem(var) != 0){
-    setPosX(oneup, getPosX(getImage(sprite)));
-    setPosY(oneup, getPosY(getImage(sprite)) - 40);
-    setImX(oneup, (getItem(var) - 1)*31);
-    incrTempsIt(var);
-    SDL_BlitSurface(oneup->image, &oneup->taille, screen, &oneup->position);
-    if (getTempsIt(var) == 150) {
-      initItem(var);      
+  if (*item != 0){
+    upPosition->x = spritePosition->x;
+    upPosition->y = spritePosition->y - 40;
+    upImage->x = (*item - 1)*31;
+    *tempsItem += 1;
+    SDL_BlitSurface(oneup, upImage, screen, upPosition);
+    if (*tempsItem == 150) {
+      *item = 0;
+      *tempsItem = 0;      
     }    
   }
 }
 
-void drawSprite (Sprite *sprite, SDL_Surface *screen){
-  setImX(getImage(sprite), SPRITE_SIZE * (2 * getVar(sprite)->dir + getVar(sprite)->anim));
-  if(!getVar(sprite)->damage) { 
-    SDL_BlitSurface(getImage(sprite)->image, &getImage(sprite)->taille, screen, &getImage(sprite)->position);
+void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, int *currentDirection, int *animationFlip, int *damage, int *tempsDamage){
+  spriteImage->x = SPRITE_SIZE * (2 * *currentDirection + *animationFlip);
+  if(*damage == 0) { 
+    SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
   }
-  else{
-    if ((getVar(sprite)->tempsDam/20)%2 == 1) {
-      SDL_BlitSurface(getImage(sprite)->image, &getImage(sprite)->taille, screen, &getImage(sprite)->position);
+  if(*damage == 1) {
+    if ((*tempsDamage/20)%2 == 1) {
+      SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
     }
   }
 }
 
-void drawEnnemy (Sprite **ennemy, SDL_Surface *screen){
+void drawEnnemy (SDL_Surface **ennemy, SDL_Surface *screen, SDL_Rect *ennemyImage, SDL_Rect *ennemyPosition, int *enDirection, int *enAnimFlip, 
+		 int *ennemy_array, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage){
   for (int i = 0; i<NB_ENNEMY; i++){
-    if (getPresence(ennemy[i])){
-      if (!getVar(ennemy[i])->damage){
-      	setImX(getImage(ennemy[i]), SPRITE_SIZE/2 * getVar(ennemy[i])->dir);
-      	setImY(getImage(ennemy[i]), SPRITE_SIZE/2 * getVar(ennemy[i])->anim);    
-		SDL_BlitSurface(getImage(ennemy[i])->image, &getImage(ennemy[i])->taille, screen, &getImage(ennemy[i])->position);
+    if (ennemy_array[i] != 0){
+      if (enDamage[i] == 0){
+	ennemyImage->y = SPRITE_SIZE/2 * enDirection[i];
+	ennemyImage->x = SPRITE_SIZE/2 * *enAnimFlip;	  
+	SDL_BlitSurface(ennemy[i], ennemyImage, screen, &ennemyPosition[i]);
       }
-    else {
-		if ((getVar(ennemy[i])->tempsDam/20)%2 == 1) {
-	  		SDL_BlitSurface(getImage(ennemy[i])->image, &getImage(ennemy[i])->taille, screen, &ennemy[i]->posDamage);
-		}
-		setPosX(getImage(ennemy[i]), getPosDam(ennemy[i]).x);
-		setPosY(getImage(ennemy[i]), getPosDam(ennemy[i]).y);
+      if(enDamage[i] == 1) {
+	if ((*enTempsDamage/20)%2 == 1) {
+	  SDL_BlitSurface(ennemy[i], ennemyImage, screen, &ennemyPosDamage[i]);
+	}
+	ennemyPosition[i].x = ennemyPosDamage[i].x;
+	ennemyPosition[i].y = ennemyPosDamage[i].y;
       }
     }
   }

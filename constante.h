@@ -20,7 +20,7 @@
 #define DIR_LEFT        3
 
 #define EN_DIR_RIGHT   	3
-#define EN_DIR_LEFT	2
+#define EN_DIR_LEFT		2
 
 #define SAUT 1
 #define PASSAUT 0
