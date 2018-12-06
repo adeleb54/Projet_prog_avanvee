@@ -47,6 +47,7 @@ typedef struct VariablesSprite{
   int anim;
   int dir;
   int vie;
+  int change;
 }VariablesS;
 
 typedef struct Sprite{
@@ -54,6 +55,7 @@ typedef struct Sprite{
   VariablesS* var;  
   int here;
   SDL_Rect posStart;
+  SDL_Rect posDamage;
 }Sprite;
 
 
@@ -69,7 +71,7 @@ void setIm(Image* picture, int x, int y);
 void setPosX (Image* picture, int x);
 void setPosY (Image* picture, int y);
 
-VariablesS* createVarS(int debutSaut, int saut, int finSaut, int hperso, int droite, int gauche, int delai, int damage, int tempsDam, int anim);
+VariablesS* createVarS(int hperso);
 
 Sprite* createSprite(Image* image);
 Image* getImage(Sprite* sprite);
@@ -78,6 +80,8 @@ int getEtatSaut(Sprite* sprite);
 int getVie(Sprite* sprite);
 int* pointeurSaut(Sprite* sprite);
 int getPresence(Sprite* sprite);
+SDL_Rect getPosDam(Sprite* sprite);
+int getPosStartX(Sprite* sprite);
 void setSaut(Sprite* sprite, int finSaut, int debutSaut, int saut);
 void initDam(Sprite* sprite);
 void setDamage(Sprite* sprite);
@@ -93,6 +97,9 @@ void isHere(Sprite* sprite);
 void initHere(Sprite* sprite);
 void initPosStart(Sprite* sprite);
 void setPosStart(Sprite* sprite, SDL_Rect pos);
+void setPosDamage(Sprite* sprite, int x, int y);
+void change(Sprite* sprite);
+//void anim(Sprite* sprite)
 
 VariablesG* createVarG();
 int getGameOver(VariablesG* var);

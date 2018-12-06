@@ -47,20 +47,21 @@ void destroyImage(Image* picture){
 }
 
 
-VariablesS* createVarS(int debutSaut, int saut, int finSaut, int hperso, int droite, int gauche, int delai, int damage, int tempsDam, int anim){
+VariablesS* createVarS(int hperso){
   VariablesS* var = malloc(sizeof(VariablesS));
-  var->debutSaut = debutSaut;
-  var->saut = saut;
-  var->finSaut = finSaut;
+  var->debutSaut = 0;
+  var->saut = 0;
+  var->finSaut = 1;
   var->hperso = hperso;
-  var->droite = droite;
-  var->gauche = gauche;
-  var->delai = delai;
-  var->damage = damage;
-  var->tempsDam = tempsDam;
-  var->anim = anim;
+  var->droite = 0;
+  var->gauche = 0;
+  var->delai = 0;
+  var->damage = 0;
+  var->tempsDam = 0;
+  var->anim = 0;
   var->dir = DIR_RIGHT;
   var->vie = 5;
+  var->change = 1;
   return var;
 }
 
@@ -195,7 +196,7 @@ int getNiveau(VariablesG* var){
 Sprite* createSprite(Image* image){
   Sprite* sprite = malloc(sizeof(Sprite));
   sprite->image = image;  
-  sprite->var = createVarS(0,0,1,getPosY(image), 0, 0, 0, 0, 0, 0);
+  sprite->var = createVarS(getPosY(image));
   return sprite;
 }
 void setSaut(Sprite* sprite, int finSaut, int debutSaut, int saut){
@@ -247,6 +248,23 @@ void initPosStart(Sprite* sprite){
 void setPosStart(Sprite* sprite, SDL_Rect pos){
   sprite->posStart = pos;
 }
+void setPosDamage(Sprite* sprite, int x, int y){
+  sprite->posStart.x = x;
+  sprite->posStart.y = y;
+}
+// void anim(Sprite* sprite){
+//   sprite->var->delai ++;
+//   if (sprite->var->delai == 50){
+//     sprite->var->anim ++;
+//     if (sprite->var->anim == 3){
+//        sprite->var->anim = 0;
+//     }
+//    sprite->var->delai = 0;
+//   }
+// }
+void change(Sprite* sprite){
+  sprite->var->change = 1 - sprite->var->change;
+}
 Image* getImage(Sprite* sprite){
   return sprite->image;
 }
@@ -266,4 +284,10 @@ int* pointeurSaut(Sprite* sprite){
 }
 int getPresence(Sprite* sprite){
   return sprite->here;
+}
+SDL_Rect getPosDam(Sprite* sprite){
+  return sprite->posDamage;
+}
+int getPosStartX(Sprite* sprite){
+  return sprite->posStart.x;
 }

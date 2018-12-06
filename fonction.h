@@ -17,11 +17,9 @@ int pause (VariablesG *var, Image *spritePause, SDL_Surface *screen);
 
 void move (Sprite* sprite);
 
-void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_array, int *enDirection, int *enAnimFlip, int *change, int *delaiEN, SDL_Rect *plateformePos, int *plat_array, Sprite* sprite,
-		 int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage);
+void ennemyMove(Sprite **ennemy, SDL_Rect *plateformePos, int *plat_array, Sprite* sprite);
 
-void spriteCollide (Sprite *sprite, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, VariablesG* var, 
-					SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart);
+void spriteCollide (Sprite *sprite, SDL_Rect *plateformePos, int *plat_array, Sprite** ennemy, VariablesG* var);
 
 void lose_life (Sprite* sprite);
 
@@ -41,8 +39,7 @@ void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage
 
 void drawSprite (Sprite *sprite, SDL_Surface *screen);
 
-void drawEnnemy (SDL_Surface **ennemy, SDL_Surface *screen, SDL_Rect *ennemyImage, SDL_Rect *ennemyPosition, int *enDirection, int *enAnimFlip, 
-		 int *ennemy_array, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage);
+void drawEnnemy (Sprite **ennemy, SDL_Surface *screen);
 
 void drawBonus (Image *oneup, SDL_Surface *screen,VariablesG* var, Sprite *sprite);
 

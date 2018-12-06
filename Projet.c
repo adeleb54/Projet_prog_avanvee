@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
 	move (sprite);
 	
 	/*Collisions*/      
-	//spriteCollide (sprite, plateformePos, plat_array, ennemi, varGlobal);
+	spriteCollide (sprite, plateformePos, plat_array, ennemi, varGlobal);
 	//spriteCollide (sprite, plateformePos, plat_array, ennemy_array, varGlobal, ennemyPos, ennemyPosStart);
   
 	/*Gestion des dégâts*/
@@ -209,7 +209,7 @@ int main(int argc, char* argv[])
 	      /*draw sprites*/
       drawSprite (sprite, screen);
       
-      //drawEnnemy (ennemi, screen);
+      drawEnnemy (ennemi, screen);
       //drawEnnemy (ennemy, screen, &ennemyImage, ennemyPos, ennemyDir, &enAnimFlip, ennemy_array, enDamage, &enTempsDamage, ennemyPosDamage);
 	
       drawBonus (oneUp, screen, varGlobal, sprite);
