@@ -811,7 +811,7 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
   }
   
   for (int i = 0; i <NB_PLATEFORME; i++){
-    if (plat_array[i] != 0 && plat_array[i]<= 4){
+    if (plat_array[i] != 0 && plat_array[i]<= 5){
       if (collision(*spritePosition,plateformePos[i], saut, "perso") == 3) {
 	  if (plat_array[i] == 4) {
 	    *damage = 1;
@@ -827,9 +827,11 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
 }
  
   /*Gestion du game over*/
-int game_over (int *vie, SDL_Rect gameoverPosition, SDL_Surface *spriteGameover, SDL_Surface *screen){
+int game_over (int *vie, SDL_Rect gameoverPosition, SDL_Surface *spriteGameover, SDL_Surface *screen, SDL_Surface *sprite, SDL_Rect *spriteImage, SDL_Rect *spritePosition){
   if (*vie == 0) {
     SDL_BlitSurface(spriteGameover, NULL, screen, &gameoverPosition);
+    spriteImage->x = 0;
+    SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
     return 1;
   }
   else {

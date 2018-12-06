@@ -69,7 +69,7 @@ void fTimer (int* timer, int* heures, int* minutes, int* secondes);
 void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SDL_Rect *plateformePos, int *debutsaut, int *finsaut, int *damage, 
 	   int *vie, int *clef, int *tempsItem, int *niveau, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *est_passe, int *item);
 
-int game_over (int *vie, SDL_Rect gameoverPosition, SDL_Surface *spriteGameover, SDL_Surface *screen);
+int game_over (int *vie, SDL_Rect gameoverPosition, SDL_Surface *spriteGameover, SDL_Surface *screen, SDL_Surface *sprite, SDL_Rect *spriteImage, SDL_Rect *spritePosition);
 
 void drawSky (Image *sky, SDL_Surface *screen);
 

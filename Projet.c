@@ -42,8 +42,6 @@ int main(int argc, char* argv[])
   int enTempsDamage = 0;
   int haut = 0;
   int bas =  0; 
-  int entree = 0;
-  int select = 0;
   int niveau = 1;
   int change = 1;
   int est_passe = 0;
@@ -75,7 +73,7 @@ int main(int argc, char* argv[])
   SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
   /*Font*/
-  temp   = SDL_LoadBMP("franklin.bmp");
+  temp   = SDL_LoadBMP("font.bmp");
   font = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
   SDL_Rect fontImage;
@@ -210,7 +208,7 @@ int main(int argc, char* argv[])
       }
       
       //Pause
-      if ((pause (&space, &changspace, &pauseV, pausePosition, spritePause, screen) == 1) && (game_over(&vie, gameoverPosition, spriteGameover, screen) == 0)){
+      if ((pause (&space, &changspace, &pauseV, pausePosition, spritePause, screen) == 1) && (game_over(&vie, gameoverPosition, spriteGameover, screen, sprite, &spriteImage, &spritePosition) == 0)){
 
       //Jeu
 	//Handle timer
