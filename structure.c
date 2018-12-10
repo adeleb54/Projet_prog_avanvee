@@ -50,7 +50,7 @@ VarG* createVarG(SDL_Surface * screen){
   var->colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   var->gameover = 2;
   var->timer = 0;
-  var->pauseV = 1;
+  var->pause = 1;
   var->space = 0;
   var->changspace = 1;
   var->vie = 3;
@@ -62,6 +62,58 @@ VarG* createVarG(SDL_Surface * screen){
   var->niveau = 1;
   var->est_passe = 0;
   return var;
+}
+int getColorKey(VarG* var){
+  return var->colorkey;
+}
+int getGameOver(VarG* var){
+  return var->gameover;
+}
+int getTimer(VarG* var){
+  return var->timer;
+}
+int getPause(VarG* var){
+  return var->pause;
+}
+int getSpace(VarG* var){
+  return var->space;
+}
+int getChangeSp(VarG* var){
+  return var->changspace;
+}
+int getVie(VarG* var){
+  return var->vie;
+}
+int getSecondes(VarG* var){
+  return var->secondes;
+}
+int getMinutes(VarG* var){
+  return var->minutes;
+}
+int getHeure(VarG* var){
+  return var->heures;
+}
+int getItem(VarG* var){
+  return var->item;
+}
+int getTpsItem(VarG* var){
+  return var->tempsItem;
+}
+int getClef(VarG* var){
+  return var->clef;
+}
+int getHaut(VarG* var){
+  return var->haut;
+}
+int getBas(VarG* var){
+  return var->bas;
+}
+int getNiveau(VarG* var){
+  return var->niveau;
+}
+// int getChange(VarG* var);
+int getPass(VarG* var){
+  return var->est_passe;
 }
 
 void destroyVarG(VarG* var){

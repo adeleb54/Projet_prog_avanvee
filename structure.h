@@ -28,7 +28,7 @@ typedef struct VariablesGlobales{
   int colorkey;
   int gameover;
   int timer;
-  int pauseV;
+  int pause;
   int space;
   int changspace;
   int vie;
@@ -39,9 +39,29 @@ typedef struct VariablesGlobales{
   int haut;
   int bas; 
   int niveau;
-  int change;
+//   int change;
   int est_passe;
 }VarG;
-  
+VarG* createVarG(SDL_Surface* screen);
+int getColorKey(VarG* var);
+int getGameOver(VarG* var);
+int getTimer(VarG* var);
+int getPause(VarG* var);
+int getSpace(VarG* var);
+int getChangeSp(VarG* var);
+int getVie(VarG* var);
+int getSecondes(VarG* var);
+int getMinutes(VarG* var);
+int getHeure(VarG* var);
+int getItem(VarG* var);
+int getTpsItem(VarG* var);
+int getClef(VarG* var);
+int getHaut(VarG* var);
+int getBas(VarG* var);
+int getNiveau(VarG* var);
+// int getChange(VarG* var);
+int getPass(VarG* var);
+
+void destroyVarG(VarG* var);
 
 #endif 

@@ -43,14 +43,13 @@ int collision(SDL_Rect A, SDL_Rect B, int *saut, char* type);
 
 void HandleEvent(SDL_Event event,
         int *quit, int *saut, int *debutsaut, 
-	int *hperso, int *finsaut, int *droite, int *gauche, int *space, int *haut, int *bas, int pause, SDL_Rect pausePosition);
+	int *hperso, int *finsaut, int *droite, int *gauche, int *space, int *haut, int *bas/*, int pause, SDL_Rect pausePosition*/);
 
-int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, SDL_Surface *skyL, SDL_Surface *spriteDem, SDL_Surface *spriteQuit, 
-	    SDL_Surface *screen, SDL_Surface *font, SDL_Rect *demPosition, SDL_Rect *quitPosition, SDL_Rect *fontPosition, SDL_Rect *selectImage);
+int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, Image *skyL, Image *spriteDem, Image *spriteQuit, SDL_Surface *screen, Image *font);
 
 void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateformePos, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart );
 
-int pause (int *space, int *changspace, int *pause, SDL_Rect pausePosition, SDL_Surface *spritePause, SDL_Surface *screen);
+int pause (int *space, int *changspace, int *pause, Image *spritePause, SDL_Surface *screen);
 
 void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirection, int *finsaut, int *delai, int *animationFlip);
 
@@ -69,7 +68,7 @@ void fTimer (int* timer, int* heures, int* minutes, int* secondes);
 void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SDL_Rect *plateformePos, int *debutsaut, int *finsaut, int *damage, 
 	   int *vie, int *clef, int *tempsItem, int *niveau, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *est_passe, int *item);
 
-int game_over (int *vie, SDL_Rect gameoverPosition, SDL_Surface *spriteGameover, SDL_Surface *screen);
+int game_over (int *vie, Image *spriteGameover, SDL_Surface *screen, SDL_Surface *sprite, SDL_Rect *spriteImage, SDL_Rect *spritePosition);
 
 void drawSky (Image *sky, SDL_Surface *screen);
 
@@ -82,6 +81,6 @@ void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage
 void drawEnnemy (SDL_Surface **ennemy, SDL_Surface *screen, SDL_Rect *ennemyImage, SDL_Rect *ennemyPosition, int *enDirection, int *enAnimFlip, 
 		 int *ennemy_array, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage);
 
-void drawBonus (SDL_Surface *oneup, SDL_Surface *screen, SDL_Rect *upImage, SDL_Rect *upPosition, int *item, int *tempsItem, SDL_Rect *spritePosition);
+void drawBonus (Image *oneup, SDL_Surface *screen, int *item, int *tempsItem, SDL_Rect *spritePosition);
 
 #endif 

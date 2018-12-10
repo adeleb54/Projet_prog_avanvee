@@ -1,10 +1,9 @@
 #include "fonction.h"
-
   
 //Gestion des evenements
 void HandleEvent(SDL_Event event,
         int *quit, int *saut, int *debutsaut, int *hperso, int *finsaut, 
-	int *droite, int *gauche, int *space, int *haut, int *bas, int pause, SDL_Rect pausePosition )
+	int *droite, int *gauche, int *space, int *haut, int *bas/*, int pause, SDL_Rect pausePosition*/ )
 {
   switch (event.type) {
     /* close button clicked */
@@ -145,8 +144,7 @@ void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entr
   }
 }
 
-int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, SDL_Surface *skyL, SDL_Surface *spriteDem, SDL_Surface *spriteQuit, 
-	    SDL_Surface *screen, SDL_Surface *font, SDL_Rect *demPosition, SDL_Rect *quitPosition, SDL_Rect *fontPosition, SDL_Rect *selectImage){
+int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, Image *skyL, Image *spriteDem, Image *spriteQuit, SDL_Surface *screen, Image *font){
   
   int changhaut, changbas;
   while (*gameover == 2){  
@@ -175,26 +173,26 @@ int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gam
     }
     
     /* draw the background */
-    SDL_BlitSurface(skyL, NULL, screen, NULL);
+    SDL_BlitSurface(skyL->image, NULL, screen, NULL);
     
     
-    demPosition->y = 90;
-    SDL_BlitSurface(spriteDem, NULL, screen, demPosition);
+    setPosY(spriteDem, 90);
+    SDL_BlitSurface(spriteDem->image, NULL, screen, &spriteDem->position);
     
-    quitPosition->y = 120;
-    SDL_BlitSurface(spriteQuit, NULL, screen, quitPosition);
+    setPosY(spriteQuit, 120);
+    SDL_BlitSurface(spriteQuit->image, NULL, screen, &spriteQuit->position);
     
     if (*select == 0) {
-      fontPosition->x = 190;
-      fontPosition->y = 90;
-      SDL_BlitSurface(font, selectImage, screen, fontPosition);
+      setPosX(font, 190);
+      setPosY(font, 90);
+      SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 
     }
     
     if (*select == 1) {
-      fontPosition->x = 190;
-      fontPosition->y = 120;
-      SDL_BlitSurface(font, selectImage, screen, fontPosition);
+      setPosX(font, 190);
+      setPosY(font, 120);
+      SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 
     }
     
@@ -206,9 +204,9 @@ int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gam
       if (*select == 0) {
 	
 	/* clean up */
-	SDL_FreeSurface(skyL);
-	SDL_FreeSurface(spriteDem);
-	SDL_FreeSurface(spriteQuit);
+	destroyImage(skyL);
+	destroyImage(spriteDem);
+	destroyImage(spriteQuit);
 	
 	/* initialize SDL */
 	SDL_Init(SDL_INIT_VIDEO);
@@ -225,7 +223,9 @@ int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gam
       if (*select == 1) {
 	  
 	/* clean up */
-	SDL_FreeSurface(skyL);
+	destroyImage(skyL);
+	destroyImage(spriteDem);
+	destroyImage(spriteQuit);
 	*gameover = 1;
 	SDL_Quit();
 	return 0;
@@ -381,7 +381,7 @@ void set_pos (SDL_Rect *spritePosition, int a, int b) {
 }
 
 //Gestion de la pause
-int pause (int *space, int *changspace, int *pause, SDL_Rect pausePosition, SDL_Surface *spritePause, SDL_Surface *screen){
+int pause (int *space, int *changspace, int *pause, Image *spritePause, SDL_Surface *screen){
   
   if (*space == 0) {
       *changspace = 1;  
@@ -393,7 +393,7 @@ int pause (int *space, int *changspace, int *pause, SDL_Rect pausePosition, SDL_
   }
   
   if (*pause == 0) {
-    SDL_BlitSurface(spritePause, NULL, screen, &pausePosition);
+    SDL_BlitSurface(spritePause->image, NULL, screen, &spritePause->position);
   }
   
   return *pause;
@@ -812,7 +812,7 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
   }
   
   for (int i = 0; i <NB_PLATEFORME; i++){
-    if (plat_array[i] != 0 && plat_array[i]<= 4){
+    if (plat_array[i] != 0 && plat_array[i]<= 5){
       if (collision(*spritePosition,plateformePos[i], saut, "perso") == 3) {
 	  if (plat_array[i] == 4) {
 	    *damage = 1;
@@ -828,9 +828,11 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
 }
  
   /*Gestion du game over*/
-int game_over (int *vie, SDL_Rect gameoverPosition, SDL_Surface *spriteGameover, SDL_Surface *screen){
+int game_over (int *vie, Image *spriteGameover, SDL_Surface *screen, SDL_Surface *sprite, SDL_Rect *spriteImage, SDL_Rect *spritePosition){
   if (*vie == 0) {
-    SDL_BlitSurface(spriteGameover, NULL, screen, &gameoverPosition);
+    SDL_BlitSurface(spriteGameover->image, NULL, screen, &spriteGameover->position);
+    spriteImage->x = 0;
+    SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
     return 1;
   }
   else {
@@ -942,14 +944,14 @@ void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage
   }
 }
 
-void drawBonus (SDL_Surface *oneup, SDL_Surface *screen, SDL_Rect *upImage, SDL_Rect *upPosition, int *item, int *tempsItem, SDL_Rect *spritePosition){
+void drawBonus (Image *oneup, SDL_Surface *screen, int *item, int *tempsItem, SDL_Rect *spritePosition){
   /*Draw bonus*/
   if (*item != 0){
-    upPosition->x = spritePosition->x;
-    upPosition->y = spritePosition->y - 40;
-    upImage->x = (*item - 1)*31;
+    setPosX(oneup,spritePosition->x);
+    setPosY(oneup,spritePosition->y - 40);
+    setImX(oneup,(*item - 1)*31);
     *tempsItem += 1;
-    SDL_BlitSurface(oneup, upImage, screen, upPosition);
+    SDL_BlitSurface(oneup->image, &oneup->taille, screen, &oneup->position);
     if (*tempsItem == 150) {
       *item = 0;
       *tempsItem = 0;      
