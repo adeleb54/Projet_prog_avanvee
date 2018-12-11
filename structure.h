@@ -1,9 +1,7 @@
 #ifndef STRUCTURE_H
 #define STRUCTURE_H
 
-#include <SDL/SDL.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "constante.h"
 
 typedef struct Image{
 	char* nom;
