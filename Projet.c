@@ -1,5 +1,4 @@
 #include "fonction.h"
-#include "structure.h"
 
 int main(int argc, char* argv[]) {
   
@@ -13,7 +12,7 @@ int main(int argc, char* argv[]) {
   SDL_Rect spritePosition;
   SDL_Rect ennemyPos [NB_ENNEMY];
   SDL_Rect plateformePos [NB_PLATEFORME];
-  int gameover = 2;
+  //int gameover = 2;
   int hperso = spritePosition.y;
   int debutsaut;
   int finsaut = 1;
@@ -22,26 +21,25 @@ int main(int argc, char* argv[]) {
   int gauche = 0;
   int delai = 0;
   int delaiEn = 0;
-  int timer = 0;
-  int pauseV = 1;
-  int space = 0;
-  int changspace = 1;
+  //int timer = 0;
+  //int pauseV = 1;
+  //int space = 0;
+  //int changspace = 1;
   int vie = 3;
-  int secondes, minutes, heures;
-  int item = 0;
-  int tempsItem = 0;
-  int clef = 0;  
+  //int secondes, minutes, heures;
+  //int item = 0;
+  //int tempsItem = 0;
+  //int clef = 0;  
   int damage = 0;
   int tempsDamage = 0;
   int enTempsDamage = 0;
-  int haut = 0;
-  int bas =  0; 
-  int entree = 0;
-  int select = 0;
-  int niveau = 1;
+  //int haut = 0;
+  //int bas =  0; 
+  //int entree = 0;
+  //int select = 0;
+  //int niveau = 1;
   int change = 1;
-  int est_passe = 0;
-  
+  //int est_passe = 0;
   
   /* initialize SDL */
   SDL_Init(SDL_INIT_VIDEO);
@@ -52,6 +50,7 @@ int main(int argc, char* argv[]) {
   /* set keyboard repeat */
   SDL_EnableKeyRepeat(10, 10);
   colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
+  VarG* varGlobal = createVarG(screen);
 
   
   /*Sprites*/
@@ -141,42 +140,41 @@ int main(int argc, char* argv[]) {
   afficher_bloc("niveau1.txt", plat_array, plateformePos, ennemy_array, ennemyPos, ennemyPosStart);
   
 
-  if (start (&haut, &finsaut, &select, &bas, &entree, &gameover, skyL, spriteDem, spriteQuit,screen, font) == 1){
-    while (gameover != 1)
+  if (start (&finsaut, skyL, spriteDem, spriteQuit,screen, font, varGlobal) == 1){
+    while (getGameOver(varGlobal) != 1)
     {
       setPosY(font, 0);
       
       SDL_Event event;
 	  
       if (SDL_PollEvent(&event)) {
-	HandleEvent(event, &gameover, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, &space, &haut, &bas);
+	HandleEvent(event, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, varGlobal);
       }
       
       //Pause
-      if ((pause (&space, &changspace, &pauseV,spritePause, screen) == 1) && (game_over(&vie, spriteGameover, screen, sprite, &spriteImage, &spritePosition) == 0)){
+      if (!pause (varGlobal, spritePause, screen) && !game_over(varGlobal, spriteGameover, screen, sprite, &spriteImage, &spritePosition)){
 
       //Jeu
 	//Handle timer
-	timer += 1;
-	fTimer (&timer, &heures, &minutes, &secondes);
+	incrTimer(varGlobal);
+	fTimer (varGlobal);
 	
 	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, &change, &delaiEn, plateformePos, 
-		  plat_array, &spritePosition, &damage, &tempsDamage, &vie, &saut, enDamage, &enTempsDamage, ennemyPosDamage);
+		  plat_array, &spritePosition, &damage, &tempsDamage, &saut, enDamage, &enTempsDamage, ennemyPosDamage, varGlobal);
 	
 	/*handle the movement of the sprite*/
 	move (&droite, &gauche, &spritePosition, &currentDirection, &finsaut, &delai, &animationFlip);
 	
 	/*Collisions*/      
-	spriteCollide (&spritePosition, plateformePos, plat_array, ennemy_array, saut, &vie, &item, &clef, 
-		       &tempsItem, &damage, &niveau, ennemyPos, ennemyPosStart, &est_passe);
+	spriteCollide (&spritePosition, plateformePos, plat_array, ennemy_array, saut, &damage, ennemyPos, ennemyPosStart, varGlobal);
   
 	/*Gestion des dégâts*/
-	lose_life (&damage, &tempsDamage, &vie);
+	lose_life (&damage, &tempsDamage, varGlobal);
 	
 	stopEnnemy (enDamage, &enTempsDamage);
 
 	/*Saut*/
-	Saut (&hperso, &spritePosition, &saut, plat_array, plateformePos, &debutsaut, &finsaut, &damage, &vie, &clef,& tempsItem, &niveau, ennemy_array, ennemyPos, ennemyPosStart, &est_passe, &item);
+	Saut (&hperso, &spritePosition, &saut, plat_array, plateformePos, &debutsaut, &finsaut, &damage, ennemy_array, ennemyPos, ennemyPosStart, varGlobal);
 	
 		      /******Affichage*******/
 		      
@@ -185,7 +183,7 @@ int main(int argc, char* argv[]) {
       drawSky(sky, screen);
 
 	      /*Dans bandeau noir*/
-      drawFont (font, screen, &heures, &minutes, &secondes, &vie, &clef);     
+      drawFont (font, screen, varGlobal);     
 	    
 	      /*draw blocs*/
       drawBloc(plateforme, screen, &blocImage, plateformePos, plat_array);
@@ -195,7 +193,7 @@ int main(int argc, char* argv[]) {
       
       drawEnnemy (ennemy, screen, &ennemyImage, ennemyPos, ennemyDir, &enAnimFlip, ennemy_array, enDamage, &enTempsDamage, ennemyPosDamage);
 	
-      drawBonus (oneUp, screen, &item, &tempsItem, &spritePosition);
+      drawBonus (oneUp, screen, &spritePosition, varGlobal);
   
       SDL_Delay(4);
       }

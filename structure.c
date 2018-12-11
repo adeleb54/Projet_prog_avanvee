@@ -50,7 +50,7 @@ VarG* createVarG(SDL_Surface * screen){
   var->colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
   var->gameover = 2;
   var->timer = 0;
-  var->pause = 1;
+  var->pause = 0;
   var->space = 0;
   var->changspace = 1;
   var->vie = 3;
@@ -61,6 +61,7 @@ VarG* createVarG(SDL_Surface * screen){
   var->bas =  0; 
   var->niveau = 1;
   var->est_passe = 0;
+  var->entree = 0;
   return var;
 }
 int getColorKey(VarG* var){
@@ -90,7 +91,7 @@ int getSecondes(VarG* var){
 int getMinutes(VarG* var){
   return var->minutes;
 }
-int getHeure(VarG* var){
+int getHeures(VarG* var){
   return var->heures;
 }
 int getItem(VarG* var){
@@ -115,8 +116,74 @@ int getNiveau(VarG* var){
 int getPass(VarG* var){
   return var->est_passe;
 }
+int getEntree(VarG* var){
+  return var->entree;
+}
 
 void destroyVarG(VarG* var){
   free(var);
   var = NULL;
+}
+void setGameOver(VarG* var, int gameO){
+  var->gameover = gameO;
+}
+void incrTimer(VarG* var){
+  var->timer++;
+}
+void setPause(VarG* var, int pause){
+  var->pause = pause;
+}
+void setSpace(VarG* var, int space){
+  var->space = space;
+}
+void setChangeSp(VarG* var, int changspace){
+  var->changspace = changspace;
+}
+void incrVie(VarG* var){
+  var->vie++;
+}
+void decrVie(VarG* var){
+  var->vie--;
+}
+void setSecondes(VarG* var, int seconde){
+  var->secondes = seconde;
+}
+void setMinutes(VarG* var, int minute){
+  var->minutes = minute;
+}
+void setHeures(VarG* var, int heure){
+  var->heures = heure;
+}
+void setItem(VarG* var, int item){
+  var->item = item;
+}
+void incrTpsItem(VarG* var){
+  var->tempsItem++;
+}
+void initTpsItem(VarG* var){
+  var->tempsItem = 0;
+}
+void incrClef(VarG* var){
+  var->clef++;
+}
+void decrClef(VarG* var){
+  var->clef--;
+}
+void setHaut(VarG* var, int haut){
+  var->haut = haut;
+}
+void setBas(VarG* var, int bas){
+  var->bas = bas;
+}
+void incrNiveau(VarG* var){
+  var->niveau++;
+}
+void incrPass(VarG* var){
+  var->est_passe++;
+}
+void initPass(VarG* var){
+  var->est_passe = 0;
+}
+void setEntree(VarG* var, int entree){
+  var->entree = entree;
 }

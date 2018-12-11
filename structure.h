@@ -37,6 +37,7 @@ typedef struct VariablesGlobales{
   int haut;
   int bas; 
   int niveau;
+  int entree;
 //   int change;
   int est_passe;
 }VarG;
@@ -50,7 +51,7 @@ int getChangeSp(VarG* var);
 int getVie(VarG* var);
 int getSecondes(VarG* var);
 int getMinutes(VarG* var);
-int getHeure(VarG* var);
+int getHeures(VarG* var);
 int getItem(VarG* var);
 int getTpsItem(VarG* var);
 int getClef(VarG* var);
@@ -59,7 +60,29 @@ int getBas(VarG* var);
 int getNiveau(VarG* var);
 // int getChange(VarG* var);
 int getPass(VarG* var);
+int getEntree(VarG* var);
 
 void destroyVarG(VarG* var);
+void setGameOver(VarG* var, int gameO);
+void incrTimer(VarG* var);
+void setPause(VarG* var, int pause);
+void setSpace(VarG* var, int space);
+void setChangeSp(VarG* var, int changspace);
+void incrVie(VarG* var);
+void decrVie(VarG* var);
+void setSecondes(VarG* var, int seconde);
+void setMinutes(VarG* var, int minute);
+void setHeures(VarG* var, int heure);
+void setItem(VarG* var, int item);
+void incrTpsItem(VarG* var);
+void initTpsItem(VarG* var);
+void incrClef(VarG* var);
+void decrClef(VarG* var);
+void setHaut(VarG* var, int haut);
+void setBas(VarG* var, int bas);
+void incrNiveau(VarG* var);
+void incrPass(VarG* var);
+void initPass(VarG* var);
+void setEntree(VarG* var, int entree);
 
 #endif 

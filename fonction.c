@@ -1,14 +1,11 @@
 #include "fonction.h"
   
 //Gestion des evenements
-void HandleEvent(SDL_Event event,
-        int *quit, int *saut, int *debutsaut, int *hperso, int *finsaut, 
-	int *droite, int *gauche, int *space, int *haut, int *bas/*, int pause, SDL_Rect pausePosition*/ )
-{
+void HandleEvent(SDL_Event event, int *saut, int *debutsaut, int *hperso, int *finsaut,	int *droite, int *gauche, VarG* var){
   switch (event.type) {
     /* close button clicked */
     case SDL_QUIT:
-	*quit = 1;
+	setGameOver(var, 1);
 	break;
 
     /* handle the keyboard */
@@ -16,22 +13,22 @@ void HandleEvent(SDL_Event event,
 	switch (event.key.keysym.sym) {
 	    case SDLK_ESCAPE:
 	    case SDLK_q:
-		*quit = 1;
+		setGameOver(var, 1);
 		break;
 		
 	    case SDLK_UP:
-	      if (*quit != 1) {
+	      if (getGameOver(var) !=1) {
 		if (*finsaut != 0) {
 		  *finsaut = 0;
 		  *saut = SAUT;
 		  *debutsaut = *hperso;
 		}
 	      }
-	      *haut = 1;
+	      setHaut(var, 1);
 	      break;
 	      
 	    case SDLK_DOWN:
-	      *bas = 1;
+	      setBas(var, 1);
 	      break;
 		
 	    case SDLK_LEFT:
@@ -43,7 +40,7 @@ void HandleEvent(SDL_Event event,
 	      break;
 	    
 	    case SDLK_SPACE:
-	      *space = 1;
+	      setSpace(var, 1);
 	      break;
 	    
 	    default:
@@ -54,11 +51,11 @@ void HandleEvent(SDL_Event event,
     case SDL_KEYUP:
 	switch (event.key.keysym.sym) {
 	    case SDLK_UP:
-	      *haut = 0;
+	      setHaut(var, 0);
 	      break;
 	    
 	    case SDLK_DOWN:
-	      *bas = 0;
+	      setBas(var, 0);
 	      break;
 	    
 	    case SDLK_LEFT:
@@ -70,7 +67,7 @@ void HandleEvent(SDL_Event event,
 	      break;
 		
 	    case SDLK_SPACE:
-	      *space = 0;
+	      setSpace(var, 0);
 	      break;
 		
 	    default :
@@ -90,12 +87,12 @@ void HandleEvent(SDL_Event event,
   }
 }
   
-void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entree)
+void HandleEventStart(SDL_Event event, VarG* var)
 {
   switch (event.type) {
     /* close button clicked */
     case SDL_QUIT:
-	*quit = 1;
+	setGameOver(var, 1);
 	break;
 
     /* handle the keyboard */
@@ -103,19 +100,19 @@ void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entr
 	switch (event.key.keysym.sym) {
 	    case SDLK_ESCAPE:
 	    case SDLK_q:
-		*quit = 1;
+		setGameOver(var, 1);
 		break;
 		
 	    case SDLK_UP:
-	      *haut = 1;
+	      setHaut(var, 1);
 	      break;
 	      
 	    case SDLK_DOWN:
-	      *bas = 1;
+	      setBas(var, 1);
 	      break;
 	      
 	    case SDLK_RETURN:
-	      *entree = 1;
+	      setEntree(var, 1);
 	      break;
 	    
 	    default:
@@ -126,15 +123,15 @@ void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entr
     case SDL_KEYUP:
 	switch (event.key.keysym.sym) {
 	    case SDLK_UP:
-	      *haut = 0;
+	      setHaut(var, 0);
 	      break;
 	    
 	    case SDLK_DOWN:
-	      *bas = 0;
+	      setBas(var, 0);
 	      break;
 	      
 	    case SDLK_RETURN:
-	      *entree = 0;
+	      setEntree(var, 0);
 	      break;
 		
 	    default :
@@ -144,32 +141,33 @@ void HandleEventStart(SDL_Event event, int *quit, int *haut, int *bas, int *entr
   }
 }
 
-int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gameover, Image *skyL, Image *spriteDem, Image *spriteQuit, SDL_Surface *screen, Image *font){
+int start (int *finsaut, Image *skyL, Image *spriteDem, Image *spriteQuit, SDL_Surface *screen, Image *font, VarG* var){
   
   int changhaut, changbas;
-  while (*gameover == 2){  
+  int select = 0;
+  while (getGameOver(var) == 2){  
     
     SDL_Event event;
     if (SDL_PollEvent(&event)) {
-      HandleEventStart(event, gameover, haut, bas, entree);
+      HandleEventStart(event, var);
     }
     
-    if (*haut == 0) {
+    if (getHaut(var) == 0) {
 	changhaut = 1;
     }
     
-    if (changhaut == 1 && *haut == 1) {
+    if (changhaut == 1 && getHaut(var) == 1) {
       changhaut = 0;
-      *select = 1 - *select;
+      select = 1 - select;
     }
     
-    if (*bas == 0) {
+    if (getBas(var) == 0) {
 	changbas = 1;
     }
     
-    if (changbas == 1 && *bas == 1) {
+    if (changbas == 1 && getBas(var) == 1) {
       changbas = 0;
-      *select = 1 - *select;
+      select = 1 - select;
     }
     
     /* draw the background */
@@ -182,14 +180,14 @@ int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gam
     setPosY(spriteQuit, 120);
     SDL_BlitSurface(spriteQuit->image, NULL, screen, &spriteQuit->position);
     
-    if (*select == 0) {
+    if (select == 0) {
       setPosX(font, 190);
       setPosY(font, 90);
       SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 
     }
     
-    if (*select == 1) {
+    if (select == 1) {
       setPosX(font, 190);
       setPosY(font, 120);
       SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
@@ -199,9 +197,9 @@ int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gam
     /* update the screen */
      SDL_UpdateRect(screen, 0, 0, 0, 0);
      
-    if (*entree == 1) {
+    if (getEntree(var) == 1) {
       
-      if (*select == 0) {
+      if (select == 0) {
 	
 	/* clean up */
 	destroyImage(skyL);
@@ -217,16 +215,16 @@ int start (int *haut, int *finsaut, int *select, int *bas, int *entree, int *gam
 	/* set keyboard repeat */
 	SDL_EnableKeyRepeat(10, 10);
 	
-	*gameover = 0;
-      }
+	setGameOver(var, 0);
+    }
           
-      if (*select == 1) {
+      if (select == 1) {
 	  
 	/* clean up */
 	destroyImage(skyL);
 	destroyImage(spriteDem);
 	destroyImage(spriteQuit);
-	*gameover = 1;
+	setGameOver(var, 1);
 	SDL_Quit();
 	return 0;
       }
@@ -381,22 +379,22 @@ void set_pos (SDL_Rect *spritePosition, int a, int b) {
 }
 
 //Gestion de la pause
-int pause (int *space, int *changspace, int *pause, Image *spritePause, SDL_Surface *screen){
+int pause (VarG* var, Image *spritePause, SDL_Surface *screen){
   
-  if (*space == 0) {
-      *changspace = 1;  
+  if (!getSpace(var)) {
+      setChangeSp(var,  1);  
   }
   
-  if (*changspace == 1 && *space == 1) {
-    *changspace = 0;
-    *pause = 1 - *pause;
+  if (getChangeSp(var) && getSpace(var) ) {
+    setChangeSp(var,  0);
+    setPause(var, 1 - getPause(var));
   }
   
-  if (*pause == 0) {
+  if (getPause(var) == 1) {
     SDL_BlitSurface(spritePause->image, NULL, screen, &spritePause->position);
   }
   
-  return *pause;
+  return getPause(var);
 }
 
 //Gestion des déplacements
@@ -427,7 +425,7 @@ void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirec
 
 //Replacement de l'ennemi lors de collisions
 void ennemyCollide (SDL_Rect *spritePosition, SDL_Rect *ennemyPosition, int *ennemy_array, SDL_Rect *plateformePos, int *plat_array, int* enDirection, 
-			int *damage, int *tempsDamage, int *vie, int *saut, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage){
+			int *damage, int *tempsDamage, int *saut, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage, VarG* var){
   for (int i = 0; i<NB_ENNEMY; i++){  
     if ( ennemyPosition[i].x <= 0)
       ennemyPosition[i].x = 0;
@@ -463,7 +461,7 @@ void ennemyCollide (SDL_Rect *spritePosition, SDL_Rect *ennemyPosition, int *enn
 
 //Deplacement ennemi
 void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_array, int *enDirection, int *enAnimFlip, int *change, int *delaiEN, SDL_Rect *plateformePos, int *plat_array, 
-		SDL_Rect *spritePosition, int *damage, int *tempsDamage, int *vie, int *saut, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage){
+		SDL_Rect *spritePosition, int *damage, int *tempsDamage, int *saut, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage, VarG* var){
   for (int i = 0; i<NB_ENNEMY; i++){  
     if (ennemy_array[i] != 0){
       if (enDirection[i] == EN_DIR_LEFT){
@@ -502,19 +500,18 @@ void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_
       }
     }
   }
-  ennemyCollide (spritePosition, ennemyPosition, ennemy_array, plateformePos, plat_array, enDirection, damage, tempsDamage, vie, saut, enDamage, enTempsDamage, ennemyPosDamage);
+  ennemyCollide (spritePosition, ennemyPosition, ennemy_array, plateformePos, plat_array, enDirection, damage, tempsDamage, saut, enDamage, enTempsDamage, ennemyPosDamage, var);
 }  
 
 
 // Gestion des items
-void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *vie, int *item, int *clef, 
-		    int *tempsItem, int i, int *damage, int *niveau, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *est_passe) {
+void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePosition, SDL_Rect *plateformePos, int i, int *damage, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, VarG* var) {
   if (collision == 1 || collision == 2 || collision == 3 ){
     switch (bloc){
       case 3:
 	//Si on a une clef pour l'ouvrir
-	if (*clef >= 1) {
-	  *clef -= 1;
+	if (getClef(var) >= 1) {
+	  decrClef(var);
 	  plat_array[i] = 0;
 	}
 	else {
@@ -554,51 +551,51 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
 	}
 	break;
       case 6:
-	if (*vie < 6) {
+	if (getVie(var) < 6) {
 	  plat_array[i] = 0;
-	  *vie += 1;
-	  if (*item == 1) {
-	    *tempsItem = 0;
+	  incrVie(var) ;
+	  if (getItem(var) == 1) {
+	    initTpsItem(var) ;
 	  }
 	  else {
-	    *item = 1;
+	    setItem(var, 1);
 	  }
 	}
 	break;
       //Si c'est une clef
       case 7 :
 	plat_array[i] = 0;
-	*clef += 1;
-	if (*item == 2) {
-	  *tempsItem = 0;
+	incrClef(var);
+	if (getItem(var) == 2) {
+	  initTpsItem(var) ;
 	}
 	else {
-	  *item = 2;
+	  setItem(var, 2);
 	} 
 	break;
       case 8:
-	if (*niveau == 3) {	
+	if (getNiveau(var) ==3) {	
 	  afficher_bloc("niveau4.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
 	  set_pos(spritePosition, 32, SOL);
-	  *niveau += 1;
+	  incrNiveau(var);
 	}
-	else if (*niveau == 2) {
+	else if (getNiveau(var) ==2) {
 	  afficher_bloc("niveau3.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
 	  set_pos(spritePosition, 0, 64);
-	  *niveau += 1;
+	  incrNiveau(var);
 	}
-	else if (*niveau == 1) {
+	else if (getNiveau(var) ==1) {
 	  afficher_bloc("niveau2.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
 	  set_pos(spritePosition, 32, 64);
-	  *niveau += 1;
+	  incrNiveau(var);
 	}
 	break;
       case 9:
 	for (int i = 0; i < NB_PLATEFORME; i++) {
 	  if (plat_array[i]==10) {
-	    if(*est_passe == 0){
+	    if(getPass(var) == 0){
 	      set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
-	      *est_passe += 1;
+	      incrPass(var);
 	    }
 	  }
 	}
@@ -606,9 +603,9 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
       case 10 :
 	for (int i = 0; i < NB_PLATEFORME; i++) {
 	  if (plat_array[i]==9) {
-	    if(*est_passe == 0){
+	    if(getPass(var) == 0){
 	      set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
-	      *est_passe += 1;
+	      incrPass(var);
 	    }
 	  }
 	}
@@ -618,11 +615,9 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
     }
   }
 }
-
   
 //Replacement du sprite lors de collisions
-void spriteCollide (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, int saut, int *vie, int *item, 
-		    int *clef, int *tempsItem, int *damage, int *niveau, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *est_passe){
+void spriteCollide (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, int saut, int *damage, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, VarG* var){
   
   if (spritePosition->x <= 0)
     spritePosition->x = 0;
@@ -631,10 +626,10 @@ void spriteCollide (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat
   if (spritePosition->y >= SCREEN_HEIGHT - SPRITE_SIZE) 
     spritePosition->y = SCREEN_HEIGHT - SPRITE_SIZE;
     
-  if(*est_passe > 0) {
-    *est_passe += 1;
-    if (*est_passe == 50) {
-      *est_passe = 0;
+  if(getPass(var) > 0) {
+    incrPass(var);
+    if (getPass(var) == 50) {
+      initPass(var);
     }
   }
   
@@ -649,7 +644,7 @@ void spriteCollide (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat
     }
     else{
        gestion_items(collision(*spritePosition,plateformePos[i], &saut, "perso"), plat_array, plat_array[i], spritePosition, plateformePos, 
-		     vie, item, clef, tempsItem, i, damage, niveau, ennemy_array, ennemyPosition, ennemyPosStart, est_passe);
+		     i, damage, ennemy_array, ennemyPosition, ennemyPosStart, var);
     }
   }
   for (int i = 0; i<NB_ENNEMY; i++){
@@ -680,10 +675,10 @@ void stopEnnemy (int *EnDamage, int *enTempsDamage) {
 }
 
 /*Gestion de la perte de vie*/
-void lose_life (int *damage, int *tempsDamage, int *vie) {
+void lose_life (int *damage, int *tempsDamage, VarG* var) {
     if (*damage == 1) {
       if (*tempsDamage == 0) {
-	*vie -= 1;
+	decrVie(var);
 	*tempsDamage += 1;
       }
       if (*tempsDamage == 350) {
@@ -697,15 +692,15 @@ void lose_life (int *damage, int *tempsDamage, int *vie) {
 }
 
 //Gestion du timer
-void fTimer (int* timer, int* heures, int* minutes, int* secondes){
-  *heures = *timer/(200*3600);
-  *minutes = (*timer/200 - 3600 * *heures)/ 60;
-  *secondes = *timer/200 - 60 * *minutes;
+void fTimer (VarG* var){
+  setHeures(var, getTimer(var)/(200*3600));
+  setMinutes(var, (getTimer(var)/200 - 3600 * getHeures(var))/ 60);
+  setSecondes(var, getTimer(var)/200 - 60 * getMinutes(var));
 }
 
 //Gestion du saut
 void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SDL_Rect *plateformePos, int *debutsaut, int *finsaut, int *damage, 
-	   int *vie, int *clef, int *tempsItem, int *niveau, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *est_passe, int *item){
+	   int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, VarG* var){
   *hperso = spritePosition->y;
   int col_haut = 0;
   //Si on a demandé au perso de sauter
@@ -717,8 +712,8 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
 	  switch (plat_array[i]){
 	    case 3:
 	      //Si on a une clef pour l'ouvrir
-	      if (*clef >= 1) {
-		*clef -= 1;
+	      if (getClef(var) >= 1) {
+		decrClef(var);
 		plat_array[i] = 0;
 	      }
 	      else {
@@ -730,51 +725,51 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
 	      col_haut = 1;
 	      break;
 	    case 6:
-	      if (*vie < 6) {
+	      if (getVie(var) < 6) {
 		plat_array[i] = 0;
-		*vie += 1;
-		if (*item == 1) {
-		  *tempsItem = 0;
+		incrVie(var);
+		if (getItem(var) == 1) {
+		  initTpsItem(var);
 		}
 		else {
-		  *item = 1;
+		  setItem(var, 1);
 		}
 	      }
 	      break;
 	    //Si c'est une clef
 	    case 7 :
 	      plat_array[i] = 0;
-	      *clef += 1;
-	      if (*item == 2) {
-		*tempsItem = 0;
+	      incrClef(var);
+	      if (getItem(var) == 2) {
+		initTpsItem(var);
 	      }
 	      else {
-		*item = 2;
+		setItem(var, 2);
 	      } 
 	      break;
 	    case 8:
-	      if (*niveau == 3) {	
+	      if (getNiveau(var) == 3) {	
 		set_pos(spritePosition, SOL, 32);
 		afficher_bloc("niveau4.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
-		*niveau += 1;
+		incrNiveau(var);
 	      }
-	      else if (*niveau == 2) {
+	      else if (getNiveau(var) == 2) {
 		afficher_bloc("niveau3.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
 		set_pos(spritePosition, 0, 64);
-		*niveau += 1;
+		incrNiveau(var);
 	      }
-	      else if (*niveau == 1) {
+	      else if (getNiveau(var) == 1) {
 		afficher_bloc("niveau2.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
 		set_pos(spritePosition, 32, 64);
-		*niveau += 1;
+		incrNiveau(var);
 	      }
 	      break;
 	    case 9:
 	      for (int i = 0; i < NB_PLATEFORME; i++) {
 		if (plat_array[i]==10) {
-		  if(*est_passe == 0){
+		  if(getPass(var) == 0){
 		    set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
-		    *est_passe += 1;
+		    incrPass(var);
 		  }
 		}
 	      }
@@ -782,9 +777,9 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
 	    case 10 :
 	      for (int i = 0; i < NB_PLATEFORME; i++) {
 		if (plat_array[i]==9) {
-		  if(*est_passe == 0){
+		  if(getPass(var) == 0){
 		    set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
-		    *est_passe += 1;
+		    incrPass(var);
 		  }
 		}
 	      }
@@ -828,8 +823,8 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
 }
  
   /*Gestion du game over*/
-int game_over (int *vie, Image *spriteGameover, SDL_Surface *screen, SDL_Surface *sprite, SDL_Rect *spriteImage, SDL_Rect *spritePosition){
-  if (*vie == 0) {
+int game_over (VarG* var, Image *spriteGameover, SDL_Surface *screen, SDL_Surface *sprite, SDL_Rect *spriteImage, SDL_Rect *spritePosition){
+  if (getVie(var) == 0) {
     SDL_BlitSurface(spriteGameover->image, NULL, screen, &spriteGameover->position);
     spriteImage->x = 0;
     SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
@@ -846,7 +841,7 @@ void drawSky (Image *sky, SDL_Surface *screen){
   SDL_BlitSurface(sky->image, NULL, screen, NULL);
 }
 
-void drawFont (Image *font, SDL_Surface *screen, int *heures, int *minutes, int *secondes, int *vie, int *clef){
+void drawFont (Image *font, SDL_Surface *screen, VarG* var){
   
   setImY(font, FONT_SIZE*3);
   
@@ -854,12 +849,12 @@ void drawFont (Image *font, SDL_Surface *screen, int *heures, int *minutes, int 
   
   //Affichage heures
   //Dizaines
-  setImX(font, FONT_SIZE * (*heures/10));
+  setImX(font, FONT_SIZE * (getHeures(var)/10));
   setPosX(font, 10);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 
   //Unités
-  setImX(font, FONT_SIZE * (*heures%10));
+  setImX(font, FONT_SIZE * (getHeures(var)%10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
@@ -871,13 +866,13 @@ void drawFont (Image *font, SDL_Surface *screen, int *heures, int *minutes, int 
   
   //Affichage minutes
   //Dizaines
-  setImX(font, FONT_SIZE * (*minutes/10));
+  setImX(font, FONT_SIZE * (getMinutes(var)/10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   
   //Unités
-  setImX(font, FONT_SIZE * (*minutes%10));
+  setImX(font, FONT_SIZE * (getMinutes(var)%10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
@@ -890,13 +885,13 @@ void drawFont (Image *font, SDL_Surface *screen, int *heures, int *minutes, int 
   
   //Affichage secondes
   //Dizaines
-  setImX(font, FONT_SIZE * (*secondes/10));
+  setImX(font, FONT_SIZE * (getSecondes(var)/10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   
   //Unités
-  setImX(font, FONT_SIZE * (*secondes%10));
+  setImX(font, FONT_SIZE * (getSecondes(var)%10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
@@ -914,7 +909,7 @@ void drawFont (Image *font, SDL_Surface *screen, int *heures, int *minutes, int 
   
   /*Affichage du nombre de clefs*/
   setPosX(font, font->position.x + 20);
-  setIm(font, FONT_SIZE* *clef, FONT_SIZE*3);
+  setIm(font, FONT_SIZE* getClef(var), FONT_SIZE*3);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
   /***Vie***/
@@ -931,7 +926,7 @@ void drawFont (Image *font, SDL_Surface *screen, int *heures, int *minutes, int 
 
   /*Affichage de la vie restante*/
   setPosX(font, font->position.x + 20);
-  setIm(font, FONT_SIZE* *vie, FONT_SIZE*3);
+  setIm(font, FONT_SIZE* getVie(var), FONT_SIZE*3);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 }
 
@@ -944,17 +939,17 @@ void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage
   }
 }
 
-void drawBonus (Image *oneup, SDL_Surface *screen, int *item, int *tempsItem, SDL_Rect *spritePosition){
+void drawBonus (Image *oneup, SDL_Surface *screen, SDL_Rect *spritePosition, VarG* var){
   /*Draw bonus*/
-  if (*item != 0){
+  if (getItem(var) != 0){
     setPosX(oneup,spritePosition->x);
     setPosY(oneup,spritePosition->y - 40);
-    setImX(oneup,(*item - 1)*31);
-    *tempsItem += 1;
+    setImX(oneup,(getItem(var) - 1)*31);
+    incrTpsItem(var);
     SDL_BlitSurface(oneup->image, &oneup->taille, screen, &oneup->position);
-    if (*tempsItem == 150) {
-      *item = 0;
-      *tempsItem = 0;      
+    if (getTpsItem(var) == 150) {
+      setItem(var, 0);
+      initTpsItem(var);  
     }    
   }
 }
