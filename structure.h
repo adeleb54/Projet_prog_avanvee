@@ -38,7 +38,6 @@ typedef struct VariablesGlobales{
   int bas; 
   int niveau;
   int entree;
-//   int change;
   int est_passe;
 }VarG;
 VarG* createVarG(SDL_Surface* screen);
@@ -58,7 +57,6 @@ int getClef(VarG* var);
 int getHaut(VarG* var);
 int getBas(VarG* var);
 int getNiveau(VarG* var);
-// int getChange(VarG* var);
 int getPass(VarG* var);
 int getEntree(VarG* var);
 
@@ -84,5 +82,47 @@ void incrNiveau(VarG* var);
 void incrPass(VarG* var);
 void initPass(VarG* var);
 void setEntree(VarG* var, int entree);
+void incrItem(VarG* var, int item);
+
+typedef struct VariablesSprite{
+  int dir;
+  int anim;
+  int height;
+  int debutSaut;
+  int finSaut;
+  int saut;
+  int droite;
+  int gauche;
+  int delai;
+  int damage;
+}VarS;
+
+VarS* createVarS();
+int getDir(VarS* var);
+int getAnim(VarS* var);
+int getHeight(VarS* var);
+int getDebutSaut(VarS* var);
+int getFinSaut(VarS* var);
+int getSaut(VarS* var);
+int getDroite(VarS* var);
+int getGauche(VarS* var);
+int getDelai(VarS* var);
+int getDamage(VarS* var);
+
+void destroyVarS(VarS* var);
+void setDir(VarS* var, int val);
+void setAnim(VarS* var, int val);
+void setHeight(VarS* var, int val);
+void setDebutSaut(VarS* var, int val);
+void setFinSaut(VarS* var);
+void setSaut(VarS* var);
+void setDroite(VarS* var);
+void setGauche(VarS* var);
+void setDamage(VarS* var);
+void setNoFinSaut(VarS* var);
+void setNoSaut(VarS* var);
+void setNoDroite(VarS* var);
+void setNoGauche(VarS* var);
+void setNoDamage(VarS* var);
 
 #endif 

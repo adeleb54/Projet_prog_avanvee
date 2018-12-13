@@ -17,7 +17,7 @@ int pause (VarG* var, Image *spritePause, SDL_Surface *screen);
 
 void move (int *droite, int *gauche, SDL_Rect *spritePosition, int *currentDirection, int *finsaut, int *delai, int *animationFlip);
 
-void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_array, int *enDirection, int *enAnimFlip, int *change, int *delaiEN, SDL_Rect *plateformePos, int *plat_array, 
+void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_array, int *enDirection, int *enAnimFlip, int *enChange, int *delaiEN, SDL_Rect *plateformePos, int *plat_array, 
 		SDL_Rect *spritePosition, int *damage, int *tempsDamage, int *saut, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage, VarG* var);
 
 void spriteCollide (SDL_Rect *spritePosition, SDL_Rect *plateformePos, int *plat_array, int *ennemy_array, int saut, int *damage, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, VarG* var);

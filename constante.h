@@ -27,9 +27,6 @@
 #define EN_DIR_RIGHT   	3
 #define EN_DIR_LEFT	2
 
-#define SAUT 1
-#define PASSAUT 0
-
 #define HSAUT 70
 #define SOL 576
 
@@ -38,5 +35,6 @@
 
 /* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     1
+#define MAX_VIE		6
 
 #endif
