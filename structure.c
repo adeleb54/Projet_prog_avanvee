@@ -45,6 +45,7 @@ int getPosY(Image* picture){
   return picture->position.y;
 }
 
+
 VarG* createVarG(SDL_Surface * screen){
   VarG* var = malloc(sizeof(VarG));
   var->colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
@@ -113,14 +114,12 @@ int getBas(VarG* var){
 int getNiveau(VarG* var){
   return var->niveau;
 }
-// int getChange(VarG* var);
 int getPass(VarG* var){
   return var->est_passe;
 }
 int getEntree(VarG* var){
   return var->entree;
 }
-
 int getClaquettes(VarG* var) {
   return var->claquettes;
 }
@@ -186,15 +185,116 @@ void incrNiveau(VarG* var){
 void incrPass(VarG* var){
   var->est_passe++;
 }
+void initPass(VarG* var){
+  var->est_passe = 0;
+}
+void setEntree(VarG* var, int entree){
+  var->entree = entree;
+}
+void incrItem(VarG* var, int item){
+  if (getItem(var) == item){
+    initTpsItem(var);
+  }
+  else{
+    setItem(var, item);
+  }
+}
 void incrClaquettes(VarG* var){
   var->claquettes++;
 }
 void resetClaquettes(VarG* var) {
   var->claquettes = 0;
 }
-void initPass(VarG* var){
-  var->est_passe = 0;
+
+
+VarS* createVarS(){
+  VarS* var = malloc(sizeof(VarS));
+  var-> dir = DIR_RIGHT;
+  var-> anim = 0;
+  var-> height = 0;
+  var-> debutSaut = 0;
+  var-> finSaut = 1;
+  var-> saut = 0;
+  var-> droite = 0;
+  var-> gauche = 0;
+  var-> delai = 0;
+  var-> damage = 0;
+  return var;
 }
-void setEntree(VarG* var, int entree){
-  var->entree = entree;
+int getDir(VarS* var){
+  return var->dir;
+}
+int getAnim(VarS* var){
+  return var->anim;
+}
+int getHeight(VarS* var){
+  return var->height;
+}
+int getDebutSaut(VarS* var){
+  return var->debutSaut;
+}
+int getFinSaut(VarS* var){
+  return var->finSaut;
+}
+int getSaut(VarS* var){
+  return var->saut;
+}
+int getDroite(VarS* var){
+  return var->droite;
+}
+int getGauche(VarS* var){
+  return var->gauche;
+}
+int getDelai(VarS* var){
+  return var->delai;
+}
+int getDamage(VarS* var){
+  return var->damage;
+}
+
+void destroyVarS(VarS* var){
+  free(var);
+  var = NULL;
+}
+void setDir(VarS* var, int val){
+  var->dir = val;
+}
+void setAnim(VarS* var, int val){
+  var->anim = val;
+}
+void setHeight(VarS* var, int val){
+  var->height = val;
+}
+void setDebutSaut(VarS* var, int val){
+  var->debutSaut = val;
+}
+void setFinSaut(VarS* var){
+  var->finSaut = 1;
+}
+void setSaut(VarS* var){
+  var->saut = 1;
+}
+void setDroite(VarS* var){
+  var->droite = 1;
+}
+void setGauche(VarS* var){
+  var->gauche = 1;
+}
+void setDamage(VarS* var){
+  var->damage = 1;
+}
+void setNoFinSaut(VarS* var){
+  var->finSaut = 0;
+}
+void setNoSaut(VarS* var){
+  var->saut = 0;
+}
+void setNoDroite(VarS* var){
+  var->droite = 0;
+}
+void setNoGauche(VarS* var){
+  var->gauche = 0;
+}
+void setNoDamage(VarS* var){
+  var->damage = 0;
 }
