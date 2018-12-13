@@ -218,13 +218,16 @@ int main(int argc, char* argv[]) {
     }
     for (int i = 0; i <NB_ENNEMY; i++){
       SDL_FreeSurface(ennemy[i]);
-    }
-    destroyImage(font);
+    } 
     SDL_FreeSurface(sprite);
+    destroyImage(font);
     destroyImage(sky);
     destroyImage(spriteGameover);
     destroyImage(spritePause);
     destroyImage(oneUp);
+    destroyImage(spriteEndG);
+    destroyImage(spriteWP);
+    destroyImage(spriteTitre);
     SDL_Quit();
     return 0;
   }
