@@ -99,6 +99,7 @@ typedef struct VariablesSprite{
   int gauche;
   int delai;
   int damage;
+  int tpsDamage;
 }VarS;
 
 VarS* createVarS();
@@ -112,12 +113,17 @@ int getDroite(VarS* var);
 int getGauche(VarS* var);
 int getDelai(VarS* var);
 int getDamage(VarS* var);
+int getTpsDamage(VarS* var);
+int* getPtSaut(VarS* var);
+
 
 void destroyVarS(VarS* var);
 void setDir(VarS* var, int val);
-void setAnim(VarS* var, int val);
 void setHeight(VarS* var, int val);
 void setDebutSaut(VarS* var, int val);
+void setAnim(VarS* var);
+void initDelai(VarS* var);
+void incrDelai(VarS* var);
 void setFinSaut(VarS* var);
 void setSaut(VarS* var);
 void setDroite(VarS* var);
@@ -128,5 +134,7 @@ void setNoSaut(VarS* var);
 void setNoDroite(VarS* var);
 void setNoGauche(VarS* var);
 void setNoDamage(VarS* var);
+void initTpsDamage(VarS* var);
+void incrTpsDamage(VarS* var);
 
 #endif 

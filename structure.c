@@ -54,7 +54,7 @@ VarG* createVarG(SDL_Surface * screen){
   var->pause = 0;
   var->space = 0;
   var->changspace = 1;
-  var->vie = 3;
+  var->vie = 8;
   var->item = 0;
   var->tempsItem = 0;
   var->clef = 0;  
@@ -219,6 +219,7 @@ VarS* createVarS(){
   var-> gauche = 0;
   var-> delai = 0;
   var-> damage = 0;
+  var-> tpsDamage = 0;
   return var;
 }
 int getDir(VarS* var){
@@ -251,6 +252,12 @@ int getDelai(VarS* var){
 int getDamage(VarS* var){
   return var->damage;
 }
+int getTpsDamage(VarS* var){
+  return var->tpsDamage;
+}
+int* getPtSaut(VarS* var){
+  return &var->saut;
+}
 
 void destroyVarS(VarS* var){
   free(var);
@@ -259,14 +266,20 @@ void destroyVarS(VarS* var){
 void setDir(VarS* var, int val){
   var->dir = val;
 }
-void setAnim(VarS* var, int val){
-  var->anim = val;
-}
 void setHeight(VarS* var, int val){
   var->height = val;
 }
 void setDebutSaut(VarS* var, int val){
   var->debutSaut = val;
+}
+void setAnim(VarS* var){
+  var->anim = 1 - var->anim;
+}
+void initDelai(VarS* var){
+  var->delai = 0;
+}
+void incrDelai(VarS* var){
+  var->delai++;
 }
 void setFinSaut(VarS* var){
   var->finSaut = 1;
@@ -297,4 +310,10 @@ void setNoGauche(VarS* var){
 }
 void setNoDamage(VarS* var){
   var->damage = 0;
+}
+void initTpsDamage(VarS* var){
+  var->tpsDamage = 0;
+}
+void incrTpsDamage(VarS* var){
+  var->tpsDamage ++;
 }

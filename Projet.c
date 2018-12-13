@@ -11,16 +11,16 @@ int main(int argc, char* argv[]) {
   SDL_Rect spritePosition;
   SDL_Rect ennemyPos [NB_ENNEMY];
   SDL_Rect plateformePos [NB_PLATEFORME];
-  int hperso = spritePosition.y;
-  int debutsaut;
-  int finsaut = 1;
+  //int hperso = spritePosition.y;
+  //int debutsaut;
+  //int finsaut = 1;
   int saut = 0;
-  int droite = 0;
-  int gauche = 0;
-  int delai = 0;
+  //int droite = 0;
+  //int gauche = 0;
+  //int delai = 0;
   int delaiEn = 0;
   int damage = 0;
-  int tempsDamage = 0;
+  //int tempsDamage = 0;
   int enTempsDamage = 0;
   
   /* initialize SDL */
@@ -132,7 +132,7 @@ int main(int argc, char* argv[]) {
   afficher_bloc("niveau1.txt", plat_array, plateformePos, ennemy_array, ennemyPos, ennemyPosStart);
   
 
-  if (start (&finsaut, skyL, spriteDem, spriteQuit, spriteTitre,screen, font, varGlobal) == 1){
+  if (start (skyL, spriteDem, spriteQuit, spriteTitre,screen, font, varGlobal) == 1){
     while (getGameOver(varGlobal) != 1)
     {
       setPosY(font, 0);
@@ -154,21 +154,21 @@ int main(int argc, char* argv[]) {
 	}
 	
 	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, enChange, &delaiEn, plateformePos, 
-		  plat_array, &spritePosition, &damage, &tempsDamage, &saut, enDamage, &enTempsDamage, ennemyPosDamage, varGlobal);
+		  plat_array, &spritePosition, enDamage, &enTempsDamage, ennemyPosDamage, varSprite, varGlobal);
 	
 	/*handle the movement of the sprite*/
-	move (&droite, &gauche, &spritePosition, &currentDirection, &finsaut, &delai, &animationFlip);
+	move (&spritePosition, varSprite);
 	
 	/*Collisions*/      
-	spriteCollide (&spritePosition, plateformePos, plat_array, ennemy_array, saut, &damage, ennemyPos, ennemyPosStart, varGlobal);
+	spriteCollide (&spritePosition, plateformePos, plat_array, ennemy_array, ennemyPos, ennemyPosStart, varSprite, varGlobal);
   
 	/*Gestion des dégâts*/
-	lose_life (&damage, &tempsDamage, varGlobal);
+	lose_life (varSprite, varGlobal);
 	
 	stopEnnemy (enDamage, &enTempsDamage);
 
 	/*Saut*/
-	Saut (&hperso, &spritePosition, &saut, plat_array, plateformePos, &debutsaut, &finsaut, &damage, ennemy_array, ennemyPos, ennemyPosStart, varGlobal);
+	Saut ( &spritePosition, plat_array, plateformePos,ennemy_array, ennemyPos, ennemyPosStart, varGlobal, varSprite);
 	
 		      /******Affichage*******/
 		      
@@ -183,7 +183,7 @@ int main(int argc, char* argv[]) {
       drawBloc(plateforme, screen, &blocImage, plateformePos, plat_array);
 	
 	      /*draw sprites*/
-      drawSprite (sprite, screen, &spriteImage, &spritePosition, &currentDirection, &animationFlip, &damage, &tempsDamage, varGlobal);
+      drawSprite (sprite, screen, &spriteImage, &spritePosition, varSprite, varGlobal);
       
       drawEnnemy (ennemy, screen, &ennemyImage, ennemyPos, ennemyDir, &enAnimFlip, ennemy_array, enDamage, &enTempsDamage, ennemyPosDamage);
 	
