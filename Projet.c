@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
   /* set keyboard repeat */
   SDL_EnableKeyRepeat(10, 10);
   VarG* varGlobal = createVarG(screen);
+  VarS* varSprite = createVarS();
 
   
   /*Sprites*/
@@ -58,6 +59,10 @@ int main(int argc, char* argv[]) {
 
   /*Sky*/
   Image* sky = createImage("ciel.bmp",0,0,0,0,0,0);
+  
+  /*Game name*/
+  Image* spriteTitre = createImage("titre.bmp",151,40,0,0,0,0);
+  SDL_SetColorKey(spriteTitre->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, getColorKey(varGlobal));
       
   /*Start*/
   Image* spriteDem = createImage("dem.bmp",217,90,0,0,0,0);
@@ -74,6 +79,13 @@ int main(int argc, char* argv[]) {
   /*Game Over*/
   Image* spriteGameover = createImage("gameover.bmp", (SCREEN_WIDTH - 126)/2, (SCREEN_HEIGHT - 20)/2,0,0,0,0);
   SDL_SetColorKey(spriteGameover->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, getColorKey(varGlobal));
+  
+  /*End Game Screen*/
+  Image* spriteEndG = createImage("endgame.bmp",333,176,0,0,0,0);
+  SDL_SetColorKey(spriteEndG->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, getColorKey(varGlobal));
+  
+  Image* spriteWP = createImage("wp.bmp",411,464,0,0,0,0);
+  SDL_SetColorKey(spriteWP->image, SDL_SRCCOLORKEY | SDL_RLEACCEL, getColorKey(varGlobal));
 
   /*1up*/
   Image* oneUp = createImage("items.bmp", 0, 0, 31, 30, 0, 0);
@@ -120,7 +132,7 @@ int main(int argc, char* argv[]) {
   afficher_bloc("niveau1.txt", plat_array, plateformePos, ennemy_array, ennemyPos, ennemyPosStart);
   
 
-  if (start (&finsaut, skyL, spriteDem, spriteQuit,screen, font, varGlobal) == 1){
+  if (start (&finsaut, skyL, spriteDem, spriteQuit, spriteTitre,screen, font, varGlobal) == 1){
     while (getGameOver(varGlobal) != 1)
     {
       setPosY(font, 0);
@@ -128,7 +140,7 @@ int main(int argc, char* argv[]) {
       SDL_Event event;
 	  
       if (SDL_PollEvent(&event)) {
-	HandleEvent(event, &saut, &debutsaut, &hperso, &finsaut, &droite, &gauche, varGlobal);
+	HandleEvent(event, varSprite, varGlobal);
       }
       
       //Pause
@@ -136,8 +148,10 @@ int main(int argc, char* argv[]) {
 
       //Jeu
 	//Handle timer
-	incrTimer(varGlobal);
-	fTimer (varGlobal);
+	if (getNiveau(varGlobal) < 5) {
+	  incrTimer(varGlobal);
+	  fTimer (varGlobal);
+	}
 	
 	ennemyMove(ennemyPos, ennemyPosStart, ennemy_array, ennemyDir, &enAnimFlip, enChange, &delaiEn, plateformePos, 
 		  plat_array, &spritePosition, &damage, &tempsDamage, &saut, enDamage, &enTempsDamage, ennemyPosDamage, varGlobal);
@@ -169,11 +183,15 @@ int main(int argc, char* argv[]) {
       drawBloc(plateforme, screen, &blocImage, plateformePos, plat_array);
 	
 	      /*draw sprites*/
-      drawSprite (sprite, screen, &spriteImage, &spritePosition, &currentDirection, &animationFlip, &damage, &tempsDamage);
+      drawSprite (sprite, screen, &spriteImage, &spritePosition, &currentDirection, &animationFlip, &damage, &tempsDamage, varGlobal);
       
       drawEnnemy (ennemy, screen, &ennemyImage, ennemyPos, ennemyDir, &enAnimFlip, ennemy_array, enDamage, &enTempsDamage, ennemyPosDamage);
 	
       drawBonus (oneUp, screen, &spritePosition, varGlobal);
+      
+      if(getNiveau(varGlobal) == 5) {
+	drawEndG (sprite, screen, &spriteImage, &spritePosition, font, spriteEndG, spriteWP, &currentDirection, &animationFlip, varGlobal);
+      }
   
       SDL_Delay(4);
       }
@@ -193,7 +211,11 @@ int main(int argc, char* argv[]) {
     destroyImage(spriteGameover);
     destroyImage(spritePause);
     destroyImage(oneUp);
+    destroyImage(spriteEndG);
+    destroyImage(spriteWP);
+    destroyImage(spriteTitre);
     destroyVarG(varGlobal);
+    destroyVarS(varSprite);
     SDL_Quit();
     return 0;
   }

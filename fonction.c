@@ -1,7 +1,7 @@
 #include "fonction.h"
   
 //Gestion des evenements
-void HandleEvent(SDL_Event event, int *saut, int *debutsaut, int *hperso, int *finsaut,	int *droite, int *gauche, VarG* var){
+void HandleEvent(SDL_Event event, VarS* varS, VarG* var){
   switch (event.type) {
     /* close button clicked */
     case SDL_QUIT:
@@ -18,10 +18,10 @@ void HandleEvent(SDL_Event event, int *saut, int *debutsaut, int *hperso, int *f
 		
 	    case SDLK_UP:
 	      if (getGameOver(var) !=1) {
-		if (*finsaut != 0) {
-		  *finsaut = 0;
-		  *saut = 1;
-		  *debutsaut = *hperso;
+		if (getFinSaut(varS) != 0) {
+		  setNoFinSaut(varS);
+		  setSaut(varS);
+		  setDebutSaut(varS, getHeight(varS));
 		}
 	      }
 	      setHaut(var, 1);
@@ -32,11 +32,11 @@ void HandleEvent(SDL_Event event, int *saut, int *debutsaut, int *hperso, int *f
 	      break;
 		
 	    case SDLK_LEFT:
-	      *gauche = 1;
+	      setGauche(varS);
 	      break;
 		
 	    case SDLK_RIGHT:
-	      *droite = 1;
+	      setDroite(varS);
 	      break;
 	    
 	    case SDLK_SPACE:
@@ -59,11 +59,11 @@ void HandleEvent(SDL_Event event, int *saut, int *debutsaut, int *hperso, int *f
 	      break;
 	    
 	    case SDLK_LEFT:
-	      *gauche = 0;
+	      setNoGauche(varS);
 	      break;
 		
 	    case SDLK_RIGHT:
-	      *droite = 0;
+	      setNoDroite(varS);
 	      break;
 		
 	    case SDLK_SPACE:
@@ -141,7 +141,7 @@ void HandleEventStart(SDL_Event event, VarG* var)
   }
 }
 
-int start (int *finsaut, Image *skyL, Image *spriteDem, Image *spriteQuit, SDL_Surface *screen, Image *font, VarG* var){
+int start (int *finsaut, Image *skyL, Image *spriteDem, Image *spriteQuit, Image *spriteTitre, SDL_Surface *screen, Image *font, VarG* var){
   
   int changhaut, changbas;
   int select = 0;
@@ -173,6 +173,7 @@ int start (int *finsaut, Image *skyL, Image *spriteDem, Image *spriteQuit, SDL_S
     /* draw the background */
     SDL_BlitSurface(skyL->image, NULL, screen, NULL);
     
+    SDL_BlitSurface(spriteTitre->image, NULL, screen, &spriteTitre->position);
     
     SDL_BlitSurface(spriteDem->image, NULL, screen, &spriteDem->position);
     
@@ -518,6 +519,10 @@ void repositionnement(int collision, int i, SDL_Rect *spritePosition, SDL_Rect *
 
 void changeLevel(int *plat_array, SDL_Rect *plateformePos, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, SDL_Rect *spritePosition, VarG* var){
   switch(getNiveau(var)){
+    case 4:      
+      afficher_bloc("niveau5.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
+      incrNiveau(var);
+      break;
     case 3 :
       afficher_bloc("niveau4.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
       set_pos(spritePosition, 32, SOL);
@@ -690,6 +695,7 @@ void fTimer (VarG* var){
 //Gestion du saut
 void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SDL_Rect *plateformePos, int *debutsaut, int *finsaut, int *damage, 
 	   int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, VarG* var){
+  //setHeight(varS, spritePosition->y);
   *hperso = spritePosition->y;
   int col_haut = 0;
   //Si on a demandé au perso de sauter
@@ -713,7 +719,7 @@ void Saut (int *hperso, SDL_Rect *spritePosition, int *saut, int *plat_array, SD
 	    
 	    //Si c'est un bloc à pics vers le bas
 	    case 5:
-	      *damage = 1;
+	      *damage = 1;;
 	      col_haut = 1;
 	      break;
 	      
@@ -816,17 +822,11 @@ void drawSky (Image *sky, SDL_Surface *screen){
   SDL_BlitSurface(sky->image, NULL, screen, NULL);
 }
 
-void drawFont (Image *font, SDL_Surface *screen, VarG* var){
-  
-  setImY(font, FONT_SIZE*3);
-  
-  /***Timer***/
-  
+void drawTimer(Image *font, SDL_Surface *screen, VarG* var){
   
   //Affichage heures
   //Dizaines
   setImX(font, FONT_SIZE * (getHeures(var)/10));
-  setPosX(font, 10);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
 
   //Unités
@@ -870,10 +870,19 @@ void drawFont (Image *font, SDL_Surface *screen, VarG* var){
   setImX(font, FONT_SIZE * (getSecondes(var)%10));
   setPosX(font, font->position.x + 20);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
+}
+
+void drawFont (Image *font, SDL_Surface *screen, VarG* var){
   
+  setImY(font, FONT_SIZE*3);
+  
+  /***Timer***/
+  
+  setPosX(font, 10);
+  setPosY(font, 0);
+  drawTimer(font, screen, var);
   
   /***Clef***/
-  
   
   /*Affichage de la clef*/
   setPosX(font, SCREEN_WIDTH - 180);
@@ -890,9 +899,7 @@ void drawFont (Image *font, SDL_Surface *screen, VarG* var){
   setIm(font, FONT_SIZE* getClef(var), FONT_SIZE*3);
   SDL_BlitSurface(font->image, &font->taille, screen, &font->position);
   
-  
   /***Vie***/
-  
   
   /*Affichage du coeur*/
   setPosX(font, SCREEN_WIDTH - 90);
@@ -934,17 +941,20 @@ void drawBonus (Image *oneup, SDL_Surface *screen, SDL_Rect *spritePosition, Var
   }
 }
 
-void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, int *currentDirection, int *animationFlip, int *damage, int *tempsDamage){
-  spriteImage->x = SPRITE_SIZE * (2 * *currentDirection + *animationFlip);
-  if(*damage == 0) { 
-    SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
-  }
-  if(*damage == 1) {
-    if ((*tempsDamage/20)%2 == 1) {
+void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, int *currentDirection, int *animationFlip, int *damage, int *tempsDamage, VarG *var){
+  if (getNiveau(var) < 5) {
+    spriteImage->x = SPRITE_SIZE * (2 * *currentDirection + *animationFlip);
+    if(*damage == 0) { 
       SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+    }
+    if(*damage == 1) {
+      if ((*tempsDamage/20)%2 == 1) {
+	SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+      }
     }
   }
 }
+
 
 void drawEnnemy (SDL_Surface **ennemy, SDL_Surface *screen, SDL_Rect *ennemyImage, SDL_Rect *ennemyPosition, int *enDirection, int *enAnimFlip, 
 		 int *ennemy_array, int *enDamage, int *enTempsDamage, SDL_Rect *ennemyPosDamage){
@@ -964,4 +974,69 @@ void drawEnnemy (SDL_Surface **ennemy, SDL_Surface *screen, SDL_Rect *ennemyImag
       }
     }
   }
+}
+void drawEndG (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, Image *font, Image *spriteEndG, Image *spriteWP, int *currentDirection, int *animationFlip, VarG *var) {
+  if (getClaquettes(var) < 30) {
+    incrClaquettes(var);
+  }
+  if (getClaquettes(var) == 30) {
+    *animationFlip = 1 - *animationFlip;
+    resetClaquettes(var);
+  }
+  
+  *currentDirection = DIR_RIGHT;
+  spriteImage->x = SPRITE_SIZE * (2 * *currentDirection + *animationFlip);
+  
+  spritePosition->x = 32;
+  
+  spritePosition->y = 64;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  spritePosition->y = 160;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  spritePosition->y = 256;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  spritePosition->y = 352;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  spritePosition->y = 448;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  spritePosition->y = 544;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  
+  
+  *currentDirection = DIR_LEFT;
+  spriteImage->x = SPRITE_SIZE * (2 * *currentDirection + *animationFlip);
+  
+  spritePosition->x = 896;
+  
+  spritePosition->y = 64;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  spritePosition->y = 160;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  spritePosition->y = 256;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  spritePosition->y = 352;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  spritePosition->y = 448;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  spritePosition->y = 544;
+  SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);
+  
+  SDL_BlitSurface(spriteEndG->image, NULL, screen, &spriteEndG->position);
+  
+  setPosY(font, 320);
+  setPosX(font, 384);
+  drawTimer(font, screen, var);
+  
+  SDL_BlitSurface(spriteWP->image, NULL, screen, &spriteWP->position);
 }

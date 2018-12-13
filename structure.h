@@ -39,6 +39,7 @@ typedef struct VariablesGlobales{
   int niveau;
   int entree;
   int est_passe;
+  int claquettes;
 }VarG;
 VarG* createVarG(SDL_Surface* screen);
 int getColorKey(VarG* var);
@@ -59,6 +60,7 @@ int getBas(VarG* var);
 int getNiveau(VarG* var);
 int getPass(VarG* var);
 int getEntree(VarG* var);
+int getClaquettes(VarG* var);
 
 void destroyVarG(VarG* var);
 void setGameOver(VarG* var, int gameO);
@@ -83,6 +85,8 @@ void incrPass(VarG* var);
 void initPass(VarG* var);
 void setEntree(VarG* var, int entree);
 void incrItem(VarG* var, int item);
+void incrClaquettes(VarG* var);
+void resetClaquettes(VarG* var);
 
 typedef struct VariablesSprite{
   int dir;

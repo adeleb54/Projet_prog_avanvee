@@ -63,6 +63,7 @@ VarG* createVarG(SDL_Surface * screen){
   var->niveau = 1;
   var->est_passe = 0;
   var->entree = 0;
+  var->claquettes = 0;
   return var;
 }
 int getColorKey(VarG* var){
@@ -118,6 +119,9 @@ int getPass(VarG* var){
 }
 int getEntree(VarG* var){
   return var->entree;
+}
+int getClaquettes(VarG* var) {
+  return var->claquettes;
 }
 
 void destroyVarG(VarG* var){
@@ -194,6 +198,12 @@ void incrItem(VarG* var, int item){
   else{
     setItem(var, item);
   }
+}
+void incrClaquettes(VarG* var){
+  var->claquettes++;
+}
+void resetClaquettes(VarG* var) {
+  var->claquettes = 0;
 }
 
 
