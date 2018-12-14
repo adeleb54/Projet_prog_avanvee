@@ -54,7 +54,7 @@ VarG* createVarG(SDL_Surface * screen){
   var->pause = 0;
   var->space = 0;
   var->changspace = 1;
-  var->vie = 8;
+  var->vie = 3;
   var->item = 0;
   var->tempsItem = 0;
   var->clef = 0;  

@@ -1,7 +1,7 @@
 #include "fonction.h"
   
 //Gestion des evenements
-void HandleEvent(SDL_Event event, VarS* varS, VarG* var){
+void HandleEvent(SDL_Event event, VarS* varS, VarG* var, int *saut){
   switch (event.type) {
     /* close button clicked */
     case SDL_QUIT:
@@ -20,7 +20,7 @@ void HandleEvent(SDL_Event event, VarS* varS, VarG* var){
 	      if (getGameOver(var) !=1) {
 		if (getFinSaut(varS) != 0) {
 		  setNoFinSaut(varS);
-		  setSaut(varS);
+		  *saut = 1;
 		  setDebutSaut(varS, getHeight(varS));
 		}
 	      }
@@ -674,7 +674,6 @@ void stopEnnemy (int *EnDamage, int *enTempsDamage) {
 void lose_life (VarS* varS, VarG* var) {
   
     if (getDamage(varS) ) {
-//       printf("tpsdamage  = %d\n", getTpsDamage(varS));
       if (getTpsDamage(varS) == 0) {
 	decrVie(var);
 	incrTpsDamage(varS) ;
@@ -697,21 +696,18 @@ void fTimer (VarG* var){
 }
 
 //Gestion du saut
-void Saut (SDL_Rect *spritePosition, int *plat_array, SDL_Rect *plateformePos, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, VarG* var, VarS* varS){
+void Saut (SDL_Rect *spritePosition, int *plat_array, SDL_Rect *plateformePos, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, VarG* var, VarS* varS, int *saut){
   setHeight(varS, spritePosition->y);
   
-    printf("saut : %d\n", getSaut(varS));
-  //*hperso = spritePosition->y;
   int col_haut = 0;
   //Si on a demandé au perso de sauter
-  if (getSaut(varS)) {
+  if (*saut) {
     for (int i = 0; i < NB_PLATEFORME; i++){
       if (plat_array[i] != 0){
 	//Gestion de la collision avec le haut du perso
 	if (collision(*spritePosition, plateformePos[i], varS, "perso")==4){
 	  switch (plat_array[i]){
 	    //Si c'est un bloc a clef
-	    printf("je peux pas sauter à cause de %d\n", plat_array[i]);
 	    case 3:
 	      //Si on a une clef pour l'ouvrir
 	      if (getClef(var) >= 1) {
@@ -782,19 +778,16 @@ void Saut (SDL_Rect *spritePosition, int *plat_array, SDL_Rect *plateformePos, i
       spritePosition->y -= 1;
     }
     
-    else { setNoSaut(varS); 
-	printf("pas saut\n");
+    else { *saut = 0; 
       if(!(spritePosition->y >= getDebutSaut(varS) - HSAUT)){
-	printf("taille va pas\n");
       }
       if(col_haut){
-	printf("col haut va pas\n");
       }
     }
   }
   
   if (spritePosition->y != SOL) {
-    if (!getSaut(varS)) {
+    if (!*saut) {
       spritePosition->y += 1;
     }
   }

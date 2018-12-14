@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
       SDL_Event event;
 	  
       if (SDL_PollEvent(&event)) {
-	HandleEvent(event, varSprite, varGlobal);
+	HandleEvent(event, varSprite, varGlobal, &saut);
       }
       
       //Pause
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
 	stopEnnemy (enDamage, &enTempsDamage);
 
 	/*Saut*/
-	Saut ( &spritePosition, plat_array, plateformePos,ennemy_array, ennemyPos, ennemyPosStart, varGlobal, varSprite);
+	Saut ( &spritePosition, plat_array, plateformePos,ennemy_array, ennemyPos, ennemyPosStart, varGlobal, varSprite, &saut);
 	
 		      /******Affichage*******/
 		      

@@ -7,7 +7,7 @@
 
 int collision(SDL_Rect A, SDL_Rect B, VarS* varS, char* type);
 
-void HandleEvent(SDL_Event event, VarS* varS, VarG* var);
+void HandleEvent(SDL_Event event, VarS* varS, VarG* var, int* saut);
 
 int start (Image *skyL, Image *spriteDem, Image *spriteQuit, Image *spriteTitre, SDL_Surface *screen, Image *font, VarG* var);
 
@@ -28,7 +28,7 @@ void stopEnnemy (int *EnDamage, int *enTempsDamage);
 
 void fTimer (VarG* var);
 
-void Saut (SDL_Rect *spritePosition, int *plat_array, SDL_Rect *plateformePos, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, VarG* var, VarS* varS);
+void Saut (SDL_Rect *spritePosition, int *plat_array, SDL_Rect *plateformePos, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, VarG* var, VarS* varS, int* saut);
 
 int game_over (VarG* var, Image *spriteGameover, SDL_Surface *screen, SDL_Surface *sprite, SDL_Rect *spriteImage, SDL_Rect *spritePosition);
 
