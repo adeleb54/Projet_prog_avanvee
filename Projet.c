@@ -11,16 +11,8 @@ int main(int argc, char* argv[]) {
   SDL_Rect spritePosition;
   SDL_Rect ennemyPos [NB_ENNEMY];
   SDL_Rect plateformePos [NB_PLATEFORME];
-  //int hperso = spritePosition.y;
-  //int debutsaut;
-  //int finsaut = 1;
   int saut = 0;
-  //int droite = 0;
-  //int gauche = 0;
-  //int delai = 0;
   int delaiEn = 0;
-  int damage = 0;
-  //int tempsDamage = 0;
   int enTempsDamage = 0;
   
   /* initialize SDL */
@@ -189,7 +181,7 @@ int main(int argc, char* argv[]) {
 	
       drawBonus (oneUp, screen, &spritePosition, varGlobal);
       
-      if(getNiveau(varGlobal) == 5) {
+      if(getNiveau(varGlobal) == MAX_NIVEAU) {
 	drawEndG (sprite, screen, &spriteImage, &spritePosition, font, spriteEndG, spriteWP, &currentDirection, &animationFlip, varGlobal);
       }
   

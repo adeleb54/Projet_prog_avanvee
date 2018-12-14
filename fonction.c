@@ -345,6 +345,18 @@ void afficher_bloc(const char* nomFichier, int *plat_array, SDL_Rect *plateforme
 	  plateformePos[i].y = posY;
 	  i ++;
 	break;
+	case 98:
+	  plat_array[i] = 11;
+	  plateformePos[i].x = posX;
+	  plateformePos[i].y = posY;
+	  i ++;
+	break;
+	case 99:
+	  plat_array[i] = 12;
+	  plateformePos[i].x = posX;
+	  plateformePos[i].y = posY;
+	  i ++;
+	break;
 	case 101:
 	  if (j < NB_ENNEMY){
 	    ennemy_array[j] = 1;
@@ -519,6 +531,10 @@ void repositionnement(int collision, int i, SDL_Rect *spritePosition, SDL_Rect *
 
 void changeLevel(int *plat_array, SDL_Rect *plateformePos, int *ennemy_array, SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, SDL_Rect *spritePosition, VarG* var){
   switch(getNiveau(var)){
+    case 5:      
+      afficher_bloc("niveau6.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
+      incrNiveau(var);
+      break;  	
     case 4:      
       afficher_bloc("niveau5.txt", plat_array, plateformePos, ennemy_array, ennemyPosition, ennemyPosStart);
       incrNiveau(var);
@@ -590,24 +606,35 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
 	
       //Si c'est un portail
       case 9:
-	for (int i = 0; i < NB_PLATEFORME; i++) {
-	  if (plat_array[i]==10) {
+	for (int j = 0; j < NB_PLATEFORME; j++) {
+	  if (plat_array[j]==10) {
 	    if(getPass(var) == 0){
-	      set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
+	      set_pos(spritePosition, plateformePos[j].x, plateformePos[j].y);
 	      incrPass(var);
 	    }
 	  }
 	}
 	break;
       case 10 :
-	for (int i = 0; i < NB_PLATEFORME; i++) {
-	  if (plat_array[i]==9) {
+	for (int j = 0; j < NB_PLATEFORME; j++) {
+	  if (plat_array[j]==9) {
 	    if(getPass(var) == 0){
-	      set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
+	      set_pos(spritePosition, plateformePos[j].x, plateformePos[j].y);
 	      incrPass(var);
 	    }
 	  }
 	}
+	break;
+      case 11:
+	plat_array[i] = 0;
+	for (int j = 0; j < NB_PLATEFORME; j++) {
+	  if (plat_array[j] == 12) {
+	    plat_array[j] = 0;
+	  }
+	}
+	break;
+      case 12:
+	repositionnement(collision, i, spritePosition, plateformePos);
 	break;
       default:
 	break;
@@ -748,22 +775,30 @@ void Saut (SDL_Rect *spritePosition, int *plat_array, SDL_Rect *plateformePos, i
 	      
 	    //Si c'est un portail
 	    case 9:
-	      for (int i = 0; i < NB_PLATEFORME; i++) {
-		if (plat_array[i]==10) {
+	      for (int j = 0; j < NB_PLATEFORME; j++) {
+		if (plat_array[j]==10) {
 		  if(getPass(var) == 0){
-		    set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
+		    set_pos(spritePosition, plateformePos[j].x, plateformePos[j].y);
 		    incrPass(var);
 		  }
 		}
 	      }
 	      break;
 	    case 10 :
-	      for (int i = 0; i < NB_PLATEFORME; i++) {
-		if (plat_array[i]==9) {
+	      for (int j = 0; j < NB_PLATEFORME; j++) {
+		if (plat_array[j]==9) {
 		  if(getPass(var) == 0){
-		    set_pos(spritePosition, plateformePos[i].x, plateformePos[i].y);
+		    set_pos(spritePosition, plateformePos[j].x, plateformePos[j].y);
 		    incrPass(var);
 		  }
+		}
+	      }
+	      break;
+	    case 11 :
+	      plat_array[i] = 0;
+	      for (int j = 0; j < NB_PLATEFORME; j++) {
+		if (plat_array[j] == 12) {
+		  plat_array[j] = 0;
 		}
 	      }
 	      break;
@@ -926,6 +961,9 @@ void drawBloc(SDL_Surface **plateforme, SDL_Surface *screen, SDL_Rect *blocImage
   for (int i=0; i < NB_PLATEFORME; i++){ 
     if (plat_array[i] != 0){
       blocImage->x = (plat_array[i] - 1)* BLOC_SIZE;
+      if (plat_array[i] == 12) {
+	blocImage->x = 0;
+      }
       SDL_BlitSurface(plateforme[i],blocImage, screen, &plateformePos[i]);   
     }
   }
@@ -947,7 +985,7 @@ void drawBonus (Image *oneup, SDL_Surface *screen, SDL_Rect *spritePosition, Var
 }
 
 void drawSprite (SDL_Surface *sprite, SDL_Surface *screen, SDL_Rect *spriteImage, SDL_Rect *spritePosition, VarS* varS, VarG *var){
-  if (getNiveau(var) < 5) {
+  if (getNiveau(var) < MAX_NIVEAU) {
     spriteImage->x = SPRITE_SIZE * (2 * getDir(varS) + getAnim(varS));
     if(!getDamage(varS)) { 
       SDL_BlitSurface(sprite, spriteImage, screen, spritePosition);

@@ -36,5 +36,6 @@
 /* Number of pixels for one step of the sprite */
 #define SPRITE_STEP     1
 #define MAX_VIE		6
+#define MAX_NIVEAU 6
 
 #endif
