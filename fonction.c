@@ -74,16 +74,6 @@ void HandleEvent(SDL_Event event, VarS* varS, VarG* var, int *saut){
 	      break;
 	}
 	break;	
-	
-    case SDL_MOUSEBUTTONDOWN:
-      //Si on clique sur recommencer
-      //Si on clique sur reprendre
-//       if (pause == 0){
-// 	if (event.motion.x <= pausePosition.x + 72 && event.motion.x >= pausePosition.x && event.motion.y >= pausePosition.y && event.motion.y <= pausePosition.y + 20){
-// 	  printf("gna\n");
-// 	} 
-//       }
-      break;
   }
 }
   
@@ -458,7 +448,7 @@ void ennemyCollide (SDL_Rect *spritePosition, SDL_Rect *ennemyPosition, int *enn
       }
     }
     //collison avec le perso
-    if (collision(ennemyPosition[i], *spritePosition, varS, "ennemi")==1 /*|| collision(ennemyPosition[i], *spritePosition, saut, "ennemi")== 2 || collision(ennemyPosition[i], *spritePosition, saut, "ennemi")== 4*/){
+    if (collision(ennemyPosition[i], *spritePosition, varS, "ennemi")==1 ){
       if(ennemy_array[i] != 0){
 	if(!getDamage(varS) && enDamage[i] == 0){
 	  setDamage(varS);
@@ -577,7 +567,6 @@ void gestion_items (int collision, int *plat_array, int bloc, SDL_Rect *spritePo
       //Si c'est un bloc à pics
       case 4:
 	repositionnement(collision, i, spritePosition, plateformePos);
-	//if(collision == 3) setDamage(varS);
 	break;	
       case 5:
 	repositionnement(collision, i, spritePosition, plateformePos);

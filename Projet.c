@@ -2,9 +2,7 @@
 
 int main(int argc, char* argv[]) {
   
-  SDL_Surface *screen, *temp, *sprite, /**font, *spritePause,*/ 
-	      *ennemy[NB_ENNEMY], /**spriteGameover, *spriteDem, *spriteQuit, *skyL,
-	      *oneUp,*/ *plateforme[NB_PLATEFORME];
+  SDL_Surface *screen, *temp, *sprite,*ennemy[NB_ENNEMY], *plateforme[NB_PLATEFORME];
   int currentDirection = DIR_RIGHT;
   int animationFlip = 0;
   int enAnimFlip = 0;
