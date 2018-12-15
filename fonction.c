@@ -448,7 +448,7 @@ void ennemyCollide (SDL_Rect *spritePosition, SDL_Rect *ennemyPosition, int *enn
       
     //collision avec une plateforme
     for (int j = 0; j <NB_PLATEFORME; j++){
-      if (plat_array[j] < 5 && plat_array[j] != 0) {
+      if ((plat_array[j] < 5 && plat_array[j] != 0) ||  plat_array[j] == 12){
 	if (collision(ennemyPosition[i],plateformePos[j], varS, "ennemi")==1){
 	  enDirection[i] = EN_DIR_LEFT;
 	}
@@ -503,7 +503,7 @@ void ennemyMove(SDL_Rect *ennemyPosition, SDL_Rect *ennemyPosStart, int *ennemy_
 	  enChange[i] = 0;
       }      
       for (int j = 0; j <NB_PLATEFORME; j++){
-	if (plat_array[j] != 0 && plat_array[j] <= 4){
+	if ((plat_array[j] < 5 && plat_array[j] != 0)|| plat_array[j] == 12){
 	  if (collision(ennemyPosition[i], plateformePos[j], varS, "ennemi") == 3) {
 	      ennemyPosition[i].y -= 1;
 	      enChange[i] = 1;

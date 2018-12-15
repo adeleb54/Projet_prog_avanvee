@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
 
       //Jeu
 	//Handle timer
-	if (getNiveau(varGlobal) < 5) {
+	if (getNiveau(varGlobal) < MAX_NIVEAU) {
 	  incrTimer(varGlobal);
 	  fTimer (varGlobal);
 	}
